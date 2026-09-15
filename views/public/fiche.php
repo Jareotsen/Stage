@@ -29,7 +29,7 @@ if ($structure) {
     $actualites = $actualitesStmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-require '../../includes/header_public.php';
+require '../../includes/header.php';
 ?>
 
 <?php if ($structure): ?>

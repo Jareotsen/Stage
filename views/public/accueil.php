@@ -11,7 +11,7 @@ $actualites = $actu->fetchAll(PDO::FETCH_ASSOC);
 $categoriesStmt = $db->query("SELECT id_cat, nom_cat FROM categories ORDER BY nom_cat");
 $categories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC);
 
-require '../../includes/header_public.php';
+require '../../includes/header.php';
 ?>
 
 <section class="bg-light py-4 text-center border-bottom">
@@ -63,8 +63,10 @@ require '../../includes/header_public.php';
     <h2 class="mb-4">Trouver une structure</h2>
 
     <form action="catalogue.php" method="get" class="mx-auto mb-3" style="max-width: 600px;">
-      <input type="text" name="q" class="form-control form-control-lg" placeholder="Rechercher une structure (nom, sigle)...">
+      <input id="search" type="text" name="q" class="form-control form-control-lg" placeholder="Rechercher une structure (nom, sigle)...">
     </form>
+
+    <div id="results" class="mx-auto mb-3" style="max-width: 600px;"></div>
 
     <div class="d-flex flex-wrap justify-content-center gap-2">
       <?php foreach ($categories as $cat): ?>
@@ -77,3 +79,19 @@ require '../../includes/header_public.php';
 </section>
 
 <?php require '../../includes/footer.php'; ?>
+<script>
+document.getElementById('search').addEventListener('keyup', function() {
+    let q = this.value;
+
+    if (q.length < 1) {
+        document.getElementById('results').innerHTML = "";
+        return;
+    }
+
+    fetch('search_structures.php?q=' + encodeURIComponent(q))
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('results').innerHTML = data;
+        });
+});
+</script>
