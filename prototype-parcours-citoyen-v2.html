@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prototype — Parcours citoyen · Structures sous tutelle MRRI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="frame">
+  <div class="ruban" aria-hidden="true"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
+
+  <!-- ===== VUE 1 : ATTERRISSAGE ===== -->
+  <section id="vue-landing">
+    <div class="nav" style="background:transparent; position:absolute; top:0; left:0; right:0; z-index:6;">
+      <div class="nav-g">
+        <img class="logo" src="images/logo.JPG" alt="Logo Structures MRRI Gabon">
+        <div class="logo-texte">STRUCTURES<br/>MRRI GABON</div>
+      </div>
+    </div>
+
+    <div class="hero-illustration">
+      <img src="images/GA.jpeg" alt="Monument Gabon Horizon 2032">
+      <div class="voile-sombre"></div>
+    </div>
+
+    <div class="hero-texte">
+      <div class="drapeau-mini"><div style="background:#00953b"></div><div style="background:#fcd116"></div><div style="background:#3a75c4"></div></div>
+      <h1 class="titre-hero">Le portail citoyen pour l'accès aux institutions de la République</h1>
+      <p class="sous-hero">Ce répertoire numérique centralise et organise l'accès aux informations institutionnelles de la République gabonaise, facilitant la consultation structurée des différents organismes de l'État.</p>
+      <button class="btn-entrer" id="btn-entrer">Entrer</button>
+    </div>
+  </section>
+
+  <!-- ===== VUE 2 : ACCUEIL / ACTUALITÉS ===== -->
+  <section id="vue-accueil">
+    <div class="nav">
+      <div class="nav-g">
+        <img class="logo" src="images/logo.JPG" alt="Logo Structures MRRI Gabon">
+      </div>
+      <div class="nav-liens">
+        <button class="nav-btn actif">Accueil</button>
+        <button class="nav-btn" id="btn-mrri-accueil">MRRI</button>
+        <button class="nav-btn" title="Rechercher" id="btn-loupe-accueil">Rechercher</button>
+      </div>
+    </div>
+
+    <div class="contenu-accueil">
+      <div class="accueil-grille">
+
+        <div class="carousel">
+          <img id="carousel-image" src="images/GA.jpeg" alt="Actualité institutionnelle">
+          <div class="carousel-legende" id="carousel-legende">DEMGAB — Appui aux réformes institutionnelles</div>
+          <div class="carousel-dots">
+            <div class="dot actif" data-i="0"></div>
+            <div class="dot" data-i="1"></div>
+            <div class="dot" data-i="2"></div>
+          </div>
+        </div>
+
+        <div class="cta-catalogue" id="cta-catalogue">
+          <div>
+            <p class="t">Consulter les structures sous tutelle</p>
+            <p class="s">Rechercher et parcourir le répertoire des institutions</p>
+          </div>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--bleu)" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+
+        <div>
+          <p class="actu-titre">Actualités</p>
+          <div class="actu-item" data-actu="1">
+            <img class="actu-vignette" src="images/conference.png" alt="Conférence du MRRI">
+            <div>
+              <div class="actu-texte">Conception et mise en place de la plateforme de consultation</div>
+              <div class="actu-date">28 août 2026</div>
+            </div>
+          </div>
+          <div class="actu-item" data-actu="2">
+            <img class="actu-vignette" src="images/Hac.png" alt="Haute Autorité de la Communication">
+            <div>
+              <div class="actu-texte">Info 241 suspendu par la HAC après une publication controversée</div>
+              <div class="actu-date">11 août 2026</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="note">Prototype de démonstration — parcours d'un utilisateur non connecté</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VUE 3 : CATALOGUE ===== -->
+  <section id="vue-catalogue">
+    <div class="nav">
+      <div class="nav-g">
+        <img class="logo" src="images/logo.JPG" alt="Logo Structures MRRI Gabon">
+      </div>
+      <div class="nav-liens" id="nav-liens-catalogue">
+        <button class="nav-btn" id="btn-accueil-catalogue">Accueil</button>
+        <div class="dropdown">
+          <button class="nav-btn" data-nav="icnp">ICNP <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="menu" data-menu="icnp"></div>
+        </div>
+        <div class="dropdown">
+          <button class="nav-btn" data-nav="icp">ICP <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="menu" data-menu="icp"></div>
+        </div>
+        <div class="dropdown">
+          <button class="nav-btn" data-nav="icj">ICJ <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg></button>
+          <div class="menu" data-menu="icj"></div>
+        </div>
+        <button class="nav-btn" id="btn-mrri-catalogue">MRRI</button>
+      </div>
+    </div>
+
+    <div class="bande-drapeau">
+      <svg viewBox="0 0 400 110" preserveAspectRatio="none">
+        <rect y="0" width="400" height="37" fill="#00953b"/>
+        <rect y="37" width="400" height="37" fill="#fcd116"/>
+        <rect y="74" width="400" height="36" fill="#3a75c4"/>
+      </svg>
+      <div class="assombri"></div>
+      <div class="stats-flottantes">
+        <div class="stat-item"><div class="n">Structures</div><div class="v" id="nb-structures">10</div></div>
+        <div class="stat-item"><div class="n">Secteurs</div><div class="v">5</div></div>
+        <div class="stat-item"><div class="n">Documents publics</div><div class="v">520</div></div>
+      </div>
+    </div>
+
+    <div class="contenu-catalogue">
+      <div class="barre-controle">
+        <div class="recherche">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="champ-recherche" type="text" placeholder="Rechercher une structure" />
+        </div>
+        <div class="ligne-filtres">
+          <div class="tabs" id="tabs"></div>
+          <select class="tous" id="select-secteur"></select>
+        </div>
+      </div>
+
+      <div class="liste" id="liste"></div>
+    </div>
+  </section>
+
+  <!-- ===== VUE 4 : FICHE ===== -->
+  <section id="vue-fiche">
+    <div class="contenu-fiche">
+      <button class="retour" id="btn-retour">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+        Retour au catalogue
+      </button>
+
+      <div class="fiche-carte">
+        <div class="fiche-entete">
+          <div class="fiche-icone" id="fiche-icone-svg"></div>
+          <div>
+            <p class="fiche-nom" id="fiche-nom"></p>
+            <p class="fiche-type" id="fiche-type"></p>
+          </div>
+        </div>
+
+        <p class="fiche-desc" id="fiche-desc"></p>
+
+        <div class="fiche-grille">
+          <div class="champ"><p class="k">Secteur</p><p class="v" id="f-secteur"></p></div>
+          <div class="champ"><p class="k">Statut</p><p class="v">Structure sous tutelle</p></div>
+          <div class="champ"><p class="k">Adresse</p><p class="v" id="f-adresse"></p></div>
+          <div class="champ"><p class="k">Téléphone</p><p class="v" id="f-tel"></p></div>
+          <div class="champ" style="grid-column:span 2;"><p class="k">Email</p><p class="v" id="f-email"></p></div>
+        </div>
+
+        <div class="docs">
+          <p class="docs-titre">Documents publics</p>
+          <div id="docs-liste"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<script src="script.js"></script>
+</body>
+</html>

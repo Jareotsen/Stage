@@ -1,0 +1,49 @@
+mrri-consultation/
+│
+├── config/
+│   ├── config.php              (déjà existant)
+│   └── database.php            (déjà fait avec toi)
+│
+├── includes/
+│   ├── header.php              (déjà existant)
+│   ├── footer.php              (déjà existant)
+│   ├── auth.php                (à créer : vérifie si connecté + quel rôle)
+│   └── fonctions.php           (à créer : fonctions réutilisées partout, ex: formater une date)
+│
+├── public/                     (assets, tout ce qui est chargé par le navigateur)
+│   ├── css/
+│   ├── js/
+│   └── images/
+│
+├── uploads/                    (fichiers réels, EN DEHORS de public/ — pas d'accès direct par URL)
+│   ├── documents/
+│   └── photos/
+│
+├── views/
+│   ├── public/                 (parcours citoyen — pas de connexion requise)
+│   │   ├── accueil.php
+│   │   ├── catalogue.php
+│   │   ├── fiche.php
+│   │   └── connexion.php
+│   │
+│   ├── point_focal/            (agent de structure — connecté)
+│   │   ├── dashboard.php
+│   │   ├── modifier_structure.php
+│   │   └── ajouter_actualite.php
+│   │
+│   ├── agent_ministere/        (connecté, lecture seule sur tout)
+│   │   └── dashboard.php
+│   │
+│   └── super_admin/
+│       ├── dashboard.php
+│       ├── gerer_comptes.php
+│       └── gerer_categories.php
+│
+├── telecharger.php             (SEUL point d'accès aux fichiers — vérifie est_public avant de servir le fichier)
+└── index.php                   (page d'entrée, redirige vers views/public/accueil.php)
+
+Protection des pages — actuellement, rien n'empêche quelqu'un de taper directement l'URL super_admin/dashboard.php sans être connecté. Il faut un contrôle en haut de chaque page protégée (includes/auth.php qu'on avait prévu dans l'arborescence).
+Dashboard super admin — création de comptes (point focaux, agents), gestion des catégories
+Dashboard point focal — modifier sa structure, ajouter une actualité, uploader un document (avec le choix est_public)
+Dashboard agent du ministère — lecture seule sur toutes les structures
+Déconnexion — session_destroy()

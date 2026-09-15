@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        /* NAV */
+.nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+  background: transparent;
+}
+
+.logo-img {
+  width: 55px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.nav-g {
+  display: flex;
+  align-items: center;
+}
+
+.nav-liens {
+  display: flex;
+  gap: 15px;
+}
+
+/* HERO BACKGROUND */
+.hero-illustration {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.hero-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.voile-sombre {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+}
+
+/* HERO TEXTE */
+.hero-texte {
+  position: relative;
+  z-index: 11;
+  max-width: 700px;
+  margin: 0 auto;
+  padding-top: 140px;
+  text-align: center;
+  color: white;
+}
+
+.titre-hero {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.sous-hero {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
+
+.btn-entrer {
+  padding: 12px 28px;
+  background: white;
+  color: #1c2340;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  
+}
+
+    </style>
+    <div class="frame">
+        <div class="ruban" aria-hidden="true">
+            <span class="b1"></span><span class="b2"></span><span class="b3"></span>
+        </div>
+    
+        <!-- ===== VUE 1 : ATTERRISSAGE ===== -->
+        <section id="vue-landing">
+    
+            <!-- NAVIGATION -->
+            <div class="nav">
+                <div class="nav-g">
+                    <!-- Logo officiel (image 3) -->
+                    <img src="images/logo.JPG" alt="Logo MRRI Gabon" class="logo-img">
+                    <div class="logo-texte">STRUCTURES<br />MRRI GABON</div>
+                </div>
+    
+                <div class="nav-liens">
+                    <button class="nav-icone-btn" title="Accueil">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12l9-9 9 9" />
+                            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+                        </svg>
+                    </button>
+    
+                    <button class="nav-icone-btn" title="Menu">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="4" y1="7" x2="20" y2="7" />
+                            <line x1="4" y1="12" x2="20" y2="12" />
+                            <line x1="4" y1="17" x2="20" y2="17" />
+                        </svg>
+                    </button>
+    
+                    <button class="nav-icone-btn" title="Rechercher" id="btn-loupe-hero">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+    
+            <!-- HERO -->
+            <div class="hero-illustration">
+                <img src="images/GA.jpeg" alt="Monument Gabon Horizon 2032" class="hero-bg">
+                <div class="voile-sombre"></div>
+            </div>
+    
+            <div class="hero-texte">
+                <h1 class="titre-hero">
+                    Le portail citoyen pour l'accès aux institutions de la République
+                </h1>
+    
+                <p class="sous-hero">
+                    Ce répertoire numérique centralise et organise l'accès aux informations institutionnelles de la
+                    République gabonaise, facilitant la consultation structurée des différents organismes de l'État.
+                </p>
+    
+                <button class="btn-entrer" id="btn-entrer">Entrer</button>
+            </div>
+    
+        </section>
+    </div>
+<script src="script.js"></script>
+</body>
+</html>
