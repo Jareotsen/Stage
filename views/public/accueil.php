@@ -60,7 +60,7 @@ require '../../includes/header.php';
         $premierePhoto = $photosActuStmt->fetch(PDO::FETCH_ASSOC);
         ?>
         <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
-          <a href="actualite.php?id=<?= $actualite['id_actu'] ?>" class="actu-carte-lien">
+          <a href="actualite_detail.php?id=<?= $actualite['id_actu'] ?>" class="actu-carte-lien">
             <?php if ($premierePhoto): ?>
               <img src="../../uploads/photos/<?= htmlspecialchars($premierePhoto['Photos_actu_url']) ?>"
                    alt="<?= htmlspecialchars($actualite['titre']) ?>">

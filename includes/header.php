@@ -45,7 +45,7 @@ if (isset($_SESSION['role'])) {
   <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
     <li class="nav-item"><a class="nav-link active" href="../public/accueil.php">Accueil</a></li>
     <li class="nav-item"><a class="nav-link" href="../public/catalogue.php">Structures</a></li>
-    <li class="nav-item"><a class="nav-link" href="#">Actualités</a></li>
+    <li class="nav-item"><a class="nav-link" href="../public/actualite.php">Actualités</a></li>
     <?php if ($estAgentMinistere): ?>
       <li class="nav-item"><a class="nav-link" href="../agent_ministere/demandes.php">Demandes</a></li>
     <?php endif; ?>
