@@ -32,7 +32,7 @@ $structures = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $categoriesStmt = $db->query("SELECT id_cat, nom_cat FROM categories ORDER BY nom_cat");
 $toutesCategories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC);
 
-require '../../includes/header_public.php';
+require '../../includes/header.php';
 ?>
 
 <section class="bg-light py-4 border-bottom">

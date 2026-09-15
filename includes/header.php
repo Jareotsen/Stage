@@ -6,6 +6,11 @@
 <title>Structures sous tutelle — Ministère des Réformes et des Relations avec les Institutions</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../public/css/style.css">
+
 <style>
   :root { --vert-mrri: #1B7A3D; }
   .navbar-brand { font-weight: 700; }
@@ -15,7 +20,6 @@
   .bandeau-drapeau { height: 5px; background: linear-gradient(90deg, #1B7A3D 0 33%, #FBCE07 33% 66%, #142A6B 66% 100%); }
 </style>
 </head>
-<body>
 <?php
 $lienDashboard = '#';
 $estAgentMinistere = isset($_SESSION['role']) && $_SESSION['role'] === 'agent_ministere';
