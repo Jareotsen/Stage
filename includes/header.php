@@ -32,28 +32,27 @@ if (isset($_SESSION['role'])) {
   <div class="container">
     <a class="navbar-brand d-flex align-items-center gap-2" href="../../public/accueil.php">
       <img src="../../public/image/sceau.png" alt="Armoiries de la République Gabonaise" width="42" height="42">
-      <span>Ministère de la Réforme et des Relations avec les Institutions</span>
+      <span>Ministère de la Réforme et des <br> Relations avec les Institutions</span>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMrri">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navMrri">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link active" href="../professionel/accueil_.php">Accueil</a></li>
-        <li class="nav-item"><a class="nav-link" href="../professionel/catalogue_.php">Structures</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Actualités</a></li>
-        <?php if ($estAgentMinistere): ?>
-          <li class="nav-item"><a class="nav-link" href="../agent_ministere/demandes.php">Demandes</a></li>
-        <?php endif; ?>
-      </ul>
-      <div class="d-flex align-items-center gap-2">
-        <?php if (isset($_SESSION['user_id'])): ?>
-          <a href="<?= $lienDashboard ?>" class="btn btn-mrri btn-sm">Tableau de bord</a>
-          <a href="../../deconnexion.php" class="btn btn-outline-secondary btn-sm">Déconnexion</a>
-        <?php else: ?>
-          <a href="../public/connexion.php" class="btn btn-mrri btn-sm">Se connecter</a>
-        <?php endif; ?>
-      </div>
+  <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+    <li class="nav-item"><a class="nav-link active" href="../public/accueil.php">Accueil</a></li>
+    <li class="nav-item"><a class="nav-link" href="../public/catalogue.php">Structures</a></li>
+    <li class="nav-item"><a class="nav-link" href="#">Actualités</a></li>
+    <?php if ($estAgentMinistere): ?>
+      <li class="nav-item"><a class="nav-link" href="../agent_ministere/demandes.php">Demandes</a></li>
+    <?php endif; ?>
+  </ul>
+  <?php if (isset($_SESSION['user_id'])): ?>
+    <div class="d-flex align-items-center gap-2">
+      <a href="<?= $lienDashboard ?>" class="btn btn-mrri btn-sm">Tableau de bord</a>
+      <a href="../../deconnexion.php" class="btn btn-outline-secondary btn-sm">Déconnexion</a>
+    </div>
+  <?php endif; ?>
+</div>
     </div>
   </div>
 </nav>

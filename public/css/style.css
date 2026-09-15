@@ -130,7 +130,7 @@ img { max-width: 100%; display: block; }
    EN-TÊTE / NAVIGATION — calqué sur le site officiel du MRRI
    ============================================================ */
 .bandeau-drapeau {
-  height: 5px;
+  height: 10px;
   background: linear-gradient(90deg, var(--vert-mrri) 0 33%, var(--jaune-drapeau) 33% 66%, var(--bleu-drapeau) 66% 100%);
 }
 
@@ -144,7 +144,7 @@ img { max-width: 100%; display: block; }
 
 .entete-haut {
   display: flex;
-  align-items: center;
+  align-items:center ;
   justify-content: space-between;
   gap: var(--espace-3);
   padding: var(--espace-3);

@@ -16,14 +16,18 @@
       </div>
       <div class="col-md-3 mb-3">
         <h6>Suivez-nous</h6>
-        <a href="#" class="btn btn-dark btn-sm rounded-circle">f</a>
+        <a href="https://www.facebook.com/RelationsInstitutionsGOUVGA/" class="btn btn-dark btn-sm rounded-circle">f</a>
       </div>
     </div>
-    <hr>
-    <div class="d-flex justify-content-between flex-wrap small text-secondary">
-      <span>&copy; <?= date("Y") ?> Ministère des Réformes et des Relations avec les Institutions. Tous droits réservés.</span>
-      <span><a href="https://www.facebook.com/RelationsInstitutionsGOUVGA/" class="link-secondary">Mentions légales</a></span>
-    </div>
+   <hr>
+<div class="d-flex justify-content-between flex-wrap small text-secondary">
+  <span>&copy; <?= date("Y") ?> Ministère des Réformes et des Relations avec les Institutions. Tous droits réservés.</span>
+  <span>
+    <a href="../public/connexion.php" class="link-secondary">Parties réservées aux agents externes</a>
+    &nbsp;·&nbsp;
+    <a href="#" class="link-secondary">Mentions légales</a>
+  </span>
+</div>
   </div>
 </footer>
 
