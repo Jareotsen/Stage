@@ -66,7 +66,7 @@ require '../../includes/header.php';
 					<?php endif; ?>
 					<div class="actualite-content">
 						<div class="actualite-meta"><?= htmlspecialchars($actualite['nom_struc'], ENT_QUOTES, 'UTF-8') ?> · <?= formaterDateFr($actualite['date_publication']) ?></div>
-						<h2><?= htmlspecialchars($actualite['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
+						<h2> <strong><?= htmlspecialchars($actualite['titre'], ENT_QUOTES, 'UTF-8') ?></strong></h2>
 						<p><?= htmlspecialchars(mb_strimwidth($actualite['contenu'], 0, 140, '…'), ENT_QUOTES, 'UTF-8') ?></p>
 						<a class="actualite-link" href="actualite_detail.php?id=<?= $actualite['id_actu'] ?>">Lire la suite&nbsp; →</a>
 					</div>
