@@ -71,7 +71,7 @@ require '../../includes/header.php';
               <p class="text-secondary small mb-2"><?= htmlspecialchars($s['sigle'] ?? '') ?></p>
               <span class="badge bg-success-subtle text-success mb-2 align-self-start"><?= htmlspecialchars($s['nom_cat']) ?></span>
               <p class="card-text small text-secondary flex-grow-1"><?= htmlspecialchars($s['adresse'] ?? 'Adresse non renseignée') ?></p>
-              <a href="fiche.php?id=<?= $s['id_struc'] ?>" class="btn btn-outline-success btn-sm mt-2">Voir la fiche</a>
+              <a href="fiche.php?id=<?= $s['id_struc'] ?>" class="btn btn-outline-success btn-sm mt-2">voir +</a>
             </div>
           </div>
         </div>

@@ -51,7 +51,7 @@ require '../../includes/header.php';
     <h1 class="fw-bold">Plateforme de consultation des structures sous tutelle du MRRI</h1>
     <p class="text-secondary mb-4">Centralisation, organisation et accès sécurisé aux informations administratives et opérationnelles des entités publiques.</p>
 <?php if (!empty($actualites)): ?>
-  <div id="carouselActus" class="carousel slide" data-bs-ride="carousel">
+  <div id="carouselActus" class="carousel slide actu-carousel" data-bs-ride="carousel">
     <div class="carousel-inner">
       <?php foreach ($actualites as $index => $actualite): ?>
         <?php
@@ -60,24 +60,19 @@ require '../../includes/header.php';
         $premierePhoto = $photosActuStmt->fetch(PDO::FETCH_ASSOC);
         ?>
         <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
-          <a href="actualite_detail.php?id=<?= $actualite['id_actu'] ?>" class="actu-carte-lien">
+          <a href="actualite_detail.php?id=<?= $actualite['id_actu'] ?>" class="actu-horizontal">
             <?php if ($premierePhoto): ?>
               <img src="../../uploads/photos/<?= htmlspecialchars($premierePhoto['Photos_actu_url']) ?>"
-                   alt="<?= htmlspecialchars($actualite['titre']) ?>">
+                   alt="<?= htmlspecialchars($actualite['titre']) ?>" class="actu-horizontal-image">
             <?php else: ?>
-              <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background:#e9e9e6;">
-                <span class="text-secondary">Pas de photo</span>
-              </div>
+              <div class="actu-horizontal-image-vide">Pas de photo</div>
             <?php endif; ?>
 
-            <div class="actu-barre-titre">
-              <span class="actu-pastille"></span>
-              <p class="actu-titre-barre"><?= htmlspecialchars($actualite['titre']) ?></p>
-              <div class="actu-puces">
-                <?php foreach ($actualites as $i => $a): ?>
-                  <button type="button" data-bs-target="#carouselActus" data-bs-slide-to="<?= $i ?>" class="<?= $i === $index ? 'active' : '' ?>" onclick="event.preventDefault(); event.stopPropagation();"></button>
-                <?php endforeach; ?>
-              </div>
+            <div class="actu-horizontal-contenu">
+              <p class="actu-horizontal-structure"><?= htmlspecialchars($actualite['nom_struc']) ?></p>
+              <h3 class="actu-horizontal-titre"><?= htmlspecialchars($actualite['titre']) ?></h3>
+              <p class="actu-horizontal-extrait"><?= htmlspecialchars($actualite['contenu']) ?></p>
+              <p class="actu-horizontal-date"><?= htmlspecialchars($actualite['date_publication']) ?></p>
             </div>
           </a>
         </div>
@@ -128,7 +123,7 @@ require '../../includes/header.php';
                 <p class="text-secondary small mb-2"><?= htmlspecialchars($s['sigle'] ?? '') ?></p>
                 <span class="badge bg-success-subtle text-success mb-2 align-self-start"><?= htmlspecialchars($s['nom_cat']) ?></span>
                 <p class="card-text small text-secondary flex-grow-1"><?= htmlspecialchars($s['adresse'] ?? 'Adresse non renseignée') ?></p>
-                <a href="fiche.php?id=<?= $s['id_struc'] ?>" class="btn btn-outline-success btn-sm mt-2">Voir la fiche</a>
+                <a href="fiche.php?id=<?= $s['id_struc'] ?>" class="btn btn-outline-success btn-sm mt-2">Voir +</a>
               </div>
             </div>
           </div>

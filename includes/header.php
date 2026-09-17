@@ -18,6 +18,62 @@
   .btn-mrri:hover { background-color: #145C2E; color: #fff; }
   .nav-link.active { color: var(--vert-mrri) !important; font-weight: 600; }
   .bandeau-drapeau { height: 5px; background: linear-gradient(90deg, #1B7A3D 0 33%, #FBCE07 33% 66%, #142A6B 66% 100%); }
+  .actu-carousel { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 18px rgba(0,0,0,0.10); }
+.actu-horizontal {
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+  text-decoration: none;
+  color: inherit;
+  min-height: 220px;
+}
+.actu-horizontal:hover { color: inherit; text-decoration: none; }
+.actu-horizontal-image {
+  flex: 0 0 300px;
+  max-width: 300px;
+  object-fit: cover;
+}
+.actu-horizontal-image-vide {
+  flex: 0 0 300px;
+  max-width: 300px;
+  background: #eceae2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8a8a80;
+}
+.actu-horizontal-contenu {
+  flex: 1;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+.actu-horizontal-structure {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #1B7A3D;
+  margin-bottom: 0.25rem;
+}
+.actu-horizontal-titre { font-size: 1.35rem; font-weight: 700; margin-bottom: 0.4rem; }
+.actu-horizontal-extrait {
+  color: #5B5B5B;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.actu-horizontal-date { font-size: 0.8rem; color: #8a8a80; margin: 0; }
+
+@media (max-width: 576px) {
+  .actu-horizontal { flex-direction: column; }
+  .actu-horizontal-image, .actu-horizontal-image-vide { flex: 0 0 180px; max-width: 100%; width: 100%; }
+}
 </style>
 </head>
 <?php
