@@ -12,19 +12,60 @@
 <style>
   
 :root {
-  --bleu-roi: #1B3FAE;
-  --bleu-roi-fonce: #142F86;
-  --bleu-nuit: #0B1D4D;
-  --vert-irl: #0F8A4B;
-  --vert-irl-fonce: #0B6B3A;
-  --or: #C9972C;
-  --encre: #101826;
-  --gris-texte: #5B6472;
-  --fond: #F4F6FA;
-  --bordure: #E1E5EE;
+    /* ==============================
+       COULEURS — IDENTITÉ MRRI
+       ============================== */
 
-  --police-titres: "Fraunces", Georgia, serif;
-  --police-texte: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    --mrri-vert: #0F8A4B;
+    --mrri-vert-dark: #0B6B3A;
+
+    --mrri-bleu: #1B3FAE;
+    --mrri-bleu-dark: #142F86;
+
+    --mrri-or: #C9972C;
+    --mrri-or-light: #F6E8C5;
+
+    --mrri-nuit: #0B1D4D;
+
+    /* ==============================
+       COULEURS INTERFACE
+       ============================== */
+
+    --mrri-text: #172033;
+    --mrri-text-light: #667085;
+
+    --mrri-bg: #F5F7FA;
+    --mrri-white: #FFFFFF;
+
+    --mrri-border: #E4E7EC;
+
+    /* ==============================
+       TYPOGRAPHIE
+       ============================== */
+
+    --font-heading: "Fraunces", Georgia, serif;
+
+    --font-body:
+        "Public Sans",
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    /* ==============================
+       DIMENSIONS
+       ============================== */
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    --shadow-sm:
+        0 2px 8px rgba(11, 29, 77, 0.06);
+
+    --shadow-md:
+        0 8px 24px rgba(11, 29, 77, 0.08);
 }
 
 body { font-family: var(--police-texte); color: var(--encre); background: #F0F4F8; }
@@ -144,17 +185,17 @@ if (isset($_SESSION['role'])) {
 <nav class="navbar navbar-expand-lg">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center gap-2" href="../public/accueil.php">
-      <img src="../../public/image/sceau.png" alt="Armoiries de la République Gabonaise" width="42" height="42">
-      <span>Ministère de la Réforme et des Relations avec les Institutions</span>
+      <img src="../../publique/image/sceau.png" alt="Armoiries de la République Gabonaise" width="42" height="42">
+      <span>Ministère de la Réforme et des <br> Relations avec les Institutions</span>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMrri">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navMrri">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link active" href="../public/accueil.php">Accueil</a></li>
         <li class="nav-item"><a class="nav-link" href="../public/catalogue.php">Structures</a></li>
-        <li class="nav-item"><a class="nav-link" href="../public/actualite.php">Actulités</a></li>
+        <li class="nav-item"><a class="nav-link" href="../public/actualite.php">Actualités</a></li>
         <?php if ($estAgentMinistere): ?>
           <li class="nav-item"><a class="nav-link" href="../agent_ministere/demandes.php">Demandes</a></li>
         <?php endif; ?>
@@ -163,8 +204,6 @@ if (isset($_SESSION['role'])) {
         <?php if (isset($_SESSION['user_id'])): ?>
           <a href="<?= $lienDashboard ?>" class="btn btn-mrri btn-sm">Tableau de bord</a>
           <a href="../../deconnexion.php" class="btn btn-outline-secondary btn-sm">Déconnexion</a>
-        <?php else: ?>
-          <a href="../public/connexion.php" class="btn btn-mrri btn-sm">Se connecter</a>
         <?php endif; ?>
       </div>
     </div>
