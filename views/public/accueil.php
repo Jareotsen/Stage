@@ -52,6 +52,12 @@ require '../../includes/header.php';
     <p class="text-secondary mb-4">Centralisation, organisation et accès sécurisé aux informations administratives et opérationnelles des entités publiques.</p>
 <?php if (!empty($actualites)): ?>
   <div id="carouselActus" class="carousel slide actu-carousel" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      <?php foreach ($actualites as $index => $a): ?>
+        <button type="button" data-bs-target="#carouselActus" data-bs-slide-to="<?= $index ?>" class="<?= $index === 0 ? 'active' : '' ?>"></button>
+      <?php endforeach; ?>
+    </div>
+
     <div class="carousel-inner">
       <?php foreach ($actualites as $index => $actualite): ?>
         <?php
@@ -60,21 +66,30 @@ require '../../includes/header.php';
         $premierePhoto = $photosActuStmt->fetch(PDO::FETCH_ASSOC);
         ?>
         <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
-          <a href="actualite_detail.php?id=<?= $actualite['id_actu'] ?>" class="actu-horizontal">
-            <?php if ($premierePhoto): ?>
-              <img src="../../uploads/photos/<?= htmlspecialchars($premierePhoto['Photos_actu_url']) ?>"
-                   alt="<?= htmlspecialchars($actualite['titre']) ?>" class="actu-horizontal-image">
-            <?php else: ?>
-              <div class="actu-horizontal-image-vide">Pas de photo</div>
-            <?php endif; ?>
-
-            <div class="actu-horizontal-contenu">
-              <p class="actu-horizontal-structure"><?= htmlspecialchars($actualite['nom_struc']) ?></p>
-              <h3 class="actu-horizontal-titre"><?= htmlspecialchars($actualite['titre']) ?></h3>
-              <p class="actu-horizontal-extrait"><?= htmlspecialchars($actualite['contenu']) ?></p>
-              <p class="actu-horizontal-date"><?= htmlspecialchars($actualite['date_publication']) ?></p>
-            </div>
-          </a>
+          <?php if ($premierePhoto): ?>
+            <a href="actualite_detail.php?id=<?= $actualite['id_actu'] ?>" class="actu-slide"
+               style="background-image: url('../../uploads/photos/<?= htmlspecialchars($premierePhoto['Photos_actu_url']) ?>');">
+              <div class="actu-degrade"></div>
+              <div class="actu-legende">
+                <div class="actu-badges">
+                  <span class="actu-badge-structure"><?= htmlspecialchars($actualite['nom_struc']) ?></span>
+                  <span class="actu-badge-date"><?= htmlspecialchars($actualite['date_publication']) ?></span>
+                </div>
+                <div class="actu-trait"></div>
+                <h3><?= htmlspecialchars($actualite['titre']) ?></h3>
+              </div>
+            </a>
+          <?php else: ?>
+            <a href="actualite_detail.php?id=<?= $actualite['id_actu'] ?>" class="actu-slide actu-slide-vide">
+              <div class="actu-legende" style="position: static; padding: 0; text-align: center;">
+                <div class="actu-badges" style="justify-content: center;">
+                  <span class="actu-badge-structure"><?= htmlspecialchars($actualite['nom_struc']) ?></span>
+                  <span class="actu-badge-date"><?= htmlspecialchars($actualite['date_publication']) ?></span>
+                </div>
+                <h3 style="text-align:center;"><?= htmlspecialchars($actualite['titre']) ?></h3>
+              </div>
+            </a>
+          <?php endif; ?>
         </div>
       <?php endforeach; ?>
     </div>
@@ -119,7 +134,7 @@ require '../../includes/header.php';
           <div class="col">
             <div class="card h-100 shadow-sm">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title mb-0"><?= htmlspecialchars($s['nom_struc']) ?></h5>
+               <h5 class="card-title mb-0 structure-carte-titre"><?= htmlspecialchars($s['nom_struc']) ?></h5>
                 <p class="text-secondary small mb-2"><?= htmlspecialchars($s['sigle'] ?? '') ?></p>
                 <span class="badge bg-success-subtle text-success mb-2 align-self-start"><?= htmlspecialchars($s['nom_cat']) ?></span>
                 <p class="card-text small text-secondary flex-grow-1"><?= htmlspecialchars($s['adresse'] ?? 'Adresse non renseignée') ?></p>

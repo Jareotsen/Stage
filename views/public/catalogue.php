@@ -67,7 +67,7 @@ require '../../includes/header.php';
         <div class="col">
           <div class="card h-100 shadow-sm">
             <div class="card-body d-flex flex-column">
-              <h5 class="card-title mb-0"><?= htmlspecialchars($s['nom_struc']) ?></h5>
+<h5 class="card-title mb-0 structure-carte-titre"><?= htmlspecialchars($s['nom_struc']) ?></h5>
               <p class="text-secondary small mb-2"><?= htmlspecialchars($s['sigle'] ?? '') ?></p>
               <span class="badge bg-success-subtle text-success mb-2 align-self-start"><?= htmlspecialchars($s['nom_cat']) ?></span>
               <p class="card-text small text-secondary flex-grow-1"><?= htmlspecialchars($s['adresse'] ?? 'Adresse non renseignée') ?></p>
