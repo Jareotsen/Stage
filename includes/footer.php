@@ -12,6 +12,7 @@
         <ul class="list-unstyled small">
           <li><a href="#" style="color: #C9D3EE;">Présidence de la République</a></li>
           <li><a href="#" style="color: #C9D3EE;">Gouvernement</a></li>
+          <li><a href=" ../public/connexion.php" style="color: #C9D3EE;"></a></li>
         </ul>
       </div>
       <div class="col-md-3 mb-3">
