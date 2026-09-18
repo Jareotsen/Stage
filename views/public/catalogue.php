@@ -17,6 +17,7 @@ if ($catFiltre) {
     $parametres[':cat'] = $catFiltre;
 }
 
+
 $sql = "SELECT structure.id_struc, structure.nom_struc, structure.adresse, 
                structure.directeur_general, categories.nom_cat, categories.id_cat, structure.sigle
         FROM structure

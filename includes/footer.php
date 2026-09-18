@@ -76,7 +76,7 @@
                 <ul class="mrri-footer-links">
 
                     <li>
-                        <a href="#">
+                        <a href="https://presidence.ga/">
                             Présidence de la République
                         </a>
                     </li>
@@ -494,7 +494,16 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script>
+  const toggle = document.getElementById('mrriMenuToggle');
+  const nav = document.getElementById('mrriNav');
+  if (toggle && nav) {
+    toggle.addEventListener('click', () => {
+      const ouvert = nav.classList.toggle('ouvert');
+      toggle.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+    });
+  }
+</script>
 </body>
 </html>
 ```

@@ -10,164 +10,298 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-  
 :root {
-    /* ==============================
-       COULEURS — IDENTITÉ MRRI
-       ============================== */
-
-    --mrri-vert: #0F8A4B;
-    --mrri-vert-dark: #0B6B3A;
-
-    --mrri-bleu: #1B3FAE;
-    --mrri-bleu-dark: #142F86;
-
-    --mrri-or: #C9972C;
-    --mrri-or-light: #F6E8C5;
-
-    --mrri-nuit: #0B1D4D;
-
-    /* ==============================
-       COULEURS INTERFACE
-       ============================== */
-
-    --mrri-text: #172033;
-    --mrri-text-light: #667085;
-
-    --mrri-bg: #F5F7FA;
-    --mrri-white: #FFFFFF;
-
-    --mrri-border: #E4E7EC;
-
-    /* ==============================
-       TYPOGRAPHIE
-       ============================== */
-
-    --font-heading: "Fraunces", Georgia, serif;
-
-    --font-body:
-        "Public Sans",
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Arial,
-        sans-serif;
-
-    /* ==============================
-       DIMENSIONS
-       ============================== */
-
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 16px;
-
-    --shadow-sm:
-        0 2px 8px rgba(11, 29, 77, 0.06);
-
-    --shadow-md:
-        0 8px 24px rgba(11, 29, 77, 0.08);
+  --mrri-vert: #0F8A4B;
+  --mrri-vert-dark: #0B6B3A;
+  --mrri-bleu: #1B3FAE;
+  --mrri-bleu-dark: #142F86;
+  --mrri-bleu-nuit: #0B1D4D;
+  --mrri-or: #C9972C;
+  --mrri-or-light: #F7EACB;
+  --mrri-text: #172033;
+  --mrri-text-light: #667085;
+  --mrri-bg: #F5F7FA;
+  --mrri-border: #E4E7EC;
+  --mrri-white: #FFFFFF;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
+  --shadow-sm: 0 2px 8px rgba(11,29,77,.06);
+  --shadow-md: 0 10px 30px rgba(11,29,77,.09);
+  --font-title: "Fraunces", Georgia, serif;
+  --font-body: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
 }
 
-body { font-family: var(--police-texte); color: var(--encre); background: #F0F4F8; }
-h1, h2, h3, h4, h5, h6 { font-family: var(--police-titres); font-weight: 600; color: var(--bleu-nuit); }
-a { color: var(--bleu-roi); }
-a:hover { color: var(--bleu-roi-fonce); }
+body { margin: 0; background: var(--mrri-bg); color: var(--mrri-text); font-family: var(--font-body); line-height: 1.6; }
+h1, h2, h3, h4, h5 { font-family: var(--font-title); color: var(--mrri-bleu-nuit); font-weight: 700; }
+a { text-decoration: none; }
 
-.bandeau-drapeau { height: 15px; background: linear-gradient(90deg, var(--vert-irl) 0 33%,var(--or) 33% 66%, var(--bleu-roi) 66% 100%);  box-shadow: 0 2px 4px rgba(0,0,0,0.08);}
-.bandeau-drapeau-bas {
-  height: 4px;
-  background: linear-gradient(
-    90deg,
-    var(--vert-irl) 0% 33%,
-    var(--or) 33% 66%,
-    var(--bleu-roi) 66% 100%
-  );
+/* ---------- Bandeau national ---------- */
+.mrri-top-band { height: 5px; background: linear-gradient(90deg, var(--mrri-vert) 0 33.33%, var(--mrri-or) 33.33% 66.66%, var(--mrri-bleu) 66.66% 100%); }
+
+/* ---------- En-tête ---------- */
+.mrri-header { background: #fff; border-bottom: 1px solid var(--mrri-border); }
+.mrri-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 0.9rem 0; }
+.mrri-brand { display: flex; align-items: center; gap: 0.85rem; }
+.mrri-brand img { width: 50px; height: 50px; object-fit: contain; }
+.mrri-brand-titre { font-family: var(--font-title); font-weight: 700; font-size: 1.05rem; color: var(--mrri-bleu-nuit); line-height: 1.25; margin: 0; }
+.mrri-brand-sous {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.68rem; letter-spacing: 0.08em; color: var(--mrri-text-light);
+  text-transform: uppercase; font-weight: 600; margin-top: 3px;
 }
-/* ---------- Boutons ---------- */
-.btn-mrri {
-  background: var(--bleu-roi);
-  color: #fff;
-  border: 1px solid var(--bleu-roi);
-  font-weight: 600;
+.mrri-brand-sous .liseret { width: 28px; height: 3px; background: linear-gradient(90deg, var(--mrri-vert) 0 33%, var(--mrri-or) 33% 66%, var(--mrri-bleu) 66% 100%); display: inline-block; }
+
+.mrri-nav { display: flex; align-items: center; gap: 2rem; }
+.mrri-nav a { color: var(--mrri-text); font-weight: 600; font-size: 0.92rem; padding-bottom: 4px; border-bottom: 2px solid transparent; }
+.mrri-nav a:hover, .mrri-nav a[aria-current="page"] { color: var(--mrri-vert); border-bottom-color: var(--mrri-vert); }
+
+.mrri-header-actions { display: flex; align-items: center; gap: 0.9rem; }
+.mrri-search-btn { background: none; border: none; color: var(--mrri-bleu-nuit); display: flex; align-items: center; cursor: pointer; }
+
+.mrri-pill-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0.6rem 1.15rem; border-radius: 999px;
+  border: 1px solid var(--mrri-bleu); color: var(--mrri-bleu);
+  font-weight: 700; font-size: 0.86rem; background: #fff;
 }
-.btn-mrri:hover { background: var(--bleu-roi-fonce); border-color: var(--bleu-roi-fonce); color: #fff; }
+.mrri-pill-btn:hover { background: var(--mrri-bleu); color: #fff; }
+.mrri-pill-btn.plein { background: var(--mrri-bleu); color: #fff; }
+.mrri-pill-btn.plein:hover { background: var(--mrri-bleu-dark); }
 
-.btn-accent {
-  background: var(--vert-irl);
-  color: #fff;
-  border: 1px solid var(--vert-irl);
-  font-weight: 600;
-}
-.btn-accent:hover { background: var(--vert-irl-fonce); border-color: var(--vert-irl-fonce); color: #fff; }
+/* ---------- Boutons génériques réutilisés dans les autres pages ---------- */
+.btn-mrri { background: var(--mrri-bleu); color: #fff; border: 1px solid var(--mrri-bleu); font-weight: 600; }
+.btn-mrri:hover { background: var(--mrri-bleu-dark); border-color: var(--mrri-bleu-dark); color: #fff; }
+.btn-outline-success { --bs-btn-color: var(--mrri-vert); --bs-btn-border-color: var(--mrri-vert); --bs-btn-hover-bg: var(--mrri-vert); --bs-btn-hover-border-color: var(--mrri-vert); }
+.btn-outline-secondary { --bs-btn-color: var(--mrri-bleu); --bs-btn-border-color: var(--mrri-bleu); --bs-btn-hover-bg: var(--mrri-bleu); --bs-btn-hover-border-color: var(--mrri-bleu); }
 
-.btn-outline-success { --bs-btn-color: var(--vert-irl); --bs-btn-border-color: var(--vert-irl); --bs-btn-hover-bg: var(--vert-irl); --bs-btn-hover-border-color: var(--vert-irl); }
-.btn-outline-secondary { --bs-btn-color: var(--bleu-roi); --bs-btn-border-color: var(--bleu-roi); --bs-btn-hover-bg: var(--bleu-roi); --bs-btn-hover-border-color: var(--bleu-roi); }
-.btn-outline-danger, .btn-outline-danger:hover { --bs-btn-hover-color: #fff; }
-
-/* ---------- Navigation ---------- */
-.navbar { background: #fff; border-bottom: 1px solid var(--bordure); box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
-.navbar-brand { font-family: var(--police-titres); font-weight: 700; color: var(--bleu-nuit) !important; font-size: 1.1rem; }
-.nav-link { font-weight: 500; color: var(--encre) !important; border-bottom: 2px solid transparent; padding-bottom: 4px !important; }
-.nav-link:hover, .nav-link.active { color: var(--bleu-roi) !important; border-bottom-color: var(--bleu-roi); }
-
-/* ---------- Cartes de structures ---------- */
-.card { border: 1px solid var(--bordure); border-radius: 4px; box-shadow: none; transition: border-color .15s ease, transform .15s ease; }
-.card:hover { border-color: var(--bleu-roi); transform: translateY(-2px); }
-.card-title { font-family: var(--police-titres); color: var(--bleu-nuit); }
+.card { border: 1px solid var(--mrri-border); border-radius: var(--radius-md); box-shadow: none; transition: border-color .15s ease, transform .15s ease; }
+.card:hover { border-color: var(--mrri-bleu); transform: translateY(-2px); }
+.card-title { font-family: var(--font-title); color: var(--mrri-bleu-nuit); }
 
 .structure-carte-titre {
-  min-height: 3rem;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow: hidden;
-  overflow-wrap: break-word;
-  word-break: break-word;
+  min-height: 3rem; display: -webkit-box; -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+  overflow-wrap: break-word; word-break: break-word;
 }
 
-.badge.bg-success-subtle { background: #E4F5EC !important; color: var(--vert-irl-fonce) !important; }
-.badge.bg-secondary-subtle { background: #EEF1F8 !important; color: var(--bleu-roi) !important; }
-.badge.bg-warning-subtle { background: #FBF1DF !important; color: #8A6511 !important; }
+.badge.bg-success-subtle { background: #E5F5EC !important; color: var(--mrri-vert-dark) !important; }
+.badge.bg-secondary-subtle { background: #E8EDFB !important; color: var(--mrri-bleu) !important; }
+.badge.bg-warning-subtle { background: var(--mrri-or-light) !important; color: #8A6511 !important; }
 
-/* ---------- Sections d'accueil ---------- */
-.bg-light { background: var(--fond) !important; }
-
-.filtre-actif, .btn-sm.rounded-pill.btn-mrri { background: var(--bleu-roi); border-color: var(--bleu-roi); }
-.btn-sm.rounded-pill.btn-outline-success { color: var(--bleu-roi); border-color: var(--bordure); }
-.btn-sm.rounded-pill.btn-outline-success:hover { background: var(--fond); border-color: var(--bleu-roi); color: var(--bleu-roi); }
-
-/* ---------- Carrousel actualités ---------- */
-.actu-carousel .carousel-item { height: 480px; }
-.actu-slide {
-  position: relative; display: block; width: 100%; height: 100%;
-  text-decoration: none; color: inherit;
-  background-size: cover; background-position: center;
-  background-color: var(--bleu-nuit);
-}
-.actu-slide:hover { color: inherit; text-decoration: none; }
-.actu-slide-vide { display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.75); background: linear-gradient(135deg, var(--bleu-roi) 0%, var(--bleu-nuit) 100%); }
-.actu-degrade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(11,29,77,0.92) 0%, rgba(11,29,77,0.4) 45%, rgba(11,29,77,0) 75%); }
-.actu-legende { position: absolute; left: 0; right: 0; bottom: 3rem; padding: 0 2.5rem; max-width: 900px; }
-.actu-badges { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.9rem; }
-.actu-badge-structure { background: var(--vert-irl); color: #fff; font-weight: 700; font-size: 0.82rem; padding: 0.4rem 0.9rem; border-radius: 4px; }
-.actu-badge-date { background: rgba(255,255,255,0.15); color: #fff; font-size: 0.82rem; font-weight: 600; padding: 0.4rem 0.9rem; border-radius: 4px; }
-.actu-trait { width: 46px; height: 3px; background: var(--or); margin-bottom: 0.7rem; }
-.actu-legende h3 { color: #fff; font-weight: 700; font-size: 1.9rem; line-height: 1.25; margin: 0; }
-
-.actu-carousel .carousel-control-prev-icon, .actu-carousel .carousel-control-next-icon { width: 42px; height: 42px; background-color: rgba(255,255,255,0.15); border-radius: 50%; background-size: 50%; }
-.actu-carousel .carousel-indicators [data-bs-target] { width: 12px; height: 12px; border-radius: 50%; border: none; background-color: rgba(255,255,255,0.35); opacity: 1; margin: 0 5px; }
-.actu-carousel .carousel-indicators .active { background-color: var(--vert-irl); }
-
-/* ---------- Formulaires ---------- */
-.form-control:focus, .form-select:focus { border-color: var(--bleu-roi); box-shadow: 0 0 0 3px rgba(27,63,174,0.15); }
-.form-check-input:checked { background-color: var(--vert-irl); border-color: var(--vert-irl); }
-
-/* ---------- Alertes / statuts ---------- */
-.alert-success { background: #E4F5EC; color: var(--vert-irl-fonce); border-color: #BFE4CF; }
+.form-control:focus, .form-select:focus { border-color: var(--mrri-bleu); box-shadow: 0 0 0 3px rgba(27,63,174,.14); }
+.form-check-input:checked { background-color: var(--mrri-vert); border-color: var(--mrri-vert); }
+.alert-success { background: #E5F5EC; color: var(--mrri-vert-dark); border-color: #BFE4CF; }
 .alert-danger { background: #FBEAEA; color: #A5372B; border-color: #F0C4C0; }
-.liseré-drapeau{ height:4px; background:linear-gradient(90deg, var(--vert-mrri) 33%, var(--jaune-drapeau) 33% 66%, var(--bleu-drapeau) 66%); }
-</style>
+
+.pagination .page-link { border-color: var(--mrri-border); color: var(--mrri-bleu); font-weight: 600; }
+.pagination .page-item.active .page-link { background: var(--mrri-vert); border-color: var(--mrri-vert); color: #fff; }
+
+.mrri-menu-toggle { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
+.mrri-menu-toggle span { display: block; width: 22px; height: 2px; background: var(--mrri-bleu-nuit); margin: 4px 0; }
+
+@media (max-width: 900px) {
+  .mrri-menu-toggle { display: block; }
+  .mrri-nav {
+    display: none;
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: #fff;
+    border-bottom: 1px solid var(--mrri-border);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 0.5rem 0;
+    box-shadow: var(--shadow-sm);
+  }
+  .mrri-nav.ouvert { display: flex; }
+  .mrri-nav a { width: 100%; padding: 0.75rem 1.5rem; border-bottom: none; }
+  .mrri-nav a:hover, .mrri-nav a[aria-current="page"] { background: var(--mrri-bg); border-bottom: none; }
+  .mrri-header { position: relative; }
+}
+
+/* =====================================================
+   CARTES D'ACCÈS RAPIDE
+   ===================================================== */
+
+.quick-card {
+    background: #fff;
+    border-radius: 7px;
+    padding: 14px 15px 13px;
+    min-height: 102px;
+
+    border: 1px solid rgba(30, 60, 100, 0.04);
+
+    box-shadow: 0 2px 10px rgba(20, 45, 80, 0.06);
+
+    display: flex;
+    flex-direction: column;
+
+    transition: all 0.2s ease;
+}
+
+.quick-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 18px rgba(20, 45, 80, 0.10);
+}
+
+
+/* Partie icône + titre */
+
+.quick-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+}
+
+
+/* Icônes circulaires */
+
+.quick-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* SVG */
+
+.quick-icon svg {
+    width: 22px;
+    height: 22px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+/* Couleurs */
+
+.quick-icon.green {
+    background: #00865a;
+    color: white;
+}
+
+.quick-icon.blue {
+    background: #1558bd;
+    color: white;
+}
+
+.quick-icon.gold {
+    background: #c99409;
+    color: white;
+}
+
+.quick-icon.dark {
+    background: #61738e;
+    color: white;
+}
+
+
+/* Titres */
+
+.quick-card h3 {
+    margin: 0;
+
+    color: #102f5c;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    line-height: 1.25;
+}
+
+
+/* Descriptions */
+
+.quick-card p {
+    margin: 0 0 8px 54px;
+
+    color: #64748b;
+
+    font-size: 8.5px;
+    line-height: 1.45;
+
+    flex: 1;
+}
+
+
+/* Liens */
+
+.quick-link {
+    margin-left: 54px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    width: fit-content;
+
+    text-decoration: none;
+
+    font-size: 8.5px;
+    font-weight: 700;
+
+    transition: gap 0.2s ease;
+}
+
+.quick-link span {
+    font-size: 13px;
+    line-height: 1;
+}
+
+.quick-link:hover {
+    gap: 11px;
+}
+
+
+/* Couleur des liens */
+
+.green-link {
+    color: #00865a;
+}
+
+.blue-link {
+    color: #1558bd;
+}
+
+.gold-link {
+    color: #c99409;
+}
+
+.dark-link {
+    color: #243c61;
+}
+
+
+/* Fond de la section */
+
+.quick-access {
+    background: #f2f6fb;
+    padding: 28px 0;
+}
+
+
+/* Responsive */
+
+@media (max-width: 575px) {
+
+    .quick-card {
+        min-height: 115px;
+    }
+
+}</style>
 </head>
 <body>
 <?php
@@ -181,31 +315,41 @@ if (isset($_SESSION['role'])) {
     }
 }
 ?>
-<div class="bandeau-drapeau"></div>
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center gap-2" href="../public/accueil.php">
-      <img src="../../publique/image/sceau.png" alt="Armoiries de la République Gabonaise" width="42" height="42">
-      <span>Ministère de la Réforme et des <br> Relations avec les Institutions</span>
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMrri">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navMrri">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link active" href="../public/accueil.php">Accueil</a></li>
-        <li class="nav-item"><a class="nav-link" href="../public/catalogue.php">Structures</a></li>
-        <li class="nav-item"><a class="nav-link" href="../public/actualite.php">Actualités</a></li>
-        <?php if ($estAgentMinistere): ?>
-          <li class="nav-item"><a class="nav-link" href="../agent_ministere/demandes.php">Demandes</a></li>
-        <?php endif; ?>
-      </ul>
-      <div class="d-flex align-items-center gap-2">
-        <?php if (isset($_SESSION['user_id'])): ?>
-          <a href="<?= $lienDashboard ?>" class="btn btn-mrri btn-sm">Tableau de bord</a>
-          <a href="../../deconnexion.php" class="btn btn-outline-secondary btn-sm">Déconnexion</a>
-        <?php endif; ?>
+<div class="mrri-top-band"></div>
+<header class="mrri-header">
+  <div class="container mrri-header-inner">
+    <a href="../public/accueil.php" class="mrri-brand">
+      <img src="../../publique/image/sceau.png" alt="Armoiries de la République Gabonaise">
+      <div>
+        <p class="mrri-brand-titre">Ministère de la Réforme et des<br>Relations avec les Institutions</p>
+        <div class="mrri-brand-sous"><span class="liseret"></span> République Gabonaise</div>
       </div>
+    </a>
+
+    <button type="button" class="mrri-menu-toggle" id="mrriMenuToggle" aria-label="Menu" aria-expanded="false">
+  <span></span><span></span><span></span>
+</button>
+
+    <nav class="mrri-nav">
+      <a href="../public/accueil.php" aria-current="page">Accueil</a>
+      <a href="../public/catalogue.php">Structures</a>
+      <a href="../public/actualite.php">Actualités</a>
+      <?php if ($estAgentMinistere): ?>
+        <a href="../agent_ministere/demandes.php">Demandes</a>
+      <?php endif; ?>
+    </nav>
+
+    <div class="mrri-header-actions">
+      <button type="button" class="mrri-search-btn" onclick="window.location.href='../public/catalogue.php'" aria-label="Rechercher">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      </button>
+      <?php if (isset($_SESSION['user_id'])): ?>
+        <a href="<?= $lienDashboard ?>" class="mrri-pill-btn plein">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Tableau de bord
+        </a>
+        <a href="../../deconnexion.php" class="mrri-pill-btn">Déconnexion</a>
+      <?php endif; ?>
     </div>
   </div>
-</nav>
+</header>
