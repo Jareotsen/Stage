@@ -153,23 +153,74 @@ require '../../includes/header.php';
 #results { position: relative; z-index: 20; }
 
 /* ---------- Accès rapides ---------- */
-.quick-section { padding-bottom: 4.5rem; }
-.section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 1.75rem; }
-.section-heading h2 { margin: 0; font-size: 1.7rem; }
-.section-heading p { margin: 6px 0 0; color: var(--mrri-text-light); font-size: .92rem; }
-.heading-line { width: 40px; height: 3px; background: var(--mrri-or); margin-top: 10px; }
+.quick-section { padding: 2.5rem 0 4.5rem; }
 
-.quick-card { height: 100%; background: #fff; border: 1px solid var(--mrri-border); border-radius: var(--radius-md); padding: 1.6rem; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-.quick-card:hover { transform: translateY(-4px); border-color: rgba(15,138,75,.3); box-shadow: var(--shadow-md); }
-.quick-icon { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin-bottom: 1.2rem; font-size: 1.15rem; }
-.quick-icon.green { background: #E5F5EC; color: var(--mrri-vert); }
-.quick-icon.blue { background: #E8EDFB; color: var(--mrri-bleu); }
-.quick-icon.gold { background: var(--mrri-or-light); color: #936D0F; }
-.quick-icon.dark { background: #E9EDF4; color: var(--mrri-bleu-nuit); }
-.quick-card h3 { font-size: 1.05rem; margin-bottom: 8px; }
-.quick-card p { color: var(--mrri-text-light); font-size: .85rem; margin-bottom: 1.1rem; }
-.quick-link { color: var(--mrri-vert); font-size: .85rem; font-weight: 700; }
-.quick-link:hover { color: var(--mrri-vert-dark); }
+.quick-card {
+  height: 100%;
+  background: #fff;
+  border: none;
+  border-radius: 18px;
+  padding: 1.6rem 1.75rem;
+  box-shadow: 0 4px 18px rgba(11,29,77,0.06);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.quick-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(11,29,77,0.10); }
+
+.quick-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.quick-icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  color: #fff;
+}
+.quick-icon.green { background: var(--mrri-vert); }
+.quick-icon.blue { background: var(--mrri-bleu); }
+.quick-icon.gold { background: var(--mrri-or); }
+.quick-icon.dark { background: var(--mrri-bleu-nuit); }
+
+.quick-card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.quick-card p {
+  color: var(--mrri-text-light);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin-bottom: 1.4rem;
+}
+
+.quick-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+.quick-link span { transition: transform 0.15s ease; }
+.quick-link:hover span { transform: translateX(3px); }
+
+.green-link { color: var(--mrri-vert); }
+.green-link:hover { color: var(--mrri-vert-dark); }
+.blue-link { color: var(--mrri-bleu); }
+.blue-link:hover { color: var(--mrri-bleu-dark); }
+.gold-link { color: var(--mrri-or); }
+.gold-link:hover { color: #8A6511; }
+.dark-link { color: var(--mrri-bleu-nuit); }
+.dark-link:hover { color: #000; }
 
 /* ---------- Catalogue (section aperçu) ---------- */
 .structures-section { padding: 4.5rem 0; background: #fff; border-top: 1px solid var(--mrri-border); border-bottom: 1px solid var(--mrri-border); }
@@ -279,7 +330,14 @@ require '../../includes/header.php';
 
                         <div class="quick-icon green">
 
-                            <!-- Icône -->
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="21" x2="21" y2="21"/>
+                    <line x1="5" y1="21" x2="5" y2="10"/>
+                    <line x1="19" y1="21" x2="19" y2="10"/>
+                    <line x1="9" y1="21" x2="9" y2="10"/>
+                    <line x1="15" y1="21" x2="15" y2="10"/>
+                    <polygon points="12 3 21 9 3 9"/>
+                    </svg>
 
                         </div>
 
@@ -317,8 +375,13 @@ require '../../includes/header.php';
 
                         <div class="quick-icon blue">
 
-                            <!-- Icône -->
-
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"/>
+                <path d="M14 3l5 5"/>
+                <path d="M14 3v5h5"/>
+                <circle cx="15.5" cy="15.5" r="3"/>
+                <line x1="17.8" y1="17.8" x2="20" y2="20"/>
+               </svg>
                         </div>
 
                         <h3>
@@ -355,7 +418,12 @@ require '../../includes/header.php';
 
                         <div class="quick-icon gold">
 
-                            <!-- Icône -->
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h13a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/>
+                        <line x1="8" y1="8" x2="15" y2="8"/>
+                        <line x1="8" y1="12" x2="15" y2="12"/>
+                        <line x1="8" y1="16" x2="12" y2="16"/>
+                    </svg>
 
                         </div>
 
@@ -393,8 +461,11 @@ require '../../includes/header.php';
 
                         <div class="quick-icon dark">
 
-                            <!-- Icône -->
-
+                             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/>
+    <line x1="12" y1="11" x2="12" y2="16.5"/>
+    <circle cx="12" cy="7.5" r="0.9" fill="#fff" stroke="none"/>
+  </svg>
                         </div>
 
                         <h3>

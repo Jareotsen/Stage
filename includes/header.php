@@ -123,7 +123,6 @@ a { text-decoration: none; }
 /* =====================================================
    CARTES D'ACCÈS RAPIDE
    ===================================================== */
-
 .quick-card {
     background: #fff;
     border-radius: 7px;
@@ -139,25 +138,18 @@ a { text-decoration: none; }
 
     transition: all 0.2s ease;
 }
-
 .quick-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 18px rgba(20, 45, 80, 0.10);
 }
-
-
 /* Partie icône + titre */
-
 .quick-top {
     display: flex;
     align-items: center;
     gap: 14px;
     margin-bottom: 8px;
 }
-
-
 /* Icônes circulaires */
-
 .quick-icon {
     width: 40px;
     height: 40px;
@@ -169,10 +161,7 @@ a { text-decoration: none; }
     align-items: center;
     justify-content: center;
 }
-
-
 /* SVG */
-
 .quick-icon svg {
     width: 22px;
     height: 22px;
@@ -184,33 +173,24 @@ a { text-decoration: none; }
     stroke-linecap: round;
     stroke-linejoin: round;
 }
-
-
 /* Couleurs */
-
 .quick-icon.green {
     background: #00865a;
     color: white;
 }
-
 .quick-icon.blue {
     background: #1558bd;
     color: white;
 }
-
 .quick-icon.gold {
     background: #c99409;
     color: white;
 }
-
 .quick-icon.dark {
     background: #61738e;
     color: white;
 }
-
-
 /* Titres */
-
 .quick-card h3 {
     margin: 0;
 
@@ -221,10 +201,7 @@ a { text-decoration: none; }
 
     line-height: 1.25;
 }
-
-
 /* Descriptions */
-
 .quick-card p {
     margin: 0 0 8px 54px;
 
@@ -235,10 +212,7 @@ a { text-decoration: none; }
 
     flex: 1;
 }
-
-
 /* Liens */
-
 .quick-link {
     margin-left: 54px;
 
@@ -255,53 +229,40 @@ a { text-decoration: none; }
 
     transition: gap 0.2s ease;
 }
-
 .quick-link span {
     font-size: 13px;
     line-height: 1;
 }
-
 .quick-link:hover {
     gap: 11px;
 }
-
-
 /* Couleur des liens */
-
 .green-link {
     color: #00865a;
 }
-
 .blue-link {
     color: #1558bd;
 }
-
 .gold-link {
     color: #c99409;
 }
-
 .dark-link {
     color: #243c61;
 }
-
-
 /* Fond de la section */
-
 .quick-access {
     background: #f2f6fb;
     padding: 28px 0;
 }
-
-
 /* Responsive */
-
 @media (max-width: 575px) {
 
     .quick-card {
         min-height: 115px;
     }
 
-}</style>
+}
+</style>
 </head>
 <body>
 <?php
