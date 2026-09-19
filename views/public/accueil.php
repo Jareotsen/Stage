@@ -284,6 +284,7 @@ require '../../includes/header.php';
       <img src="../../publique/image/GA.jpeg" alt="Bâtiment institutionnel du Gabon">
       <img src="../../publique/image/GA1.jpe" alt="Respectons notre drapeau">
       <img src="../../publique/image/panthera.jpe" alt="léopard noir">
+      <img src="../../publique/image/GA3.jpeg" alt="Libération">
       </div>
       <div class="mrri-hero-tagline">Un État plus proche de ses citoyens</div>
     </div>
