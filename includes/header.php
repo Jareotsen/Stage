@@ -120,6 +120,7 @@ a { text-decoration: none; }
   .mrri-header { position: relative; }
 }
 
+
 /* =====================================================
    CARTES D'ACCÈS RAPIDE
    ===================================================== */
@@ -253,6 +254,25 @@ a { text-decoration: none; }
 .quick-access {
     background: #f2f6fb;
     padding: 28px 0;
+}
+.slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.slider img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.slider img.active {
+  opacity: 1;
 }
 /* Responsive */
 @media (max-width: 575px) {

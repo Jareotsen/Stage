@@ -280,7 +280,11 @@ require '../../includes/header.php';
       </div>
     </div>
     <div class="mrri-hero-image-col">
-      <img src="../../public/image/GA.jpeg" alt="Bâtiment institutionnel du Gabon">
+        <div class="slider">
+      <img src="../../publique/image/GA.jpeg" alt="Bâtiment institutionnel du Gabon">
+      <img src="../../publique/image/GA1.jpe" alt="Respectons notre drapeau">
+      <img src="../../publique/image/panthera.jpe" alt="léopard noir">
+      </div>
       <div class="mrri-hero-tagline">Un État plus proche de ses citoyens</div>
     </div>
   </div>
@@ -590,8 +594,14 @@ require '../../includes/header.php';
                             <div class="structure-card-top">
 
                                 <div class="structure-icon">
-
-                                    🏛️
+ <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00865a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="21" x2="21" y2="21"/>
+                    <line x1="5" y1="21" x2="5" y2="10"/>
+                    <line x1="19" y1="21" x2="19" y2="10"/>
+                    <line x1="9" y1="21" x2="9" y2="10"/>
+                    <line x1="15" y1="21" x2="15" y2="10"/>
+                    <polygon points="12 3 21 9 3 9"/>
+                    </svg>
 
                                 </div>
 
@@ -627,8 +637,12 @@ require '../../includes/header.php';
 
 
                             <p class="structure-address">
-
-                                📍
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                            width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16" class="bi bi-geo-alt">
+                            <path d="M12.166 8.94 8 15.5l-4.166-6.56A4.5 4.5 0 1 1 12.166 8.94z"/>
+                            <path d="M8 9.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                           </svg>
 
                                 <?= htmlspecialchars(
                                     $s['adresse'] ?? 'Adresse non renseignée'
@@ -818,62 +832,29 @@ require '../../includes/header.php';
                                         </div>
                                     <?php endif; ?>
                                     <span class="news-badge">
-
-                                        <?= htmlspecialchars(
-                                            $actualite['nom_struc']
-                                        ) ?>
+                                        <?= htmlspecialchars(  $actualite['nom_struc'] ) ?>
                                     </span>
                                 </div>
                                 <div class="news-content">
-
                                     <div class="news-date">
-
-                                        <?= htmlspecialchars(
-                                            $actualite['date_publication']
-                                        ) ?>
-
+                                        <?= htmlspecialchars($actualite['date_publication']) ?>
                                     </div>
-
-
                                     <h3>
-
-                                        <?= htmlspecialchars(
-                                            $actualite['titre']
-                                        ) ?>
-
+                                        <?= htmlspecialchars( $actualite['titre']) ?>
                                     </h3>
-
                                 </div>
-
-
                             </article>
-
                         </a>
-
                     </div>
-
                 <?php endforeach; ?>
-
-
             </div>
-
         <?php else: ?>
-
             <div class="alert alert-light border">
-
                 Aucune actualité publiée pour le moment.
-
             </div>
-
         <?php endif; ?>
-
-
     </div>
-
 </section>
-
-
-
 <!-- =========================================================
      BLOC INSTITUTIONNEL
      ========================================================= -->
@@ -956,5 +937,18 @@ if (searchInput) {
     );
 
 }
+const images = document.querySelectorAll('.slider img');
+  let index = 0;
 
+  function showNextImage() {
+    images[index].classList.remove('active');
+    index = (index + 1) % images.length;
+    images[index].classList.add('active');
+  }
+
+  // Activer la première image
+  images[0].classList.add('active');
+
+  // Changer d’image toutes les 4 secondes
+  setInterval(showNextImage, 4000);
 </script>
