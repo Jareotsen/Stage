@@ -99,7 +99,37 @@ a { text-decoration: none; }
 
 .mrri-menu-toggle { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
 .mrri-menu-toggle span { display: block; width: 22px; height: 2px; background: var(--mrri-bleu-nuit); margin: 4px 0; }
+.citation-section { position: relative; padding: 3.5rem 0; overflow: hidden; }
+.citation-fond { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.citation-voile { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(11,29,77,0.75) 0%, rgba(11,29,77,0.55) 60%, rgba(11,29,77,0.35) 100%); }
 
+.citation-carte {
+  position: relative; z-index: 2;
+  background: #fff; border-radius: 14px;
+  box-shadow: var(--shadow-md);
+  padding: 1.75rem 2rem 1.75rem 5.5rem;
+  margin-left: 3.5rem;
+  display: flex; flex-direction: column; gap: 0.6rem;
+}
+
+.citation-portrait {
+  position: absolute; left: -3.5rem; top: 50%; transform: translateY(-50%);
+  width: 96px; height: 96px; border-radius: 50%;
+  border: 4px solid #fff; object-fit: cover;
+  box-shadow: var(--shadow-sm);
+  z-index: 3;
+}
+
+.citation-guillemet { font-family: var(--font-title); font-size: 2.2rem; color: var(--mrri-vert); line-height: 0.5; margin-bottom: 0.3rem; }
+.citation-texte { font-size: 1.05rem; font-weight: 600; color: var(--mrri-bleu-nuit); line-height: 1.5; margin: 0; }
+.citation-trait { width: 36px; height: 3px; background: var(--mrri-or); margin: 0.4rem 0; }
+.citation-auteur { font-weight: 700; font-size: 0.9rem; color: var(--mrri-text); margin: 0; }
+.citation-date { font-size: 0.8rem; color: var(--mrri-text-light); margin: 0; }
+
+@media (max-width: 700px) {
+  .citation-carte { margin-left: 1rem; margin-right: 1rem; padding-left: 4.5rem; }
+  .citation-portrait { width: 72px; height: 72px; left: -2.2rem; }
+}
 @media (max-width: 900px) {
   .mrri-menu-toggle { display: block; }
   .mrri-nav {

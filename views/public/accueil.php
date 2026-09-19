@@ -314,6 +314,24 @@ require '../../includes/header.php';
 </section>
 
 
+<section class="citation-section">
+  <div class="citation-fond" style="background-image: url('../../public/image/GA.jpeg');"></div>
+  <div class="citation-voile"></div>
+  <div class="container">
+    <div class="citation-carte">
+      <img src="../../publique/image/GA2.png" alt="[Nom de la personne citée]" class="citation-portrait">
+      <span class="citation-guillemet">"</span>
+      <p class="citation-texte">Les réformes sont un pro­ces­sus continu, pas une fin en soi</p>
+      
+      <div class="citation-trait"></div>
+      <p class="citation-auteur">François NDONG Obiang, Ministre de la Réforme et des Relations avec les Institutions</p>
+      <p class="citation-date">09 mai 2025</p>
+    </div>
+  </div>
+</section>
+
+
+
 
 <!-- =========================================================
      ACCÈS RAPIDES
@@ -501,7 +519,6 @@ require '../../includes/header.php';
     </div>
 
 </section>
-
 
 
 <!-- =========================================================
