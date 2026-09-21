@@ -332,8 +332,8 @@ if (isset($_SESSION['role'])) {
     <a href="../public/accueil.php" class="mrri-brand">
       <img src="../../publique/image/sceau.png" alt="Armoiries de la République Gabonaise">
       <div>
-        <p class="mrri-brand-titre">Ministère de la Réforme et des<br>Relations avec les Institutions</p>
-        <div class="mrri-brand-sous"><span class="liseret"></span> République Gabonaise</div>
+        <p class="mrri-brand-titre">MINISTERE DE LA REFORME ET DES <br>RELATIONS AVEC LES INSTITUTIONS</p>
+        
       </div>
     </a>
 

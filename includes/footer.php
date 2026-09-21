@@ -15,14 +15,15 @@
                         class="mrri-footer-logo"
                     >
                     <div>
+                         <div class="mrri-footer-subtitle">
+                            République Gabonaise
+                        </div>
                         <div class="mrri-footer-title">
                             Ministère de la Réforme et des
                             <br>
                             Relations avec les Institutions
                         </div>
-                        <div class="mrri-footer-subtitle">
-                            République Gabonaise
-                        </div>
+                       
                     </div>
                 </div>
                 <p class="mrri-footer-description">
@@ -48,7 +49,7 @@
 
                     <li>
                         <a href="../public/catalogue.php">
-                            Structures sous tutelle
+                            Institutions constitutionnelles  <br> Autotiré Administrative Indépéndante
                         </a>
                     </li>
 

@@ -262,12 +262,12 @@ require '../../includes/header.php';
   <div class="mrri-hero-grid">
     <div class="mrri-hero-texte">
       <div class="mrri-hero-accent"></div>
-      <h1>Plateforme de consultation des structures sous tutelle du MRRI</h1>
+      <h1> Plateforme de consultation des Institutions Constitutionnelles et des Autorité Administratives Indépendantes</h1>
       <p>Accédez facilement aux informations sur les structures sous tutelle du Ministère des Réformes et des Relations avec les Institutions.</p>
       <div class="mrri-hero-points">
         <div class="mrri-hero-point">
           <div class="mrri-hero-point-icone vert">🏛️</div>
-          <span>Structures<br>sous tutelle</span>
+          <span>Institutions  <br>& AAI</span>
         </div>
         <div class="mrri-hero-point">
           <div class="mrri-hero-point-icone bleu">📄</div>
@@ -294,7 +294,7 @@ require '../../includes/header.php';
 <section class="search-section">
   <div class="container">
     <div class="search-box">
-      <div class="search-title">Rechercher une structure</div>
+      <div class="search-title">Rechercher une Information</div>
       <form action="catalogue.php" method="get" class="search-form">
         <div class="search-input-wrapper">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
@@ -325,7 +325,7 @@ require '../../includes/header.php';
       <p class="citation-texte">Les réformes sont un pro­ces­sus continu, pas une fin en soi</p>
       
       <div class="citation-trait"></div>
-      <p class="citation-auteur">François NDONG Obiang, Ministre de la Réforme et des Relations avec les Institutions</p>
+      <p class="citation-auteur">FRANÇOIS NDONG OBIANG, Ministre de la Réforme et des Relations avec les Institutions</p>
       <p class="citation-date">09 mai 2025</p>
     </div>
   </div>
@@ -365,20 +365,20 @@ require '../../includes/header.php';
                         </div>
 
                         <h3>
-                            Consulter les structures
+                            Consulter les Institutions constitutionnelles et les Autorité Administrative Indépendante
                         </h3>
 
                     </div>
 
                     <p>
-                        Découvrez la liste des structures
-                        sous tutelle du ministère.
+                        Découvrez la liste des Institutions Constitutionnelles
+                        et des AAI.
                     </p>
 
                     <a href="catalogue.php"
                        class="quick-link green-link">
 
-                        Accéder au catalogue
+                        Accéder à la liste
 
                         <span>→</span>
 
@@ -389,47 +389,7 @@ require '../../includes/header.php';
             </div>
 
 
-            <!-- CARTE 2 -->
-            <div class="col-md-6 col-lg-3">
-
-                <div class="quick-card">
-
-                    <div class="quick-top">
-
-                        <div class="quick-icon blue">
-
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"/>
-                <path d="M14 3l5 5"/>
-                <path d="M14 3v5h5"/>
-                <circle cx="15.5" cy="15.5" r="3"/>
-                <line x1="17.8" y1="17.8" x2="20" y2="20"/>
-               </svg>
-                        </div>
-
-                        <h3>
-                            Informations détaillées
-                        </h3>
-
-                    </div>
-
-                    <p>
-                        Accédez aux missions, services,
-                        coordonnées et informations de chaque structure.
-                    </p>
-
-                    <a href="catalogue.php"
-                       class="quick-link blue-link">
-
-                        En savoir plus
-
-                        <span>→</span>
-
-                    </a>
-
-                </div>
-
-            </div>
+         
 
 
             <!-- CARTE 3 -->
@@ -458,7 +418,7 @@ require '../../includes/header.php';
 
                     <p>
                         Restez informé des dernières actualités
-                        du ministère et de ses structures.
+                        du ministère et de ses institutions.
                     </p>
 
                     <a href="actualite.php"
@@ -502,7 +462,7 @@ require '../../includes/header.php';
                         des institutions et du développement du Gabon.
                     </p>
 
-                    <a href="#institution"
+                    <a href="https://relations-institutions.gouv.ga/"
                        class="quick-link dark-link">
 
                         Découvrir le ministère
@@ -536,28 +496,20 @@ require '../../includes/header.php';
             <div>
 
                 <h2>
-                    Structures sous tutelle
+                 Institutions constitutionnelles et AAI
                 </h2>
-
                 <div class="heading-line"></div>
-
                 <p>
                     Explorez les structures enregistrées
                     dans la plateforme.
                 </p>
-
             </div>
-
             <a
                 href="catalogue.php"
-                class="btn btn-outline-primary"
-            >
+                class="btn btn-outline-primary">
                 Voir le catalogue
             </a>
-
         </div>
-
-
 
         <!-- FILTRES -->
 
@@ -567,7 +519,7 @@ require '../../includes/header.php';
                 href="accueil.php"
                 class="category-filter <?= $catFiltre === null ? 'active' : '' ?>"
             >
-                Toutes les structures
+                Toutes 
             </a>
 
 
