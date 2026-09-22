@@ -1,6 +1,11 @@
 <?php
 session_start();
 require '../../config/database.php';
+
+// ID de la catégorie "Autorité Administrative Indépendante" en base.
+// (id_cat = 5 dans la table categories,)
+define('AAI_ID', 5);
+
 $actu = $db->query("
     SELECT 
         id_actu,
@@ -14,74 +19,88 @@ $actu = $db->query("
     ORDER BY date_publication DESC
     LIMIT 8
 ");
-
 $actualites = $actu->fetchAll(PDO::FETCH_ASSOC);
-
 
 /* =========================================================
    CATÉGORIES
    ========================================================= */
 
-$categoriesStmt = $db->query("
+// Catégories "feuilles" affichées comme boutons simples,
+// en excluant les secteurs de l'AAI (traités à part en dropdown)
+// et les catégories intermédiaires sans structure directe (ex: id 2).
+$categoriesStmt = $db->prepare("
     SELECT id_cat, nom_cat
     FROM categories
+    WHERE id_cat NOT IN (
+        SELECT DISTINCT parent_id FROM categories WHERE parent_id IS NOT NULL
+    )
+    AND (parent_id IS NULL OR parent_id != :aai)
     ORDER BY nom_cat
 ");
-
+$categoriesStmt->execute([':aai' => AAI_ID]);
 $categories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Catégorie AAI elle-même (pour le libellé du menu déroulant)
+$aaiStmt = $db->prepare("SELECT id_cat, nom_cat FROM categories WHERE id_cat = :aai");
+$aaiStmt->execute([':aai' => AAI_ID]);
+$aai = $aaiStmt->fetch(PDO::FETCH_ASSOC);
+
+// Les secteurs de l'AAI (contenu du menu déroulant)
+$secteursStmt = $db->prepare("
+    SELECT id_cat, nom_cat
+    FROM categories
+    WHERE parent_id = :aai
+    ORDER BY nom_cat
+");
+$secteursStmt->execute([':aai' => AAI_ID]);
+$secteursAAI = $secteursStmt->fetchAll(PDO::FETCH_ASSOC);
+$secteursAAIIds = array_map('intval', array_column($secteursAAI, 'id_cat'));
 
 /* =========================================================
    STRUCTURES
    ========================================================= */
-
 $parPage = 9;
-
 $page = isset($_GET['page'])
     ? max(1, (int) $_GET['page'])
     : 1;
-
 $catFiltre = isset($_GET['cat'])
     ? (int) $_GET['cat']
     : null;
 
 $conditions = [];
 $parametres = [];
-
 if ($catFiltre) {
-    $conditions[] = "structure.id_cat = :cat";
+    // Deux cas possibles :
+    // - la structure est rattachée directement à la catégorie cliquée
+    //   (ex: "Juridictionnelles")
+    // - la catégorie de la structure a pour parent la catégorie cliquée
+    //   (ex: clic sur "AAI" -> ramène les structures des 4 secteurs)
+    $conditions[] = "(structure.id_cat = :cat OR categories.parent_id = :cat)";
     $parametres[':cat'] = $catFiltre;
 }
-
 $whereSQL = $conditions
     ? " WHERE " . implode(" AND ", $conditions)
     : "";
 
-
-/* Nombre total */
-
+/* Nombre total (le JOIN est nécessaire ici aussi,
+   puisque le WHERE référence categories.parent_id) */
 $compteStmt = $db->prepare("
     SELECT COUNT(*)
     FROM structure
+    JOIN categories
+        ON structure.id_cat = categories.id_cat
     $whereSQL
 ");
-
 $compteStmt->execute($parametres);
-
 $totalStructures = (int) $compteStmt->fetchColumn();
-
 $totalPages = max(
     1,
     (int) ceil($totalStructures / $parPage)
 );
-
 $page = min($page, $totalPages);
-
 $offset = ($page - 1) * $parPage;
 
-
 /* Liste */
-
 $structuresStmt = $db->prepare("
     SELECT
         structure.id_struc,
@@ -89,16 +108,11 @@ $structuresStmt = $db->prepare("
         structure.sigle,
         structure.adresse,
         categories.nom_cat
-
     FROM structure
-
     JOIN categories
         ON structure.id_cat = categories.id_cat
-
     $whereSQL
-
     ORDER BY structure.nom_struc ASC
-
     LIMIT $parPage
     OFFSET $offset
 ");
@@ -224,10 +238,11 @@ require '../../includes/header.php';
 
 /* ---------- Catalogue (section aperçu) ---------- */
 .structures-section { padding: 4.5rem 0; background: #fff; border-top: 1px solid var(--mrri-border); border-bottom: 1px solid var(--mrri-border); }
-.category-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; }
+.category-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 2rem; }
 .category-filter { display: inline-flex; align-items: center; padding: 8px 15px; border: 1px solid var(--mrri-border); border-radius: 50px; background: #fff; color: var(--mrri-text-light); font-size: .8rem; font-weight: 600; }
 .category-filter:hover { border-color: var(--mrri-vert); color: var(--mrri-vert); }
 .category-filter.active { background: var(--mrri-vert); border-color: var(--mrri-vert); color: #fff; }
+.category-filter.dropdown-toggle::after { margin-left: 8px; }
 
 .structure-card { height: 100%; display: flex; flex-direction: column; background: #fff; border: 1px solid var(--mrri-border); border-radius: var(--radius-md); padding: 1.4rem; }
 .structure-card:hover { transform: translateY(-3px); border-color: rgba(27,63,174,.3); box-shadow: var(--shadow-sm); }
@@ -522,7 +537,6 @@ require '../../includes/header.php';
                 Toutes 
             </a>
 
-
             <?php foreach ($categories as $cat): ?>
 
                 <a
@@ -535,6 +549,37 @@ require '../../includes/header.php';
                 </a>
 
             <?php endforeach; ?>
+
+            <?php if ($aai): ?>
+                <?php
+                    $aaiActif = $catFiltre === (int) $aai['id_cat']
+                        || in_array($catFiltre, $secteursAAIIds, true);
+                ?>
+                <div class="dropdown">
+                    <a
+                        href="#"
+                        class="category-filter dropdown-toggle <?= $aaiActif ? 'active' : '' ?>"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                        <?= htmlspecialchars($aai['nom_cat']) ?>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="accueil.php?cat=<?= $aai['id_cat'] ?>">
+                                Toute l'AAI
+                            </a>
+                        </li>
+                        <?php foreach ($secteursAAI as $secteur): ?>
+                            <li>
+                                <a class="dropdown-item" href="accueil.php?cat=<?= $secteur['id_cat'] ?>">
+                                    <?= htmlspecialchars($secteur['nom_cat']) ?>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
 
         </div>
 
@@ -834,15 +879,8 @@ require '../../includes/header.php';
     id="institution"
 >
 
-    
-
-
-            
-
         </div>
-
     </div>
-
 </section>
 
 

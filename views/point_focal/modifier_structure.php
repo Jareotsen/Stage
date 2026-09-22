@@ -6,6 +6,7 @@ is_authenticated();
 
 if ($_SESSION['role'] !== 'point_focal') {
     redirection_vers_les_dashboards($_SESSION['role']);
+    exit();
 }
 
 $resultat = $db->prepare("SELECT * FROM structure WHERE id_responsable = :id_responsable");
