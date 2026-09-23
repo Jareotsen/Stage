@@ -1,0 +1,619 @@
+/* =========================================================
+   MRRI — DESIGN SYSTEM DASHBOARDS
+   ========================================================= */
+
+:root {
+    --mrri-vert: #0F8A4B;
+    --mrri-vert-fonce: #0B6B3A;
+    --mrri-vert-clair: #E8F6EF;
+
+    --mrri-bleu: #1B3FAE;
+    --mrri-bleu-fonce: #142F86;
+    --mrri-bleu-nuit: #0B1D4D;
+    --mrri-bleu-clair: #EAF0FF;
+
+    --mrri-or: #C9972C;
+    --mrri-or-fonce: #9D741E;
+    --mrri-or-clair: #FBF4E3;
+
+    --mrri-fond: #F5F7FA;
+    --mrri-blanc: #FFFFFF;
+
+    --mrri-encre: #182033;
+    --mrri-texte: #566176;
+    --mrri-texte-leger: #8791A5;
+
+    --mrri-bordure: #E3E7EF;
+
+    --mrri-danger: #C93C3C;
+    --mrri-danger-clair: #FCECEC;
+
+    --mrri-warning: #C9972C;
+    --mrri-warning-clair: #FBF4E3;
+
+    --mrri-success: #0F8A4B;
+    --mrri-success-clair: #E8F6EF;
+
+    --mrri-radius: 10px;
+    --mrri-radius-sm: 7px;
+
+    --mrri-shadow: 0 2px 8px rgba(11, 29, 77, .05);
+    --mrri-shadow-hover: 0 8px 24px rgba(11, 29, 77, .09);
+
+    --mrri-sidebar-width: 260px;
+    --mrri-transition: .2s ease;
+}
+
+/* ---------- Structure générale ---------- */
+.mrri-dashboard {
+    min-height: 100vh;
+    display: flex;
+    background: var(--mrri-fond);
+}
+
+.mrri-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--mrri-sidebar-width);
+    background: var(--mrri-bleu-nuit);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.mrri-sidebar::before {
+    content: "";
+    display: block;
+    height: 4px;
+    flex-shrink: 0;
+    background: linear-gradient(90deg, var(--mrri-vert) 0 33.33%, var(--mrri-or) 33.33% 66.66%, var(--mrri-bleu) 66.66% 100%);
+}
+
+.mrri-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+.mrri-sidebar-brand img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}
+
+.mrri-sidebar-brand strong {
+    color: #fff;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: .88rem;
+    line-height: 1.25;
+}
+
+.mrri-sidebar-brand small {
+    display: block;
+    margin-top: 3px;
+    color: #9EACC9;
+    font-size: .64rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+}
+
+.mrri-sidebar-section {
+    padding: 24px 14px 8px;
+    color: #7584A5;
+    font-size: .64rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.mrri-sidebar-nav {
+    list-style: none;
+    padding: 0 10px;
+    margin: 0;
+}
+
+.mrri-sidebar-nav li {
+    margin-bottom: 4px;
+}
+
+.mrri-sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 12px;
+    border-radius: 7px;
+    color: #B9C4D9;
+    font-size: .84rem;
+    font-weight: 500;
+    transition: background var(--mrri-transition), color var(--mrri-transition);
+}
+
+.mrri-sidebar-link:hover {
+    background: rgba(255, 255, 255, .06);
+    color: #fff;
+}
+
+.mrri-sidebar-link.active {
+    background: rgba(15, 138, 75, .16);
+    color: #fff;
+    font-weight: 600;
+}
+
+.mrri-sidebar-link .icon {
+    width: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mrri-sidebar-bottom {
+    margin-top: auto;
+    padding: 14px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.mrri-sidebar-logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    color: #AEBBD1;
+    font-size: .82rem;
+    border-radius: 7px;
+}
+
+.mrri-sidebar-logout:hover {
+    background: rgba(255, 255, 255, .05);
+    color: #fff;
+}
+
+.mrri-main {
+    width: calc(100% - var(--mrri-sidebar-width));
+    margin-left: var(--mrri-sidebar-width);
+    min-height: 100vh;
+}
+
+.mrri-topbar {
+    height: 72px;
+    padding: 0 32px;
+    background: #fff;
+    border-bottom: 1px solid var(--mrri-bordure);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+
+.mrri-topbar-title {
+    font-size: .82rem;
+    color: var(--mrri-texte);
+}
+
+.mrri-topbar-title strong {
+    color: var(--mrri-encre);
+}
+
+.mrri-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mrri-user-avatar {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--mrri-bleu-clair);
+    color: var(--mrri-bleu);
+    font-weight: 700;
+}
+
+.mrri-user-info {
+    line-height: 1.25;
+}
+
+.mrri-user-name {
+    color: var(--mrri-encre);
+    font-size: .8rem;
+    font-weight: 600;
+}
+
+.mrri-user-role {
+    color: var(--mrri-texte-leger);
+    font-size: .67rem;
+}
+
+.mrri-content {
+    padding: 32px;
+}
+
+.mrri-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+
+.mrri-page-title {
+    margin: 0;
+    font-size: 1.65rem;
+    color: var(--mrri-bleu-nuit);
+    font-family: "Fraunces", Georgia, serif;
+}
+
+.mrri-page-description {
+    margin: 6px 0 0;
+    color: var(--mrri-texte);
+    font-size: .82rem;
+}
+
+.mrri-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: var(--mrri-texte-leger);
+    font-size: .7rem;
+}
+
+.mrri-breadcrumb .active {
+    color: var(--mrri-bleu);
+}
+
+/* ---------- Cartes statistiques ---------- */
+.mrri-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.mrri-stat-card {
+    position: relative;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid var(--mrri-bordure);
+    border-radius: var(--mrri-radius);
+    box-shadow: var(--mrri-shadow);
+    transition: transform var(--mrri-transition), box-shadow var(--mrri-transition);
+}
+
+.mrri-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--mrri-shadow-hover);
+}
+
+.mrri-stat-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+.mrri-stat-label {
+    color: var(--mrri-texte);
+    font-size: .72rem;
+    font-weight: 500;
+}
+
+.mrri-stat-value {
+    margin-top: 4px;
+    color: var(--mrri-bleu-nuit);
+    font-size: 1.65rem;
+    font-weight: 700;
+}
+
+.stat-vert .mrri-stat-icon {
+    background: var(--mrri-vert-clair);
+    color: var(--mrri-vert);
+}
+
+.stat-bleu .mrri-stat-icon {
+    background: var(--mrri-bleu-clair);
+    color: var(--mrri-bleu);
+}
+
+.stat-or .mrri-stat-icon {
+    background: var(--mrri-or-clair);
+    color: var(--mrri-or-fonce);
+}
+
+.stat-danger .mrri-stat-icon {
+    background: var(--mrri-danger-clair);
+    color: var(--mrri-danger);
+}
+
+@media (max-width: 1100px) {
+    .mrri-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ---------- Panneaux ---------- */
+.mrri-panel {
+    background: #fff;
+    border: 1px solid var(--mrri-bordure);
+    border-radius: var(--mrri-radius);
+    box-shadow: var(--mrri-shadow);
+    overflow: hidden;
+}
+
+.mrri-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--mrri-bordure);
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.mrri-panel-title {
+    margin: 0;
+    color: var(--mrri-bleu-nuit);
+    font-size: .86rem;
+    font-weight: 700;
+}
+
+.mrri-panel-body {
+    padding: 20px;
+}
+
+/* ---------- Tableaux ---------- */
+.mrri-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.mrri-table th {
+    padding: 12px 14px;
+    background: #F8F9FB;
+    color: var(--mrri-texte);
+    font-size: .68rem;
+    font-weight: 700;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    border-bottom: 1px solid var(--mrri-bordure);
+}
+
+.mrri-table td {
+    padding: 14px;
+    color: var(--mrri-encre);
+    font-size: .78rem;
+    border-bottom: 1px solid #EDF0F4;
+}
+
+.mrri-table tbody tr:hover {
+    background: #FAFBFC;
+}
+
+/* ---------- Badges ---------- */
+.mrri-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: .65rem;
+    font-weight: 600;
+}
+
+.mrri-badge-vert {
+    background: var(--mrri-vert-clair);
+    color: var(--mrri-vert-fonce);
+}
+
+.mrri-badge-bleu {
+    background: var(--mrri-bleu-clair);
+    color: var(--mrri-bleu-fonce);
+}
+
+.mrri-badge-or {
+    background: var(--mrri-or-clair);
+    color: var(--mrri-or-fonce);
+}
+
+/* ---------- Boutons ---------- */
+.mrri-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 15px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-size: .76rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--mrri-transition), border-color var(--mrri-transition);
+    text-decoration: none;
+}
+
+.mrri-btn-primary {
+    background: var(--mrri-vert);
+    color: #fff;
+    border-color: var(--mrri-vert);
+}
+
+.mrri-btn-primary:hover {
+    background: var(--mrri-vert-fonce);
+    color: #fff;
+}
+
+.mrri-btn-blue {
+    background: var(--mrri-bleu);
+    color: #fff;
+    border-color: var(--mrri-bleu);
+}
+
+.mrri-btn-blue:hover {
+    background: var(--mrri-bleu-fonce);
+    color: #fff;
+}
+
+.mrri-btn-outline {
+    background: #fff;
+    color: var(--mrri-bleu);
+    border-color: var(--mrri-bordure);
+}
+
+.mrri-btn-outline:hover {
+    border-color: var(--mrri-bleu);
+    background: var(--mrri-bleu-clair);
+}
+
+.mrri-btn-danger-outline {
+    background: #fff;
+    color: var(--mrri-danger);
+    border-color: #F1CACA;
+}
+
+.mrri-btn-danger-outline:hover {
+    background: var(--mrri-danger);
+    color: #fff;
+}
+
+/* ---------- Alertes ---------- */
+.mrri-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px 15px;
+    border-radius: 7px;
+    font-size: .76rem;
+    margin-bottom: 18px;
+}
+
+.mrri-alert-success {
+    background: var(--mrri-success-clair);
+    color: var(--mrri-vert-fonce);
+    border: 1px solid #C6E8D5;
+}
+
+.mrri-alert-danger {
+    background: var(--mrri-danger-clair);
+    color: #A82E2E;
+    border: 1px solid #F1CACA;
+}
+
+/* ---------- Formulaires ---------- */
+.mrri-form-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--mrri-encre);
+    font-size: .72rem;
+    font-weight: 600;
+}
+
+.mrri-form-control {
+    width: 100%;
+    padding: 10px 12px;
+    background: #fff;
+    color: var(--mrri-encre);
+    border: 1px solid var(--mrri-bordure);
+    border-radius: 6px;
+    outline: none;
+    font-size: .78rem;
+    transition: border-color var(--mrri-transition), box-shadow var(--mrri-transition);
+}
+
+.mrri-form-control:focus {
+    border-color: var(--mrri-bleu);
+    box-shadow: 0 0 0 3px rgba(27, 63, 174, .10);
+}
+
+/* ---------- Accent par rôle ---------- */
+.dashboard-point-focal .mrri-sidebar-link.active {
+    background: rgba(15, 138, 75, .18);
+    border-left: 3px solid var(--mrri-vert);
+}
+
+.dashboard-point-focal .mrri-page-title {
+    color: var(--mrri-vert-fonce);
+}
+
+.dashboard-agent .mrri-sidebar-link.active {
+    background: rgba(27, 63, 174, .18);
+    border-left: 3px solid var(--mrri-bleu);
+}
+
+.dashboard-agent .mrri-page-title {
+    color: var(--mrri-bleu-fonce);
+}
+
+.dashboard-super-admin .mrri-sidebar-link.active {
+    background: rgba(201, 151, 44, .16);
+    border-left: 3px solid var(--mrri-or);
+}
+
+.dashboard-super-admin .mrri-page-title {
+    color: var(--mrri-bleu-nuit);
+}
+
+.dashboard-super-admin .mrri-topbar {
+    border-top: 3px solid var(--mrri-or);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    :root {
+        --mrri-sidebar-width: 0px;
+    }
+
+    .mrri-sidebar {
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+    }
+
+    .mrri-sidebar.show {
+        transform: translateX(0);
+    }
+
+    .mrri-main {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .mrri-content {
+        padding: 20px;
+    }
+
+    .mrri-topbar {
+        padding: 0 20px;
+    }
+
+    .mrri-page-header {
+        flex-direction: column;
+    }
+
+    .mrri-stat-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .mrri-content {
+        padding: 15px;
+    }
+
+    .mrri-page-title {
+        font-size: 1.35rem;
+    }
+}

@@ -984,60 +984,34 @@ body {
 
 
             <!-- Symbole -->
-
             <div class="login-symbol">
-
                 <i class="bi bi-shield-lock-fill"></i>
-
             </div>
-
-
             <!-- Titre -->
-
             <h2 class="login-title">
                 Connexion
             </h2>
-
-
             <p class="login-subtitle">
                 Accédez à votre espace professionnel
             </p>
-
-
             <!-- Erreur -->
-
             <?php if ($erreur): ?>
-
                 <div class="login-error">
-
                     <i class="bi bi-exclamation-circle-fill"></i>
-
                     <span>
                         <?= htmlspecialchars($erreur) ?>
                     </span>
-
                 </div>
-
             <?php endif; ?>
-
-
             <!-- Formulaire -->
-
             <form action="connexion.php" method="post">
-
-
                 <!-- Username -->
-
                 <div class="login-field">
-
                     <label for="username">
                         Nom d'utilisateur
                     </label>
-
                     <div class="login-input-wrapper">
-
                         <i class="bi bi-person"></i>
-
                         <input
                             type="text"
                             id="username"
@@ -1047,24 +1021,15 @@ body {
                             autocomplete="username"
                             required
                         >
-
                     </div>
-
                 </div>
-
-
                 <!-- Password -->
-
                 <div class="login-field">
-
                     <label for="password">
                         Mot de passe
                     </label>
-
                     <div class="login-input-wrapper">
-
                         <i class="bi bi-lock"></i>
-
                         <input
                             type="password"
                             id="password"
@@ -1072,51 +1037,24 @@ body {
                             class="login-input"
                             placeholder="Entrez votre mot de passe"
                             autocomplete="current-password"
-                            required
-                        >
-
+                            required >
                     </div>
-
                 </div>
-
-
                 <!-- Bouton -->
-
                 <button
                     type="submit"
-                    class="login-button"
-                >
-
+                    class="login-button">
                     <i class="bi bi-box-arrow-in-right me-2"></i>
-
                     Se connecter
-
-                </button>
-
-
+            </button>
             </form>
-
-
             <!-- Footer -->
-
             <div class="login-footer">
-
                 <i class="bi bi-shield-check me-1"></i>
-
                 Accès sécurisé — Espace professionnel
-
             </div>
-
-
         </div>
-
-
         <!-- Bande couleurs -->
-
         <div class="color-strip"></div>
-
-
     </section>
-
-
 </main>
