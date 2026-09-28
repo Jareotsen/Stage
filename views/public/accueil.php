@@ -167,8 +167,14 @@ require '../../includes/header.php';
 #results { position: relative; z-index: 20; }
 
 /* ---------- Accès rapides ---------- */
-.quick-section { padding: 2.5rem 0 4.5rem; }
-
+.quick-section {
+  padding: 2.5rem 0 4.5rem;
+  display: flex;
+  justify-content: center; /* Centre le bloc de cartes horizontalement */
+  align-items: center;     /* Centre verticalement si nécessaire */
+  gap: 1.5rem;            /* Espacement entre les cartes (ajustez selon vos besoins) */
+  flex-wrap: wrap;        /* Permet un bon comportement sur écran mobile */
+}
 .quick-card {
   height: 100%;
   background: #fff;
@@ -357,7 +363,7 @@ require '../../includes/header.php';
 
     <div class="container">
 
-        <div class="row g-4">
+        <div class="row g-4 justify-content-center">
 
             <!-- CARTE 1 -->
             <div class="col-md-6 col-lg-3">
@@ -402,11 +408,6 @@ require '../../includes/header.php';
                 </div>
 
             </div>
-
-
-         
-
-
             <!-- CARTE 3 -->
             <div class="col-md-6 col-lg-3">
 
@@ -440,58 +441,37 @@ require '../../includes/header.php';
                        class="quick-link gold-link">
 
                         Voir toutes les actualités
-
                         <span>→</span>
-
                     </a>
-
                 </div>
-
             </div>
-
-
             <!-- CARTE 4 -->
             <div class="col-md-6 col-lg-3">
-
                 <div class="quick-card">
-
                     <div class="quick-top">
-
                         <div class="quick-icon dark">
-
                              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="9"/>
     <line x1="12" y1="11" x2="12" y2="16.5"/>
     <circle cx="12" cy="7.5" r="0.9" fill="#fff" stroke="none"/>
   </svg>
                         </div>
-
                         <h3>
                             À propos du MRRI
                         </h3>
-
                     </div>
-
                     <p>
                         Le ministère au service de la réforme
                         des institutions et du développement du Gabon.
                     </p>
-
                     <a href="https://relations-institutions.gouv.ga/"
                        class="quick-link dark-link">
-
                         Découvrir le ministère
-
                         <span>→</span>
-
                     </a>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
 </section>
