@@ -2,12 +2,16 @@
 require_once '../../config/database.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/flash.php';
+require_once '../../includes/csrf.php';
 is_authenticated();
+
 
 if ($_SESSION['role'] !== 'point_focal') {
     redirection_vers_les_dashboards($_SESSION['role']);
     exit();
 }
+
+
 
 $resp = $db->prepare("SELECT * 
                         FROM structure 
@@ -26,6 +30,9 @@ if ($structures) {
     $mon_actu->execute([':id_structure' => $structures['id_struc']]);
     $mon_actu = $mon_actu->fetchAll(PDO::FETCH_ASSOC);
 }
+$token = generer_token_csrf();
+//var_dump($_POST);
+//var_dump(ini_get('post_max_size'), ini_get('max_input_vars'), $_SERVER['CONTENT_LENGTH'] ?? 'ABSENT');
 
 require '../../includes/header.php';
 ?>
@@ -135,7 +142,6 @@ require '../../includes/header.php';
         <?php afficher_flash(); ?>
 
         <?php if (empty($mon_actu)): ?>
-
             <div class="actu-vide">
                 Aucune actualité publiée pour l'instant.
             </div>
@@ -156,6 +162,8 @@ require '../../includes/header.php';
                               onsubmit="return confirm('Supprimer cette actualité ?');">
                             <input type="hidden" name="id_actu"
                                    value="<?= htmlspecialchars($actualite['id_actu'], ENT_QUOTES, 'UTF-8') ?>">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
+                            
                             <button type="submit" class="btn-supprimer">
                                 Supprimer
                             </button>

@@ -2,6 +2,7 @@
 require_once '../../config/database.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/flash.php';
+require_once '../../includes/csrf.php';
 is_authenticated();
 
 if ($_SESSION['role'] !== 'point_focal') {
@@ -13,6 +14,10 @@ $resultat->execute([':id_responsable' => $_SESSION['user_id']]);
 $structures = $resultat->fetch(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+   //verification csrf
+if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
+    exit('Requête invalide.');
+}
     $titre = $_POST['titre'] ?? '';
     $contenu = $_POST['contenu'] ?? '';
 
@@ -39,7 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: dashboard.php");
     exit();
 }
-
 require '../../includes/header.php';
 ?>
 
@@ -48,6 +52,8 @@ require '../../includes/header.php';
     <p class="text-secondary">Pour <strong><?= htmlspecialchars($structures['nom_struc'] ?? '') ?></strong></p>
 
     <form action="" method="post" enctype="multipart/form-data">
+                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
+
         <div class="mb-3"><label class="form-label">Titre de l'actualité</label><input type="text" name="titre" class="form-control" placeholder="Ex. : Lancement d'un nouveau programme" required></div>
         <div class="mb-3"><label class="form-label">Contenu</label><textarea name="contenu" class="form-control" rows="5" placeholder="Détaillez l'actualité..." required></textarea></div>
         <div class="mb-3">

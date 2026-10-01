@@ -2,12 +2,15 @@
 require_once '../../includes/auth.php';
 require_once '../../config/database.php';
 require_once '../../includes/flash.php';
+require_once '../../includes/csrf.php';
 is_authenticated();
 
 if ($_SESSION['role'] !== 'super_admin') {
     redirection_vers_les_dashboards($_SESSION['role']);
 }
-
+if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
+    exit('Requête invalide.');
+}
 $erreur = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -74,6 +77,7 @@ require '../../includes/header.php';
                     <label class="form-label">Nom de la catégorie</label>
                     <input type="text" name="nom_cat" class="form-control" placeholder="Ex. : Autorité Administrative Indépendante" required>
                 </div>
+                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
                 <button type="submit" class="btn btn-mrri">Ajouter</button>
             </form>
         </div>

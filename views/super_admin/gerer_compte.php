@@ -2,22 +2,24 @@
 require_once '../../includes/auth.php';
 require_once '../../config/database.php';
 require_once '../../includes/flash.php';
+require_once '../../includes/csrf.php';
 is_authenticated();
 
 if ($_SESSION['role'] !== 'super_admin') {
     redirection_vers_les_dashboards($_SESSION['role']);
 }
 
-$erreur = null;
+if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
+    exit('Requête invalide.');
+}
 
+$erreur = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     $idCible = $_POST['id'] ?? null;
-
     $verif = $db->prepare("SELECT role FROM utilisateurs WHERE id = :id");
     $verif->execute([':id' => $idCible]);
     $compteCible = $verif->fetch(PDO::FETCH_ASSOC);
-
     if (!$compteCible || $compteCible['role'] === 'super_admin') {
         $erreur = "Action non autorisée sur ce compte.";
     } elseif ($action === 'supprimer') {
@@ -42,13 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $rattacher = $db->prepare("UPDATE structure SET id_responsable = :id WHERE id_struc = :id_struc");
             $rattacher->execute([':id' => $idCible, ':id_struc' => $nouvelleStructure]);
         }
-
         definir_flash("Compte mis à jour.");
         header("Location: gerer_comptes.php");
         exit();
     }
 }
-
 $comptesStmt = $db->query("
     SELECT utilisateurs.id, utilisateurs.username, utilisateurs.role, structure.nom_struc, structure.id_struc
     FROM utilisateurs
@@ -68,25 +68,25 @@ require '../../includes/header.php';
     <?php afficher_flash(); ?>
     <h1 class="h3">Gestion des comptes</h1>
     <p><a href="dashboard.php" class="link-secondary">← Retour au tableau de bord</a></p>
-
+     
     <?php if ($erreur): ?><div class="alert alert-danger"><?= htmlspecialchars($erreur) ?></div><?php endif; ?>
-
+    
     <div class="card shadow-sm">
         <div class="card-body">
             <?php if (empty($comptes)): ?><p class="text-secondary">Aucun compte à gérer pour le moment.</p><?php endif; ?>
-
+            
             <?php foreach ($comptes as $compte): ?>
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 border-bottom py-3">
                     <div>
                         <div class="fw-semibold"><?= htmlspecialchars($compte['username']) ?></div>
                         <span class="badge <?= $compte['role'] === 'point_focal' ? 'bg-secondary-subtle text-secondary' : 'bg-warning-subtle text-warning-emphasis' ?>">
-                            <?= $compte['role'] === 'point_focal' ? 'Point focal' : 'Agent du Ministère' ?>
+                           <?= $compte['role'] === 'point_focal' ? 'Point focal' : 'Agent du Ministère' ?>
                         </span>
                         <?php if ($compte['nom_struc']): ?>
                             <span class="small text-secondary">Rattaché à : <?= htmlspecialchars($compte['nom_struc']) ?></span>
                         <?php endif; ?>
                     </div>
-
+                    
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                         <form action="" method="post" class="d-flex align-items-center gap-1">
                             <input type="hidden" name="action" value="modifier">
@@ -102,10 +102,11 @@ require '../../includes/header.php';
                             </select>
                             <button type="submit" class="btn btn-outline-success btn-sm">Enregistrer</button>
                         </form>
-
+                         
                         <form action="" method="post" onsubmit="return confirm('Supprimer définitivement ce compte ?');">
                             <input type="hidden" name="action" value="supprimer">
                             <input type="hidden" name="id" value="<?= $compte['id'] ?>">
+                             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
                             <button type="submit" class="btn btn-outline-danger btn-sm">Supprimer</button>
                         </form>
                     </div>

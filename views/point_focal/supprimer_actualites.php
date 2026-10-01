@@ -2,11 +2,16 @@
 require_once '../../config/database.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/flash.php';
+require_once '../../includes/csrf.php';
 is_authenticated();
 
 if ($_SESSION['role'] !== 'point_focal') {
     redirection_vers_les_dashboards($_SESSION['role']);
     exit();
+}
+
+if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
+    exit('Requête invalide.');
 }
 
 $resp = $db->prepare("SELECT * 

@@ -143,6 +143,7 @@ a { text-decoration: none; }
     gap: 0;
     padding: 0.5rem 0;
     box-shadow: var(--shadow-sm);
+    z-index: 1000;
   }
   .mrri-nav.ouvert { display: flex; }
   .mrri-nav a { width: 100%; padding: 0.75rem 1.5rem; border-bottom: none; }
@@ -364,3 +365,35 @@ if (isset($_SESSION['role'])) {
     </div>
   </div>
 </header>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const menuToggle = document.getElementById('mrriMenuToggle');
+    const nav = document.querySelector('.mrri-nav');
+
+    if (!menuToggle || !nav) {
+        return;
+    }
+
+    menuToggle.addEventListener('click', function () {
+
+        nav.classList.toggle('ouvert');
+
+        const ouvert = nav.classList.contains('ouvert');
+
+        menuToggle.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+
+    });
+
+    // Fermer le menu lorsqu'on clique sur un lien
+    nav.querySelectorAll('a').forEach(function (lien) {
+
+        lien.addEventListener('click', function () {
+            nav.classList.remove('ouvert');
+            menuToggle.setAttribute('aria-expanded', 'false');
+        });
+
+    });
+
+});
+</script>

@@ -15,7 +15,16 @@ try{
         $config['db']['user'],
         $config['db']['pass']
     );
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $db->setAttribute(PDO::ATTR_ERRMODE, 
+                      PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e){
-    die ("Connexion à la base de données échouée :" . $e ->getMessage());
+     //message générique d'erreur
+    error_log(
+        'Erreur PDO :' . $e ->getMessage()
+    );
+
+    //message générique poue le user
+    http_response_code(500);
+    exit('Une erreur interne est survenue. ' .
+        'Veuillez réessayer ultérieurement.');
 }

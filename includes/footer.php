@@ -126,7 +126,7 @@
 
             <div class="mrri-footer-bottom-links">
 
-                <a href="#">
+                <a href="../public/mention_legales.php">
                     Mentions légales
                 </a>
 

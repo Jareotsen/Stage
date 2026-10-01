@@ -2,6 +2,7 @@
 require_once '../../includes/auth.php';
 require_once '../../config/database.php';
 require_once '../../includes/flash.php';
+require_once '../../includes/csrf.php';
 is_authenticated();
 
 if ($_SESSION['role'] !== 'point_focal') {
@@ -9,11 +10,16 @@ if ($_SESSION['role'] !== 'point_focal') {
     exit();
 }
 
+
 $resultat = $db->prepare("SELECT * FROM structure WHERE id_responsable = :id_responsable");
 $resultat->execute([':id_responsable' => $_SESSION['user_id']]);
 $structures = $resultat->fetch(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
+    exit('Requête invalide.');
+}
+
     $adresse = $_POST['adresse'] ?? '';
     $directeur_general = $_POST['directeur_general'] ?? '';
     $mission = $_POST['mission'] ?? '';
@@ -48,9 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
+
 require '../../includes/header.php';
 ?>
-
+  
 <main class="container my-4" style="max-width: 700px;">
     <h1 class="h3">Modifier la structure</h1>
     <p><span class="badge bg-secondary-subtle text-secondary me-1"><?= htmlspecialchars($structures['sigle'] ?? '') ?></span> <?= htmlspecialchars($structures['nom_struc'] ?? '') ?></p>
@@ -67,6 +74,7 @@ require '../../includes/header.php';
             <input type="file" name="photos[]" accept="image/*" multiple class="form-control">
             <div class="form-text">Vous pouvez sélectionner plusieurs images en une fois.</div>
         </div>
+         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
         <button type="submit" class="btn btn-mrri">Mettre à jour</button>
     </form>
 </main>

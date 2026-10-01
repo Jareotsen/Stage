@@ -2,17 +2,25 @@
 require_once '../../includes/auth.php';
 require_once '../../config/database.php';
 require_once '../../includes/flash.php';
+require_once '../../includes/csrf.php';
 is_authenticated();
 
 if ($_SESSION['role'] !== 'point_focal') {
     redirection_vers_les_dashboards($_SESSION['role']);
 }
 
+
+
 $maStructureStmt = $db->prepare("SELECT * FROM structure WHERE id_responsable = :id_responsable");
 $maStructureStmt->execute([':id_responsable' => $_SESSION['user_id']]);
 $maStructure = $maStructureStmt->fetch(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
+    exit('Requête invalide.');
+}
+
     $titreTheme = $_POST['titre_theme'] ?? '';
     $contexte = $_POST['contexte'] ?? '';
     $problematique = $_POST['problematique'] ?? '';
@@ -258,6 +266,7 @@ require '../../includes/header.php';
           <div class="form-check">
             <input class="form-check-input" type="checkbox" name="structures[]" value="<?= $s['id_struc'] ?>" id="s<?= $s['id_struc'] ?>"
               <?= ($maStructure && $s['id_struc'] == $maStructure['id_struc']) ? 'checked disabled' : '' ?>>
+              <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
             <label class="form-check-label" for="s<?= $s['id_struc'] ?>"><?= htmlspecialchars($s['nom_struc']) ?></label>
           </div>
         <?php endforeach; ?>
