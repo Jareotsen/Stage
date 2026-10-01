@@ -8,12 +8,14 @@ is_authenticated();
 if ($_SESSION['role'] !== 'super_admin') {
     redirection_vers_les_dashboards($_SESSION['role']);
 }
-if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
-    exit('Requête invalide.');
-}
+
 $erreur = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
+    exit('Requête invalide.');
+}
     $action = $_POST['action'] ?? '';
 
     if ($action === 'ajouter') {

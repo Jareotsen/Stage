@@ -2,8 +2,9 @@
 require_once '../../includes/auth.php';
 require_once '../../config/database.php';
 require_once '../../includes/flash.php';
+require_once '../../includes/csrf.php';
 is_authenticated();
-
+$token = generer_token_csrf();
 if ($_SESSION['role'] !== 'super_admin') {
     redirection_vers_les_dashboards($_SESSION['role']);
     exit();
@@ -16,27 +17,95 @@ $structures = $struc->fetchAll(PDO::FETCH_ASSOC);
 $erreur = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'] ?? '';
+
+if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
+    exit('Requête invalide.');
+}
+    $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     $role = $_POST['role'] ?? '';
     $structure = $_POST['structure'] ?? null;
 
-    if ($role === 'point_focal' && !$structure) {
+    // Vérification des champs
+    if ($username === '' || $password === '') {
+
+        $erreur = "Veuillez remplir tous les champs obligatoires.";
+
+    } elseif ($role === 'point_focal' && !$structure) {
+
         $erreur = "Veuillez sélectionner une structure pour le point focal.";
+
     } else {
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $stmt1 = $db->prepare("INSERT INTO utilisateurs (username, password, role) VALUES (:username, :password, :role)");
-        $stmt1->execute([':username' => $username, ':password' => $hashedPassword, ':role' => $role]);
-        $nouvelId = $db->lastInsertId();
 
-        if ($role === 'point_focal') {
-            $stmt2 = $db->prepare("UPDATE structure SET id_responsable = :id WHERE id_struc = :id_struc");
-            $stmt2->execute([':id' => $nouvelId, ':id_struc' => $structure]);
+        // Vérifier si le pseudo existe déjà
+        $verification = $db->prepare("
+            SELECT id 
+            FROM utilisateurs 
+            WHERE username = :username
+            LIMIT 1
+        ");
+
+        $verification->execute([
+            ':username' => $username
+        ]);
+
+        if ($verification->fetch()) {
+
+            $erreur = "Ce nom d'utilisateur est déjà utilisé.";
+
+        } else {
+
+            try {
+
+                $hashedPassword = password_hash(
+                    $password,
+                    PASSWORD_DEFAULT
+                );
+
+                $stmt1 = $db->prepare("
+                    INSERT INTO utilisateurs 
+                    (username, password, role)
+                    VALUES 
+                    (:username, :password, :role)
+                ");
+
+                $stmt1->execute([
+                    ':username' => $username,
+                    ':password' => $hashedPassword,
+                    ':role' => $role
+                ]);
+
+                $nouvelId = $db->lastInsertId();
+
+                // Si le compte est un point focal,
+                // rattacher le compte à la structure
+                if ($role === 'point_focal') {
+
+                    $stmt2 = $db->prepare("
+                        UPDATE structure 
+                        SET id_responsable = :id
+                        WHERE id_struc = :id_struc
+                    ");
+
+                    $stmt2->execute([
+                        ':id' => $nouvelId,
+                        ':id_struc' => $structure
+                    ]);
+                }
+
+                definir_flash("Compte créé avec succès.");
+
+                header("Location: dashboard.php");
+                exit();
+            } catch (PDOException $e) {
+                // Détail technique uniquement dans les logs
+                error_log(
+                    "Erreur création compte : " . $e->getMessage()
+                );
+                // Message destiné à l'utilisateur
+                $erreur = "Impossible de créer le compte. Veuillez réessayer.";
+            }
         }
-
-        definir_flash("Compte créé avec succès.");
-        header("Location: dashboard.php");
-        exit();
     }
 }
 
@@ -203,6 +272,8 @@ require '../../includes/header_dashboard.php';
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
+                                                  <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
+
                                 <button type="submit" class="mrri-btn mrri-btn-primary">Créer le compte</button>
                             </form>
                         </div>
