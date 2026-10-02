@@ -3,6 +3,7 @@ require_once '../../includes/auth.php';
 require_once '../../config/database.php';
 require_once '../../includes/flash.php';
 require_once '../../includes/csrf.php';
+require_once '../../includes/verif_doc.php';
 is_authenticated();
 
 if ($_SESSION['role'] !== 'point_focal') {
@@ -33,7 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':email' => $email, ':telephone' => $telephone, ':site_web' => $site_web,
         ':id_responsable' => $_SESSION['user_id']
     ]);
-
+     
+     $photosRejetees = [];
     if (isset($_FILES['photos']) && is_array($_FILES['photos']['name'])) {
         $nombrePhotos = count($_FILES['photos']['name']);
         for ($i = 0; $i < $nombrePhotos; $i++) {
@@ -41,6 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $extension = pathinfo($_FILES['photos']['name'][$i], PATHINFO_EXTENSION);
                 $nomFichierServeur = uniqid() . '.' . $extension;
                 $uploadFile = '../../uploads/photos/' . basename($nomFichierServeur);
+
+                  if (!fichier_image_est_valide($_FILES['photos']['tmp_name'][$i], $_FILES['photos']['name'][$i])) {
+                $photosRejetees[] = $_FILES['photos']['name'][$i];
+                continue;
+                }
                 if (move_uploaded_file($_FILES['photos']['tmp_name'][$i], $uploadFile)) {
                     $insertLogoStmt = $db->prepare("INSERT INTO structure_photos (photos_url, id_structure, Position) VALUES (:nom_fichier, :id_structure, :position)");
                     $insertLogoStmt->execute([':nom_fichier' => $nomFichierServeur, ':id_structure' => $structures['id_struc'], ':position' => $i + 1]);
@@ -49,7 +56,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    definir_flash("Structure mise à jour avec succès.");
+     $messageFlash = "Structure mise à jour avec succès.";
+    if (!empty($photosRejetees)) {
+        $messageFlash .= " Cependant, les fichiers suivants ont été rejetés (format non valide) : " . implode(', ',$photosRejetees) . ".";
+        definir_flash($messageFlash, 'warning');
+    } else {
+        definir_flash($messageFlash, 'success');
+    }
     header("Location: dashboard.php");
     exit();
 }

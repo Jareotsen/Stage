@@ -26,3 +26,31 @@ function fichier_est_valide($cheminTemporaire, $nomOrigininal) {
 
     return true;
 }
+
+function fichier_image_est_valide($cheminTemporaire, $nomOrigininal) {
+    $extension = strtolower(pathinfo($nomOrigininal, PATHINFO_EXTENSION));
+
+    $types_autorises = [
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png'  => 'image/png',
+        'gif'  => 'image/gif',
+    ];
+
+    if (!extension_loaded('fileinfo')) {
+        return false;
+    }
+
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $realMimeType = finfo_file($finfo, $cheminTemporaire);
+
+    if (!isset($types_autorises[$extension])) {
+        return false;
+    }
+
+    if ($types_autorises[$extension] !== $realMimeType) {
+        return false;
+    }
+
+    return true;
+}

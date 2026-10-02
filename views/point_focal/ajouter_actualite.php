@@ -1,12 +1,14 @@
 <?php
 require_once '../../config/database.php';
 require_once '../../includes/auth.php';
-require_once '../../includes/flash.php';
 require_once '../../includes/csrf.php';
+require_once '../../includes/verif_doc.php';
+require_once '../../includes/flash.php';
 is_authenticated();
 
 if ($_SESSION['role'] !== 'point_focal') {
     redirection_vers_les_dashboards($_SESSION['role']);
+    exit();
 }
 
 $resultat = $db->prepare("SELECT * FROM structure WHERE id_responsable = :id_responsable");
@@ -25,13 +27,20 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
     $insertStmt->execute([':titre' => $titre, ':contenu' => $contenu, ':id_struc' => $structures['id_struc']]);
     $id_actualite = $db->lastInsertId();
 
+      $photosRejetees = [];
     if (isset($_FILES['photos']) && is_array($_FILES['photos']['name'])) {
         $nombrePhotos = count($_FILES['photos']['name']);
+      
         for ($i = 0; $i < $nombrePhotos; $i++) {
             if ($_FILES['photos']['error'][$i] === UPLOAD_ERR_OK) {
                 $extension = pathinfo($_FILES['photos']['name'][$i], PATHINFO_EXTENSION);
                 $nomFichierServeur = uniqid() . '.' . $extension;
                 $uploadFile = '../../uploads/photos/' . basename($nomFichierServeur);
+
+                if (!fichier_image_est_valide($_FILES['photos']['tmp_name'][$i], $_FILES['photos']['name'][$i])) {
+                $photosRejetees[] = $_FILES['photos']['name'][$i];
+                continue;
+                }
                 if (move_uploaded_file($_FILES['photos']['tmp_name'][$i], $uploadFile)) {
                     $insertPhotoStmt = $db->prepare("INSERT INTO actualites_photos (photos_actu_url, id_actualites, Position) VALUES (:nom_fichier, :id_actualite, :position)");
                     $insertPhotoStmt->execute([':nom_fichier' => $nomFichierServeur, ':id_actualite' => $id_actualite, ':position' => $i + 1]);
@@ -40,7 +49,13 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
         }
     }
 
-    definir_flash("Actualité publiée avec succès.");
+    $messageFlash = "Actualité publiée avec succès.";
+    if (!empty($photosRejetees)) {
+        $messageFlash .= " Cependant, les fichiers suivants ont été rejetés (format non valide) : " . implode(', ',$photosRejetees) . ".";
+        definir_flash($messageFlash, 'warning');
+    } else {
+        definir_flash($messageFlash, 'success');
+    }
     header("Location: dashboard.php");
     exit();
 }
