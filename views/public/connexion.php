@@ -40,15 +40,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
->
+    rel="stylesheet" href="../../publique/vendor/bootstrap-icons/bootstrap-icons.min.css">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link
-    href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
->
+<link href="../../publique/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="../../publique/vendor/fonts/fonts.css" rel="stylesheet">
 
 <style>
 

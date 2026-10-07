@@ -34,7 +34,7 @@ $token = generer_token_csrf();
 //var_dump($_POST);
 //var_dump(ini_get('post_max_size'), ini_get('max_input_vars'), $_SERVER['CONTENT_LENGTH'] ?? 'ABSENT');
 
-require '../../includes/header.php';
+require '../../includes/header_dashboard.php';
 ?>
 
 <style>
@@ -177,4 +177,4 @@ require '../../includes/header.php';
     </div>
 </section>
 
-<?php require '../../includes/footer.php'; ?>
+<?php require '../../includes/footer_dashboard.php'; ?>

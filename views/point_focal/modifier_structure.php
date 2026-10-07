@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
-require '../../includes/header.php';
+require '../../includes/header_dashboard.php';
 ?>
   
 <main class="container my-4" style="max-width: 700px;">
@@ -92,4 +92,4 @@ require '../../includes/header.php';
     </form>
 </main>
 
-<?php require '../../includes/footer.php'; ?>
+<?php require '../../includes/footer_dashboard.php'; ?>

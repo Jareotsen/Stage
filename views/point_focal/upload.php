@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
  }
  
 $token = generer_token_csrf();
-require '../../includes/header.php';
+require '../../includes/header_dashboard.php';
 ?>
 
 <main class="container my-4" style="max-width: 560px;">
@@ -77,6 +77,4 @@ require '../../includes/header.php';
 </main>
 
 <?php 
-require '../../includes/footer.php'; 
-
-?>
+ require '../../includes/footer_dashboard.php'; ?>

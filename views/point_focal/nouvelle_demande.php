@@ -54,7 +54,7 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
 $toutesStructuresStmt = $db->query("SELECT id_struc, nom_struc FROM structure ORDER BY nom_struc");
 $toutesStructures = $toutesStructuresStmt->fetchAll(PDO::FETCH_ASSOC);
 
-require '../../includes/header.php';
+require '../../includes/header_dashboard.php';
 ?>
 
 <style>
@@ -307,4 +307,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </main>
 
-<?php require '../../includes/footer.php'; ?>
+<?php require '../../includes/footer_dashboard.php'; ?>

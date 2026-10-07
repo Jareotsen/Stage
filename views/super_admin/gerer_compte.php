@@ -63,9 +63,52 @@ $comptes = $comptesStmt->fetchAll(PDO::FETCH_ASSOC);
 $structuresStmt = $db->query("SELECT id_struc, nom_struc FROM structure ORDER BY nom_struc");
 $toutesLesStructures = $structuresStmt->fetchAll(PDO::FETCH_ASSOC);
 
-require '../../includes/header.php';
+require '../../includes/header_dashboard.php';
 ?>
+<aside class="mrri-sidebar">
+        <div class="mrri-sidebar-brand">
+            <img src="../../publique/image/sceau.png" alt="Armoiries du Gabon">
+            <div>
+                <strong>Ministère de la Réforme<br>et des Institutions</strong>
+                <small>Super administrateur</small>
+            </div>
+        </div>
 
+        <div class="mrri-sidebar-section">Navigation</div>
+        <ul class="mrri-sidebar-nav">
+            <li>
+                <a href="dashboard.php" class="mrri-sidebar-link active">
+                    <span class="icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                    </span>
+                    Tableau de bord
+                </a>
+            </li>
+            <li>
+                <a href="gerer_compte.php" class="mrri-sidebar-link">
+                    <span class="icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </span>
+                    Comptes utilisateurs
+                </a>
+            </li>
+            <li>
+                <a href="gerer_categories.php" class="mrri-sidebar-link">
+                    <span class="icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/></svg>
+                    </span>
+                    Catégories
+                </a>
+            </li>
+        </ul>
+
+        <div class="mrri-sidebar-bottom">
+            <a href="../../deconnexion.php" class="mrri-sidebar-logout">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Déconnexion
+            </a>
+        </div>
+    </aside>
 <main class="container my-4" style="max-width: 780px;">
     <?php afficher_flash(); ?>
     <h1 class="h3">Gestion des comptes</h1>
@@ -124,4 +167,4 @@ function basculerStructure(id, role) {
 }
 </script>
 
-<?php require '../../includes/footer.php'; ?>
+<?php require '../../includes/footer_dashboard.php'; ?>

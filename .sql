@@ -1,4 +1,4 @@
-
+//engine =Innodb
 CREATE DATABASE MRRI;
 CREATE TABLE utilisateurs (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -83,9 +83,44 @@ CREATE TABLE demandes_structures (
   FOREIGN KEY (id_demande) REFERENCES demandes(id_demande),
   FOREIGN KEY (id_structure) REFERENCES structure(id_struc)
 );
+CREATE TABLE consultations (
+  id_consultation INT PRIMARY KEY AUTO_INCREMENT,
+  id_structure INT,
+  id_createur INT,
+  titre VARCHAR(255) NOT NULL,
+  contenu TEXT,
+  date_ouverture DATETIME DEFAULT CURRENT_TIMESTAMP,
+  date_fermeture DATETIME,
+  statut ENUM( 'ouverte', 'fermee') DEFAULT 'ouverte',
+  FOREIGN KEY (id_structure) REFERENCES structure(id_struc),
+  FOREIGN KEY (id_createur) REFERENCES utilisateurs(id)
+);
+CREATE TABLE contributions (
+  id_contribution INT PRIMARY KEY AUTO_INCREMENT,
+  id_consultation INT NOT NULL,
+  email_contributeur VARCHAR(255) NOT NULL,
+  contenu TEXT NOT NULL,
+  statut ENUM( 'en_attente', 'validee', 'rejetee') DEFAULT 'en_attente',
+  date_contribution DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_consultation) REFERENCES consultations(id_consultation),
+  CHECK (statut IN ('en_attente', 'validee', 'rejetee'))
+);
 
+CREATE TABLE votes (
+    id_vote INT PRIMARY KEY AUTO_INCREMENT,
+    id_contribution INT NOT NULL,
+    email_votant VARCHAR(191) NOT NULL,
+    valeur_vote ENUM('pour', 'contre') NOT NULL,
+    date_vote DATETIME DEFAULT CURRENT_TIMESTAMP,
 
+    UNIQUE KEY unique_vote (id_contribution, email_votant),
 
+    CONSTRAINT fk_vote_contribution
+        FOREIGN KEY (id_contribution)
+        REFERENCES contributions(id_contribution)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
