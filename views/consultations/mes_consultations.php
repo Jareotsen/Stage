@@ -33,11 +33,13 @@ $erreur = null;
 
 $mes_consultations = [];
 if ($role === 'point_focal') {
-    $mes_consultations = $db->prepare("SELECT * FROM consultations WHERE id_structure = :id_structure ORDER BY date_ouverture DESC");
-    $mes_consultations->execute([':id_structure' => $maStructure['id_struc']]);
+    $mes_consultations = $db->prepare("SELECT * FROM consultations WHERE id_createur = :id_createur ORDER BY date_ouverture DESC");
+    $mes_consultations->execute([':id_createur' => $_SESSION['user_id']]);
     $mes_consultations = $mes_consultations->fetchAll(PDO::FETCH_ASSOC);
 } elseif ($role === 'agent_ministere') {
-    $mes_consultations = $db->query("SELECT * FROM consultations ORDER BY date_ouverture DESC")->fetchAll(PDO::FETCH_ASSOC);
+    $mes_consultations = $db->prepare("SELECT * FROM consultations WHERE id_createur = :id_createur ORDER BY date_ouverture DESC");
+    $mes_consultations->execute([':id_createur' => $_SESSION['user_id']]);
+    $mes_consultations = $mes_consultations->fetchAll(PDO::FETCH_ASSOC);
 }
 
 require '../../includes/header_dashboard.php';

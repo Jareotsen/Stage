@@ -38,13 +38,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   //je récupère l'id de la consultation
   $id_consultation = (int) $_POST['id_consultation'];
 
-  $verifStmt = $db->prepare("
-      SELECT id_consultation 
-      FROM consultations 
-      WHERE id_consultation = :id_consultation
-  ");
-  $verifStmt->execute([':id_consultation' => $id_consultation]);
-  $consultation = $verifStmt->fetch(PDO::FETCH_ASSOC);
+  if ($role === 'point_focal') {
+    $verifStmt = $db->prepare("SELECT id_consultation FROM consultations WHERE id_consultation = :id AND id_createur = :id_createur");
+    $verifStmt->execute([':id' => $id_consultation, ':id_createur' => $_SESSION['user_id']]);
+} else {
+    // agent_ministere : à toi de décider — peut-il supprimer uniquement les siennes, ou toutes ?
+    $verifStmt = $db->prepare("SELECT id_consultation FROM consultations WHERE id_consultation = :id AND id_createur = :id_createur");
+    $verifStmt->execute([':id' => $id_consultation, ':id_createur' => $_SESSION['user_id']]);
+}
+$consultation = $verifStmt->fetch(PDO::FETCH_ASSOC);
 
   if (!$consultation) {
       exit('Consultation introuvable.');
@@ -63,6 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       exit();
   } catch (Exception $e) {
       $db->rollBack();
-      exit('Erreur lors de la suppression de la consultation : ' . $e->getMessage());
+      error_log(
+        'Erreur lors de la suppression de la consultation : ' . $e->getMessage()
+        );
+        http_response_code(500);
+        exit('Une erreur interne est survenue. Veuillez réessayer ultérieurement.');
   }
 }

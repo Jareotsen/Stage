@@ -343,8 +343,11 @@ if (isset($_SESSION['role'])) {
       <a href="../public/accueil.php" aria-current="page">Accueil</a>
       <a href="../public/catalogue.php">Structures</a>
       <a href="../public/actualite.php">Actualités</a>
+      <a href="../public/consultations.php">Consultations</a>
       <?php if ($estAgentMinistere): ?>
         <a href="../agent_ministere/demandes.php">Demandes</a>
+        <a href="../consultations/créer_consultations.php">Créer une consultation</a>
+        <a href="../consultations/mes_consultations.php">Voir mes consultations</a>
       <?php endif; ?>
     </nav>
 
