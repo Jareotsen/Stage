@@ -27,8 +27,7 @@
                     </div>
                 </div>
                 <p class="mrri-footer-description">
-                    Plateforme de consultation des structures
-                    sous tutelle du Ministère de la Réforme et
+                    Plateforme de consultation des Institutions Constitutionnelles et des Autorités Administrative Indépendantes du Ministère de la Réforme et
                     des Relations avec les Institutions.
                 </p>
             </div>
@@ -58,7 +57,11 @@
                             Actualités
                         </a>
                     </li>
-
+                    <li>
+                        <a href="../public/consultations.php">
+                            Consultations
+                        </a>
+                    </li>
                 </ul>
 
             </div>

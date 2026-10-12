@@ -128,7 +128,6 @@ $structuresListe = $structuresStmt->fetchAll(PDO::FETCH_ASSOC);
 
 require '../../includes/header.php';
 ?>
-
 <style>
 /* ---------- Hero (accueil uniquement) ---------- */
 .mrri-hero { position: relative; min-height: 480px; overflow: hidden; background: var(--mrri-bleu-nuit); }
@@ -311,7 +310,6 @@ require '../../includes/header.php';
     </div>
   </div>
 </section>
-
 <section class="search-section">
   <div class="container">
     <div class="search-box">
@@ -334,8 +332,6 @@ require '../../includes/header.php';
     <div id="results" class="mt-3"></div>
   </div>
 </section>
-
-
 <section class="citation-section">
   <div class="citation-fond" style="background-image: url('../../public/image/GA.jpeg');"></div>
   <div class="citation-voile"></div>
@@ -344,36 +340,23 @@ require '../../includes/header.php';
       <img src="../../publique/image/GA2.png" alt="[Nom de la personne citée]" class="citation-portrait">
       <span class="citation-guillemet">"</span>
       <p class="citation-texte">Les réformes sont un pro­ces­sus continu, pas une fin en soi</p>
-      
       <div class="citation-trait"></div>
       <p class="citation-auteur">FRANÇOIS NDONG OBIANG, Ministre de la Réforme et des Relations avec les Institutions</p>
       <p class="citation-date">09 mai 2025</p>
     </div>
   </div>
 </section>
-
-
-
-
 <!-- =========================================================
      ACCÈS RAPIDES
      ========================================================= -->
-
 <section class="quick-access">
-
     <div class="container">
-
         <div class="row g-4 justify-content-center">
-
             <!-- CARTE 1 -->
             <div class="col-md-6 col-lg-3">
-
                 <div class="quick-card">
-
                     <div class="quick-top">
-
                         <div class="quick-icon green">
-
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="3" y1="21" x2="21" y2="21"/>
                     <line x1="5" y1="21" x2="5" y2="10"/>
@@ -382,64 +365,45 @@ require '../../includes/header.php';
                     <line x1="15" y1="21" x2="15" y2="10"/>
                     <polygon points="12 3 21 9 3 9"/>
                     </svg>
-
                         </div>
-
                         <h3>
                             Consulter les Institutions constitutionnelles et les Autorité Administrative Indépendante
                         </h3>
-
                     </div>
-
                     <p>
                         Découvrez la liste des Institutions Constitutionnelles
                         et des AAI.
                     </p>
-
                     <a href="catalogue.php"
                        class="quick-link green-link">
-
                         Accéder à la liste
-
                         <span>→</span>
-
                     </a>
-
                 </div>
-
             </div>
             <!-- CARTE 3 -->
             <div class="col-md-6 col-lg-3">
 
                 <div class="quick-card">
-
                     <div class="quick-top">
-
                         <div class="quick-icon gold">
-
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4 4h13a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/>
                         <line x1="8" y1="8" x2="15" y2="8"/>
                         <line x1="8" y1="12" x2="15" y2="12"/>
                         <line x1="8" y1="16" x2="12" y2="16"/>
                     </svg>
-
                         </div>
-
                         <h3>
                             Actualités
                         </h3>
-
                     </div>
-
                     <p>
                         Restez informé des dernières actualités
                         du ministère et de ses institutions.
                     </p>
-
                     <a href="actualite.php"
                        class="quick-link gold-link">
-
                         Voir toutes les actualités
                         <span>→</span>
                     </a>
@@ -473,23 +437,14 @@ require '../../includes/header.php';
             </div>
         </div>
     </div>
-
 </section>
-
-
 <!-- =========================================================
      STRUCTURES
      ========================================================= -->
-
 <section class="structures-section">
-
     <div class="container">
-
-
         <div class="section-heading">
-
             <div>
-
                 <h2>
                  Institutions constitutionnelles et AAI
                 </h2>
@@ -638,90 +593,54 @@ require '../../includes/header.php';
                             <path d="M12.166 8.94 8 15.5l-4.166-6.56A4.5 4.5 0 1 1 12.166 8.94z"/>
                             <path d="M8 9.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
                            </svg>
-
                                 <?= htmlspecialchars(
                                     $s['adresse'] ?? 'Adresse non renseignée'
                                 ) ?>
-
                             </p>
-
-
-
                             <a
                                 href="fiche.php?id=<?= $s['id_struc'] ?>"
                                 class="structure-link"
                             >
-
                                 <span>
                                     voir +
                                 </span>
-
                                 <span>
                                     →
                                 </span>
-
                             </a>
-
-
                         </div>
-
                     </div>
-
                 <?php endforeach; ?>
-
-
             </div>
-
-
-
             <!-- PAGINATION -->
-
             <?php if ($totalPages > 1): ?>
-
                 <nav
                     class="mt-5"
                     aria-label="Pagination des structures"
                 >
-
                     <ul class="pagination justify-content-center">
-
-
                         <li
                             class="page-item <?= $page <= 1 ? 'disabled' : '' ?>"
                         >
-
                             <a
                                 class="page-link"
                                 href="?page=<?= $page - 1 ?><?= $catFiltre ? '&cat=' . $catFiltre : '' ?>"
                             >
                                 Précédent
                             </a>
-
                         </li>
-
-
-
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-
                             <li
                                 class="page-item <?= $i === $page ? 'active' : '' ?>"
                             >
-
                                 <a
                                     class="page-link"
                                     href="?page=<?= $i ?><?= $catFiltre ? '&cat=' . $catFiltre : '' ?>"
                                 >
-
                                     <?= $i ?>
-
                                 </a>
-
                             </li>
-
                         <?php endfor; ?>
-
-
-
                         <li
                             class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>"
                         >
@@ -730,18 +649,11 @@ require '../../includes/header.php';
                                 class="page-link"
                                 href="?page=<?= $page + 1 ?><?= $catFiltre ? '&cat=' . $catFiltre : '' ?>"
                             >
-
                                 Suivant
-
                             </a>
-
                         </li>
-
-
                     </ul>
-
                 </nav>
-
             <?php endif; ?>
 
 

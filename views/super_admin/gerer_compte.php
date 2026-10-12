@@ -10,7 +10,6 @@ if ($_SESSION['role'] !== 'super_admin') {
 }
 
 
-
 $erreur = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -30,10 +29,13 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
         $supprimer = $db->prepare("DELETE FROM utilisateurs WHERE id = :id");
         $supprimer->execute([':id' => $idCible]);
         definir_flash("Compte supprimé.");
-        header("Location: gerer_comptes.php");
+        header("Location: gerer_compte.php");
         exit();
     } elseif ($action === 'modifier') {
-        $nouveauRole = $_POST['role'] ?? '';
+        $nouveauRole = in_array($_POST['role'] ?? '', ['point_focal', 'agent_ministere'], true) ? $_POST['role'] : '';
+        if ($nouveauRole === '') {
+            exit('Rôle invalide.');
+        }
         $nouvelleStructure = $_POST['structure'] ?? null;
 
         $majRole = $db->prepare("UPDATE utilisateurs SET role = :role WHERE id = :id");
@@ -47,7 +49,7 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
             $rattacher->execute([':id' => $idCible, ':id_struc' => $nouvelleStructure]);
         }
         definir_flash("Compte mis à jour.");
-        header("Location: gerer_comptes.php");
+        header("Location: gerer_compte.php");
         exit();
     }
 }
@@ -135,6 +137,7 @@ require '../../includes/header_dashboard.php';
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                         <form action="" method="post" class="d-flex align-items-center gap-1">
                             <input type="hidden" name="action" value="modifier">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
                             <input type="hidden" name="id" value="<?= $compte['id'] ?>">
                             <select name="role" class="form-select form-select-sm" onchange="basculerStructure(<?= $compte['id'] ?>, this.value)">
                                 <option value="point_focal" <?= $compte['role'] === 'point_focal' ? 'selected' : '' ?>>Point focal</option>
@@ -162,6 +165,7 @@ require '../../includes/header_dashboard.php';
 </main>
 
 <script>
+    
 function basculerStructure(id, role) {
     document.getElementById('structure-select-' + id).style.display = role === 'point_focal' ? 'inline-block' : 'none';
 }

@@ -171,6 +171,19 @@ require '../../includes/header_dashboard.php';
                                         <p class="mrri-page-description" style="margin-top:4px;">Contacter le Ministère</p>
                                     </a>
                                 </div>
+<div class="col">
+    <a href="../consultations/creer_consultations.php" class="mrri-panel" style="display:block; padding:16px;">
+        <strong style="font-size:.85rem;">Créer une consultation</strong>
+        <p class="mrri-page-description" style="margin-top:4px;">Création de consultations</p>
+    </a>
+</div>
+
+<div class="col">
+    <a href="../consultations/mes_consultations.php" class="mrri-panel" style="display:block; padding:16px;">
+        <strong style="font-size:.85rem;">Voir mes consultations</strong>
+        <p class="mrri-page-description" style="margin-top:4px;">Suivi des consultations planifiées</p>
+    </a>
+</div>
                             </div>
                         </div>
                     </div>

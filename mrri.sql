@@ -419,3 +419,47 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+-- ATTENTION : vos tables consultations / contributions / votes existent deja.
+-- NE PAS executer ce fichier tel quel (il sert de reference). Verifiez vos colonnes avec DESCRIBE.
+
+-- =========================================================
+-- À exécuter dans phpMyAdmin (onglet SQL). Adaptez les types
+-- (INT) à ceux de vos tables existantes si besoin.
+-- Sautez les lignes ADD COLUMN si elles ont déjà été exécutées.
+-- =========================================================
+
+-- 1) Table consultations : colonnes de phase + structure facultative
+--    (id_structure NULL = consultation générale)
+ALTER TABLE consultations
+  ADD COLUMN date_cloture DATE NULL,
+  ADD COLUMN statut ENUM('brouillon','ouverte','cloturee') NOT NULL DEFAULT 'ouverte';
+
+ALTER TABLE consultations
+  MODIFY id_structure INT NULL;
+
+-- 2) Contributions des citoyens (modérées avant affichage public)
+CREATE TABLE contributions (
+  id_contribution INT AUTO_INCREMENT PRIMARY KEY,
+  id_consultation INT NOT NULL,
+  email           VARCHAR(190) NOT NULL,
+  commentaire     TEXT NOT NULL,
+  statut          ENUM('en_attente','validee','rejetee') NOT NULL DEFAULT 'en_attente',
+  date_depot      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_contrib_consultation
+    FOREIGN KEY (id_consultation) REFERENCES consultations(id_consultation)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- 3) Votes : un seul vote par email et par contribution (contrainte UNIQUE)
+CREATE TABLE votes (
+  id_vote         INT AUTO_INCREMENT PRIMARY KEY,
+  id_contribution INT NOT NULL,
+  email           VARCHAR(190) NOT NULL,
+  valeur          ENUM('pour','contre') NOT NULL,
+  date_vote       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_vote_email_contribution (id_contribution, email),
+  CONSTRAINT fk_vote_contribution
+    FOREIGN KEY (id_contribution) REFERENCES contributions(id_contribution)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;

@@ -28,14 +28,20 @@ if (empty($structures)) {
     exit;
 }
 
+// Toute donnée venant de la base est échappée avant d'être écrite dans le HTML
+function h($valeur): string
+{
+    return htmlspecialchars((string) ($valeur ?? ''), ENT_QUOTES, 'UTF-8');
+}
+
 foreach ($structures as $s) {
     echo "
     <div class='p-3 border rounded mb-2 text-start'>
-        <p class='fw-bold mb-1'>{$s['sigle']} - {$s['nom_struc']}</p>
-        <p class='mb-1'>{$s['adresse']}</p>
-        <p class='mb-1'>DG : {$s['directeur_general']}</p>
-        <p class='small text-success'>{$s['nom_cat']}</p>
-        <a href='fiche.php?id={$s['id_struc']}' class='btn btn-sm btn-outline-primary'>Voir la fiche</a>
+        <p class='fw-bold mb-1'>" . h($s['sigle']) . " - " . h($s['nom_struc']) . "</p>
+        <p class='mb-1'>" . h($s['adresse']) . "</p>
+        <p class='mb-1'>DG : " . h($s['directeur_general']) . "</p>
+        <p class='small text-success'>" . h($s['nom_cat']) . "</p>
+        <a href='fiche.php?id=" . (int) $s['id_struc'] . "' class='btn btn-sm btn-outline-primary'>Voir la fiche</a>
     </div>
     ";
 }
