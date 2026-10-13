@@ -36,7 +36,7 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
                 $extension = pathinfo($_FILES['photos']['name'][$i], PATHINFO_EXTENSION);
                 $nomFichierServeur = uniqid() . '.' . $extension;
                 $uploadFile = '../../uploads/photos/' . basename($nomFichierServeur);
-
+            
                 if (!fichier_image_est_valide($_FILES['photos']['tmp_name'][$i], $_FILES['photos']['name'][$i])) {
                 $photosRejetees[] = $_FILES['photos']['name'][$i];
                 continue;
@@ -45,13 +45,16 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
                     $insertPhotoStmt = $db->prepare("INSERT INTO actualites_photos (photos_actu_url, id_actualites, Position) VALUES (:nom_fichier, :id_actualite, :position)");
                     $insertPhotoStmt->execute([':nom_fichier' => $nomFichierServeur, ':id_actualite' => $id_actualite, ':position' => $i + 1]);
                 }
-            }
+            } elseif ($_FILES['photos']['error'][$i] !== UPLOAD_ERR_NO_FILE) {
+    $photosRejetees[] = $_FILES['photos']['name'][$i] . ' (trop lourd ou erreur d\'envoi)';
+}
+            
         }
     }
 
     $messageFlash = "Actualité publiée avec succès.";
     if (!empty($photosRejetees)) {
-        $messageFlash .= " Cependant, les fichiers suivants ont été rejetés (format non valide) : " . implode(', ',$photosRejetees) . ".";
+        $messageFlash .= " Cependant, les fichiers suivants ont été rejetés (format non valide ou fichier trop lourd) : " . implode(', ',$photosRejetees) . ".";
         definir_flash($messageFlash, 'warning');
     } else {
         definir_flash($messageFlash, 'success');

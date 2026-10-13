@@ -35,6 +35,7 @@ function fichier_image_est_valide($cheminTemporaire, $nomOrigininal) {
         'jpeg' => 'image/jpeg',
         'png'  => 'image/png',
         'gif'  => 'image/gif',
+        'jpe'  => 'image/jpeg',
     ];
 
     if (!extension_loaded('fileinfo')) {
