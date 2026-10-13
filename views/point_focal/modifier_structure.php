@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 require '../../includes/header_dashboard.php';
 ?>
-  
+ <?php $pageActive = 'structure'; require '../../includes/sidebar_point_focal.php'; ?> 
 <main class="container my-4" style="max-width: 700px;">
     <h1 class="h3">Modifier la structure</h1>
     <p><span class="badge bg-secondary-subtle text-secondary me-1"><?= htmlspecialchars($structures['sigle'] ?? '') ?></span> <?= htmlspecialchars($structures['nom_struc'] ?? '') ?></p>

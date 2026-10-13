@@ -57,6 +57,7 @@ $toutesStructures = $toutesStructuresStmt->fetchAll(PDO::FETCH_ASSOC);
 require '../../includes/header_dashboard.php';
 ?>
 
+<?php $pageActive = 'demandes'; require '../../includes/sidebar_point_focal.php'; ?>
 <style>
   .demande-hero {
     background: linear-gradient(135deg, #1B7A3D 0%, #145C2E 100%);

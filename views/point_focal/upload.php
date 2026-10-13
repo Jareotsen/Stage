@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $token = generer_token_csrf();
 require '../../includes/header_dashboard.php';
 ?>
-
+<?php $pageActive = 'documents'; require '../../includes/sidebar_point_focal.php'; ?>
 <main class="container my-4" style="max-width: 560px;">
     <h1 class="h3">Uploader un document</h1>
     <p class="text-secondary">Pour <strong><?= htmlspecialchars($structures['nom_struc'] ?? '') ?></strong></p>

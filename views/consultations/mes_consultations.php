@@ -64,7 +64,7 @@ require '../../includes/header_dashboard.php';
                 </a>
             </li>
             <li>
-                <a href="demandes.php" class="mrri-sidebar-link">
+                <a href="../agent_ministere/demandes.php" class="mrri-sidebar-link">
                     <span class="icon">
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     </span>
