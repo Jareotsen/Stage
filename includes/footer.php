@@ -27,8 +27,7 @@
                     </div>
                 </div>
                 <p class="mrri-footer-description">
-                    Plateforme de consultation des Institutions Constitutionnelles et des Autorités Administrative Indépendantes du Ministère de la Réforme et
-                    des Relations avec les Institutions.
+                    Plateforme de consultation Publique
                 </p>
             </div>
                  

@@ -175,10 +175,10 @@ require '../../includes/header.php';
   flex-wrap: wrap;        /* Permet un bon comportement sur écran mobile */
 }
 .quick-card {
-  height: 100%;
+  height: 89%;
   background: #fff;
   border: none;
-  border-radius: 18px;
+  border-radius: 16px;
   padding: 1.6rem 1.75rem;
   box-shadow: 0 4px 18px rgba(11,29,77,0.06);
   transition: transform .2s ease, box-shadow .2s ease;
@@ -278,38 +278,7 @@ require '../../includes/header.php';
 }
 </style>
 <div class="mrri-top-band"></div>
-<section class="mrri-hero">
-  <div class="mrri-hero-grid">
-    <div class="mrri-hero-texte">
-      <div class="mrri-hero-accent"></div>
-      <h1> Plateforme de consultation des Institutions Constitutionnelles et des Autorité Administratives Indépendantes</h1>
-      <p>Accédez facilement aux informations sur les structures sous tutelle du Ministère des Réformes et des Relations avec les Institutions.</p>
-      <div class="mrri-hero-points">
-        <div class="mrri-hero-point">
-          <div class="mrri-hero-point-icone vert">🏛️</div>
-          <span>Institutions  <br>& AAI</span>
-        </div>
-        <div class="mrri-hero-point">
-          <div class="mrri-hero-point-icone bleu">📄</div>
-          <span>Informations<br>fiables</span>
-        </div>
-        <div class="mrri-hero-point">
-          <div class="mrri-hero-point-icone or">👥</div>
-          <span>Au service<br>des citoyens</span>
-        </div>
-      </div>
-    </div>
-    <div class="mrri-hero-image-col">
-        <div class="slider">
-      <img src="../../publique/image/GA.jpeg" alt="Bâtiment institutionnel du Gabon">
-      <img src="../../publique/image/GA1.jpe" alt="Respectons notre drapeau">
-      <img src="../../publique/image/panthera.jpe" alt="léopard noir">
-      <img src="../../publique/image/GA3.jpeg" alt="Libération">
-      </div>
-      <div class="mrri-hero-tagline">Un État plus proche de ses citoyens</div>
-    </div>
-  </div>
-</section>
+<?php require '../../includes/hero_actualites.php'; ?>
 <section class="search-section">
   <div class="container">
     <div class="search-box">
@@ -367,7 +336,7 @@ require '../../includes/header.php';
                     </svg>
                         </div>
                         <h3>
-                            Consulter les Institutions constitutionnelles et les Autorité Administrative Indépendante
+                            I.C &  A.A.I
                         </h3>
                     </div>
                     <p>
@@ -415,11 +384,11 @@ require '../../includes/header.php';
                     <div class="quick-top">
                         <div class="quick-icon dark">
                              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="9"/>
-    <line x1="12" y1="11" x2="12" y2="16.5"/>
-    <circle cx="12" cy="7.5" r="0.9" fill="#fff" stroke="none"/>
-  </svg>
-                        </div>
+                            <circle cx="12" cy="12" r="9"/>
+                            <line x1="12" y1="11" x2="12" y2="16.5"/>
+                            <circle cx="12" cy="7.5" r="0.9" fill="#fff" stroke="none"/>
+                        </svg>
+                                                </div>
                         <h3>
                             À propos du MRRI
                         </h3>
@@ -837,18 +806,5 @@ if (searchInput) {
     );
 
 }
-const images = document.querySelectorAll('.slider img');
-  let index = 0;
 
-  function showNextImage() {
-    images[index].classList.remove('active');
-    index = (index + 1) % images.length;
-    images[index].classList.add('active');
-  }
-
-  // Activer la première image
-  images[0].classList.add('active');
-
-  // Changer d’image toutes les 4 secondes
-  setInterval(showNextImage, 4000);
 </script>

@@ -310,6 +310,263 @@ a { text-decoration: none; }
     }
 
 }
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: fondu-sortie .25s ease both;
+}
+
+::view-transition-new(root) {
+  animation: fondu-entree .3s ease both;
+}
+
+@keyframes fondu-sortie {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-8px); }
+}
+
+@keyframes fondu-entree {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+/* =====================================================
+   MENU DÉROULANT "STRUCTURES"
+   ===================================================== */
+.mrri-dropdown {
+  position: relative;
+}
+
+.mrri-dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  background: none;
+  border: none;
+  padding: 0 0 4px;
+  cursor: pointer;
+
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--mrri-text);
+
+  border-bottom: 2px solid transparent;
+  transition: color .2s ease, border-color .2s ease;
+}
+
+.mrri-dropdown-toggle:hover,
+.mrri-dropdown.ouvert .mrri-dropdown-toggle {
+  color: var(--mrri-vert);
+  border-bottom-color: var(--mrri-vert);
+}
+
+.mrri-dropdown-toggle svg {
+  transition: transform .25s ease;
+}
+
+.mrri-dropdown.ouvert .mrri-dropdown-toggle svg {
+  transform: rotate(180deg);
+}
+
+/* Menu principal */
+.mrri-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+
+  min-width: 330px;
+  max-height: 70vh;
+  overflow-y: auto;
+
+  background: #fff;
+  border: 1px solid var(--mrri-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+
+  padding: 0.45rem 0;
+
+  z-index: 1100;
+
+  /* État fermé : animable */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(.98);
+  transform-origin: top left;
+
+  transition:
+    opacity .22s ease,
+    transform .22s ease,
+    visibility .22s ease;
+}
+
+.mrri-dropdown.ouvert .mrri-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* Lien "Toutes les structures" */
+.mrri-dropdown-menu > a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  position: relative;
+
+  padding: 0.6rem 1.15rem;
+  padding-left: calc(1.15rem + var(--niveau, 0) * 1.05rem);
+
+  font-weight: 500;
+  font-size: 0.88rem;
+  color: var(--mrri-text);
+
+  border-left: 3px solid transparent;
+
+  transition:
+    background-color .18s ease,
+    color .18s ease,
+    border-color .18s ease,
+    padding-left .18s ease;
+}
+
+.mrri-dropdown-menu > a:hover {
+  background: var(--mrri-bg);
+  color: var(--mrri-vert);
+  border-left-color: var(--mrri-vert);
+  padding-left: calc(1.35rem + var(--niveau, 0) * 1.05rem);
+}
+
+/* Catégories parentes */
+.mrri-dropdown-menu > a.est-parent {
+  font-weight: 700;
+  color: var(--mrri-bleu-nuit);
+}
+
+.mrri-dropdown-menu > a.est-parent::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mrri-or);
+  flex-shrink: 0;
+  opacity: .85;
+}
+
+.mrri-dropdown-menu > a:not(.est-parent)::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--mrri-border);
+  flex-shrink: 0;
+  transition: background-color .18s ease;
+}
+
+.mrri-dropdown-menu > a:hover:not(.est-parent)::before {
+  background: var(--mrri-vert);
+}
+
+/* Séparateur */
+.mrri-dropdown-menu .separateur {
+  height: 1px;
+  margin: 0.35rem 0;
+  background: linear-gradient(
+    90deg,
+    var(--mrri-vert) 0 33%,
+    var(--mrri-or) 33% 66%,
+    var(--mrri-bleu) 66% 100%
+  );
+  opacity: .35;
+}
+
+/* Apparition progressive des éléments */
+.mrri-dropdown.ouvert .mrri-dropdown-menu > a {
+  animation: mrri-apparition .25s ease both;
+}
+
+.mrri-dropdown.ouvert .mrri-dropdown-menu > a:nth-child(1) { animation-delay: .02s; }
+.mrri-dropdown.ouvert .mrri-dropdown-menu > a:nth-child(2) { animation-delay: .04s; }
+.mrri-dropdown.ouvert .mrri-dropdown-menu > a:nth-child(3) { animation-delay: .06s; }
+.mrri-dropdown.ouvert .mrri-dropdown-menu > a:nth-child(4) { animation-delay: .08s; }
+.mrri-dropdown.ouvert .mrri-dropdown-menu > a:nth-child(5) { animation-delay: .10s; }
+.mrri-dropdown.ouvert .mrri-dropdown-menu > a:nth-child(6) { animation-delay: .12s; }
+.mrri-dropdown.ouvert .mrri-dropdown-menu > a:nth-child(7) { animation-delay: .14s; }
+.mrri-dropdown.ouvert .mrri-dropdown-menu > a:nth-child(8) { animation-delay: .16s; }
+
+@keyframes mrri-apparition {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Accessibilité : réduit les mouvements si l'utilisateur le demande */
+@media (prefers-reduced-motion: reduce) {
+  .mrri-dropdown-menu,
+  .mrri-dropdown-menu > a,
+  .mrri-dropdown-toggle svg {
+    transition: opacity .15s ease, visibility .15s ease;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .mrri-dropdown {
+    width: 100%;
+  }
+
+  .mrri-dropdown-toggle {
+    width: 100%;
+    justify-content: space-between;
+    padding: 0.75rem 1.5rem;
+    border-bottom: none;
+  }
+
+  .mrri-dropdown-menu {
+    position: static;
+    min-width: 0;
+    max-height: none;
+    overflow: visible;
+
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: var(--mrri-bg);
+    padding: 0.25rem 0;
+
+    transform: none;
+  }
+
+  .mrri-dropdown-menu > a {
+    padding-left: calc(2rem + var(--niveau, 0) * 1rem);
+  }
+
+  .mrri-dropdown-menu > a:hover {
+    padding-left: calc(2.2rem + var(--niveau, 0) * 1rem);
+  }
+}
+@media (max-width: 900px) {
+  .mrri-dropdown { width: 100%; }
+  .mrri-dropdown-toggle { width: 100%; justify-content: space-between; padding: 0.75rem 1.5rem; border-bottom: none; }
+  .mrri-dropdown-menu { position: static; min-width: 0; max-height: none; border: none; border-radius: 0; box-shadow: none; background: var(--mrri-bg); padding: 0.25rem 0; }
+  .mrri-nav .mrri-dropdown-menu a { padding-left: calc(2rem + var(--niveau, 0) * 1rem); }
+}
 </style>
 </head>
 <body>
@@ -321,6 +578,43 @@ if (isset($_SESSION['role'])) {
         case 'super_admin': $lienDashboard = '../super_admin/dashboard.php'; break;
         case 'point_focal': $lienDashboard = '../point_focal/dashboard.php'; break;
         case 'agent_ministere': $lienDashboard = '../agent_ministere/dashboard.php'; break;
+    }
+}
+?>
+<?php
+// Catégories pour le menu déroulant "Structures".
+// $db est fourni par la page qui inclut ce header ; sans lui, on affiche un simple lien.
+$menuCategories = [];
+if (isset($db) && $db instanceof PDO) {
+    try {
+        $lignesCat = $db->query("SELECT id_cat, nom_cat, parent_id FROM categories ORDER BY nom_cat")
+                        ->fetchAll(PDO::FETCH_ASSOC);
+
+        // Regroupe les catégories par parent (0 = catégorie de premier niveau)
+        $enfantsCat = [];
+        foreach ($lignesCat as $c) {
+            $enfantsCat[(int) ($c['parent_id'] ?? 0)][] = $c;
+        }
+
+        // Aplatit l'arbre en liste ordonnée, avec la profondeur pour l'indentation
+        $aplatirCat = function (int $parent, int $profondeur) use (&$aplatirCat, &$menuCategories, $enfantsCat) {
+            if ($profondeur > 3) {
+                return;
+            }
+            foreach ($enfantsCat[$parent] ?? [] as $c) {
+                $idCat = (int) $c['id_cat'];
+                $menuCategories[] = [
+                    'id'         => $idCat,
+                    'nom'        => $c['nom_cat'],
+                    'profondeur' => $profondeur,
+                    'parent'     => !empty($enfantsCat[$idCat]),
+                ];
+                $aplatirCat($idCat, $profondeur + 1);
+            }
+        };
+        $aplatirCat(0, 0);
+    } catch (PDOException $e) {
+        error_log("Menu catégories : " . $e->getMessage());
     }
 }
 ?>
@@ -340,14 +634,38 @@ if (isset($_SESSION['role'])) {
 </button>
 
     <nav class="mrri-nav">
-      <a href="../public/accueil.php" aria-current="page">Accueil</a>
-      <a href="../public/catalogue.php">Structures</a>
+<?php
+$pageActuelle = basename($_SERVER['PHP_SELF']);
+$estAccueil = ($pageActuelle === 'accueil.php');
+?>
+
+<a href="../public/accueil.php"
+   <?= $estAccueil ? 'aria-current="page"' : '' ?>>
+   Accueil
+</a>      <?php if (!empty($menuCategories)): ?>
+      <div class="mrri-dropdown">
+        <button type="button" class="mrri-dropdown-toggle" aria-expanded="false" aria-controls="mrriStructuresMenu">
+          Structures
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="mrri-dropdown-menu" id="mrriStructuresMenu">
+          <a href="../public/catalogue.php" class="est-parent">Toutes les structures</a>
+          <div class="separateur"></div>
+          <?php foreach ($menuCategories as $cat): ?>
+            <a href="../public/catalogue.php?cat=<?= (int) $cat['id'] ?>"
+               class="<?= $cat['parent'] ? 'est-parent' : '' ?>"
+               style="--niveau: <?= (int) $cat['profondeur'] ?>;"><?= htmlspecialchars($cat['nom']) ?></a>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <?php else: ?>
+        <a href="../public/catalogue.php">Structures</a>
+      <?php endif; ?>
       <a href="../public/actualite.php">Actualités</a>
       <a href="../public/consultations.php">Consultations</a>
       <?php if ($estAgentMinistere): ?>
         <a href="../agent_ministere/demandes.php">Demandes</a>
-        <a href="../consultations/créer_consultations.php">Créer une consultation</a>
-        <a href="../consultations/mes_consultations.php">Voir mes consultations</a>
+        <a href="../agent_ministere/gerer_consultations.php">Gérer les consultations</a>
       <?php endif; ?>
     </nav>
 
@@ -395,5 +713,85 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
 
+});
+</script>
+
+<script>
+// Menu déroulant "Structures" : ouverture au clic, fermeture au clic ailleurs ou avec Échap
+document.addEventListener('DOMContentLoaded', function () {
+    const menu = document.querySelector('.mrri-dropdown');
+    if (!menu) {
+        return;
+    }
+    const bouton = menu.querySelector('.mrri-dropdown-toggle');
+
+    function fermer() {
+        menu.classList.remove('ouvert');
+        bouton.setAttribute('aria-expanded', 'false');
+    }
+
+    bouton.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const ouvert = menu.classList.toggle('ouvert');
+        bouton.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!menu.contains(e.target)) {
+            fermer();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            fermer();
+            bouton.focus();
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.mrri-sous-toggle').forEach(function (bouton) {
+        const parent = bouton.closest('.mrri-sous-dropdown');
+
+        bouton.addEventListener('click', function (e) {
+            e.stopPropagation();
+
+            // Ferme les sous-menus frères au même niveau
+            const freres = parent.parentElement.querySelectorAll(':scope > .mrri-sous-dropdown');
+            freres.forEach(function (frere) {
+                if (frere !== parent) {
+                    frere.classList.remove('ouvert');
+                    const b = frere.querySelector(':scope > .mrri-sous-toggle');
+                    if (b) b.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            const ouvert = parent.classList.toggle('ouvert');
+            bouton.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+        });
+    });
+
+    // Ferme tous les sous-menus si clic en dehors du menu principal
+    document.addEventListener('click', function (e) {
+        const menuPrincipal = document.getElementById('mrriStructuresMenu');
+        if (menuPrincipal && !menuPrincipal.contains(e.target)) {
+            document.querySelectorAll('.mrri-sous-dropdown.ouvert').forEach(function (item) {
+                item.classList.remove('ouvert');
+                const b = item.querySelector(':scope > .mrri-sous-toggle');
+                if (b) b.setAttribute('aria-expanded', 'false');
+            });
+        }
+    });
+
+    // Ferme aussi avec Échap
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.mrri-sous-dropdown.ouvert').forEach(function (item) {
+                item.classList.remove('ouvert');
+                const b = item.querySelector(':scope > .mrri-sous-toggle');
+                if (b) b.setAttribute('aria-expanded', 'false');
+            });
+        }
+    });
 });
 </script>

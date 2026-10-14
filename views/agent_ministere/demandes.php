@@ -11,7 +11,7 @@ if ($_SESSION['role'] !== 'agent_ministere') {
 $demandesStmt = $db->query("
     SELECT demandes.id_demande, demandes.titre_theme, demandes.statut, demandes.date_soumission, utilisateurs.username AS soumis_par
     FROM demandes
-    JOIN utilisateurs ON utilisateurs.id = demandes.id_point_focal
+    LEFT JOIN utilisateurs ON utilisateurs.id = demandes.id_point_focal
     ORDER BY demandes.date_soumission DESC
 ");
 $demandes = $demandesStmt->fetchAll(PDO::FETCH_ASSOC);
