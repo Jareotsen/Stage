@@ -30,50 +30,60 @@ function formaterDateFr(string $dateSql): string {
 require '../../includes/header.php';
 ?>
 
-<style>
-	.actualite-page { max-width: 1180px; margin: 0 auto; padding: 48px 24px 70px; color: #263746; font-family: Arial, sans-serif; }
-	.actualite-page .intro { border-left: 5px solid #000000; padding-left: 18px; margin-bottom: 38px; }
-	.actualite-page h1 { margin: 0 0 10px; color: #030303; font-size: 2.5rem; }
-	.actualite-page .intro p { margin: 0; color: #131618; font-size: 1.05rem; }
-	.actualite-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
-	.actualite-card { overflow: hidden; background: #fff; border: 1px solid #e5e9eb; border-radius: 3px; box-shadow: 0 3px 12px rgba(30,50,60,.08); }
-	.actualite-card img { display: block; width: 100%; height: 190px; object-fit: cover; }
-	.actualite-content { padding: 22px; }
-	.actualite-meta { color: #000000; font-size: .82rem; font-weight: bold; text-transform: uppercase; letter-spacing: .04em; }
-	.actualite-card h2 { margin: 10px 0; color: #141515; font-size: 1.25rem; line-height: 1.3; }
-	.actualite-card p { margin: 0 0 20px; color: #121516; line-height: 1.55; }
-	.actualite-link { color: #000000; font-weight: bold; text-decoration: none; }
-	.actualite-link:hover { color: #080807; }
-	@media (max-width: 760px) { .actualite-grid { grid-template-columns: 1fr; } .actualite-page h1 { font-size: 2rem; } }
-</style>
+<link rel="stylesheet" href="../../publique/css/theme.css">
 
 <main class="actualite-page">
-	<header class="intro">
-		<h1>Actualités</h1>
-		<p>Découvrez les dernières nouvelles publiées par les structures sous tutelle du MRRI.</p>
-	</header>
+    <header class="actualite-hero">
+        <div class="actualite-hero-inner">
+            <h1>Dernières actualités</h1>
+            <p>Les informations et annonces officielles des structures placées sous la tutelle du Ministère des Réformes et des Relations avec les Institutions.</p>
+        </div>
+    </header>
 
-	<?php if (empty($actualites)): ?>
-		<p>Aucune actualité publiée pour le moment.</p>
-	<?php else: ?>
-		<section class="actualite-grid" aria-label="Liste des actualités">
-			<?php foreach ($actualites as $actualite): ?>
-				<article class="actualite-card">
-					<?php if ($actualite['image']): ?>
-						<img src="../../uploads/photos/<?= htmlspecialchars($actualite['image'], ENT_QUOTES, 'UTF-8') ?>" alt="">
-					<?php else: ?>
-						<div style="width:100%; height:190px; background:#eef1f2; display:flex; align-items:center; justify-content:center; color:#9aa6ac; font-size:.85rem;">Pas de photo</div>
-					<?php endif; ?>
-					<div class="actualite-content">
-						<div class="actualite-meta"><?= htmlspecialchars($actualite['nom_struc'], ENT_QUOTES, 'UTF-8') ?> · <?= formaterDateFr($actualite['date_publication']) ?></div>
-						<h2> <strong><?= htmlspecialchars($actualite['titre'], ENT_QUOTES, 'UTF-8') ?></strong></h2>
-						<p><?= htmlspecialchars(mb_strimwidth($actualite['contenu'], 0, 140, '…'), ENT_QUOTES, 'UTF-8') ?></p>
-						<a class="actualite-link" href="actualite_detail.php?id=<?= $actualite['id_actu'] ?>">Lire la suite&nbsp; →</a>
-					</div>
-				</article>
-			<?php endforeach; ?>
-		</section>
-	<?php endif; ?>
+   
+
+    <?php if (empty($actualites)): ?>
+        <section class="actualite-empty" aria-live="polite">
+            <div class="actualite-empty-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 5.5V21M8 7h8M8 11h8"/></svg>
+            </div>
+            <h2>Aucune actualité pour le moment</h2>
+            <p>Les nouvelles publications des structures apparaîtront ici dès leur mise en ligne.</p>
+        </section>
+    <?php else: ?>
+        <section class="actualite-feature-grid" aria-label="Dernières actualités">
+            <?php foreach ($actualites as $index => $actualite): ?>
+                <?php
+                    $cardClass = $index === 0 ? 'featured' : ($index === 1 ? 'side-large' : ($index <= 3 ? 'side-small' : 'extra'));
+                    $isExtra = $index > 3;
+                ?>
+                <?php if ($isExtra && $index === 4): ?><div class="actualite-extra-grid" aria-label="Autres actualités"><?php endif; ?>
+                <article class="actualite-card <?= $cardClass ?>">
+                    <div class="actualite-media">
+                        <?php if (!empty($actualite['image'])): ?>
+                            <img src="../../uploads/photos/<?= htmlspecialchars($actualite['image'], ENT_QUOTES, 'UTF-8') ?>" alt="Illustration de l’actualité : <?= htmlspecialchars($actualite['titre'], ENT_QUOTES, 'UTF-8') ?>" loading="lazy">
+                        <?php else: ?>
+                            <div class="actualite-no-image" aria-label="Aucune image disponible">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-7h6v7M9 10h.01M15 10h.01"/></svg>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="actualite-content">
+                        <div class="actualite-meta">
+                            <time datetime="<?= htmlspecialchars(date('Y-m-d', strtotime($actualite['date_publication'])), ENT_QUOTES, 'UTF-8') ?>"><?= formaterDateFr($actualite['date_publication']) ?></time>
+                            <span><?= htmlspecialchars($actualite['nom_struc'], ENT_QUOTES, 'UTF-8') ?></span>
+                        </div>
+                        <h2><?= htmlspecialchars($actualite['titre'], ENT_QUOTES, 'UTF-8') ?></h2>
+                        <?php if ($index === 0): ?>
+                            <p><?= htmlspecialchars(mb_strimwidth(strip_tags($actualite['contenu']), 0, 190, '…', 'UTF-8'), ENT_QUOTES, 'UTF-8') ?></p>
+                        <?php endif; ?>
+                        <a class="actualite-link" href="actualite_detail.php?id=<?= (int) $actualite['id_actu'] ?>">Lire l’actualité <span aria-hidden="true">→</span></a>
+                    </div>
+                </article>
+                <?php if ($index === count($actualites) - 1 && count($actualites) > 4): ?></div><?php endif; ?>
+            <?php endforeach; ?>
+        </section>
+    <?php endif; ?>
 </main>
 
 <?php require '../../includes/footer.php'; ?>

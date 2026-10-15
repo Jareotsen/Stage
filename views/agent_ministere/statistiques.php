@@ -103,27 +103,7 @@ $nbParticipants = (int) $db->query(
 require '../../includes/header_dashboard.php';
 ?>
 
-<style>
-    .st-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
-    .st-kpi { background: #fff; border: 1px solid #E4E7EC; border-radius: 10px; padding: 16px 18px; }
-    .st-kpi .lib { color: #667085; font-size: .78rem; font-weight: 600; }
-    .st-kpi .val { font-size: 1.9rem; font-weight: 700; color: #0B1D4D; line-height: 1.2; }
-    .st-table-wrap { overflow-x: auto; }
-    .st-table { width: 100%; border-collapse: collapse; font-size: .84rem; background: #fff; }
-    .st-table th { text-align: left; padding: 10px 12px; background: #F5F7FA; color: #667085; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid #E4E7EC; white-space: nowrap; }
-    .st-table td { padding: 12px; border-bottom: 1px solid #E4E7EC; vertical-align: middle; }
-    .st-table td.num, .st-table th.num { text-align: right; }
-    .st-badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: .7rem; font-weight: 700; }
-    .st-badge.ouverte { background: #E5F5EC; color: #0B6B3A; }
-    .st-badge.cloturee { background: #EEF1F2; color: #667085; }
-    .st-badge.generale { background: #E8EDFB; color: #1B3FAE; }
-    .st-badge.structure { background: #E5F5EC; color: #0B6B3A; }
-    .st-barre { display: flex; width: 120px; height: 8px; border-radius: 4px; overflow: hidden; background: #E4E7EC; }
-    .st-barre .pour { background: #0F8A4B; }
-    .st-barre .contre { background: #c0392b; }
-    .st-score { font-size: .75rem; color: #667085; margin-top: 3px; }
-    @media (max-width: 900px) { .st-kpis { grid-template-columns: repeat(2, 1fr); } }
-</style>
+<link rel="stylesheet" href="../../publique/css/theme.css">
 
 <div class="mrri-dashboard dashboard-agent">
 

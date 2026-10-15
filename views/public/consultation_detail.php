@@ -165,43 +165,7 @@ $emailMemorise = $_SESSION['email_citoyen'] ?? '';
 require '../../includes/header.php';
 ?>
 
-<style>
-    .cd-page { max-width: 850px; margin: 40px auto; padding: 0 20px 60px; }
-    .cd-retour { display: inline-block; margin-bottom: 20px; color: var(--mrri-bleu, #1B3FAE); }
-    .cd-carte { background: #fff; border: 1px solid #e5e9eb; border-radius: 8px; box-shadow: 0 2px 12px #00000012; padding: 28px; margin-bottom: 28px; }
-    .cd-carte.generale { border-top: 5px solid var(--mrri-bleu, #1B3FAE); }
-    .cd-carte.structure { border-top: 5px solid var(--mrri-vert, #0F8A4B); }
-    .cd-badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: .72rem; font-weight: 700; margin-right: 6px; }
-    .cd-badge.generale { background: #E8EDFB; color: var(--mrri-bleu, #1B3FAE); }
-    .cd-badge.structure { background: #E5F5EC; color: var(--mrri-vert-dark, #0B6B3A); }
-    .cd-badge.ouverte { background: #E5F5EC; color: var(--mrri-vert-dark, #0B6B3A); }
-    .cd-badge.cloturee { background: #EEF1F2; color: #667085; }
-    .cd-carte h1 { margin: 14px 0 8px; font-size: 2rem; }
-    .cd-meta { color: #68717d; font-size: .9rem; }
-    .cd-texte { margin-top: 22px; white-space: pre-line; line-height: 1.65; }
-
-    .cd-section-titre { font-size: 1.3rem; margin: 0 0 18px; }
-    .cd-contrib { border-bottom: 1px solid #e5e9eb; padding: 18px 0; }
-    .cd-contrib:last-child { border-bottom: none; }
-    .cd-contrib-meta { color: #68717d; font-size: .8rem; margin-bottom: 6px; }
-    .cd-contrib-texte { line-height: 1.6; margin-bottom: 12px; }
-
-    .cd-vote { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-    .cd-vote input[type="email"] { flex: 1; min-width: 180px; max-width: 260px; height: 36px; padding: 0 10px; border: 1px solid #e4e7ec; border-radius: 6px; font-size: .85rem; }
-    .cd-btn-vote { height: 36px; padding: 0 14px; border-radius: 6px; font-weight: 700; font-size: .82rem; background: #fff; cursor: pointer; }
-    .cd-btn-vote.pour { border: 1px solid var(--mrri-vert, #0F8A4B); color: var(--mrri-vert, #0F8A4B); }
-    .cd-btn-vote.pour:hover { background: var(--mrri-vert, #0F8A4B); color: #fff; }
-    .cd-btn-vote.contre { border: 1px solid #c0392b; color: #c0392b; }
-    .cd-btn-vote.contre:hover { background: #c0392b; color: #fff; }
-    .cd-score { font-size: .82rem; color: #4a5563; }
-
-    .cd-form label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: 4px; }
-    .cd-form input[type="email"], .cd-form textarea { width: 100%; padding: 10px 12px; border: 1px solid #e4e7ec; border-radius: 8px; font-size: .92rem; margin-bottom: 14px; }
-    .cd-form input:focus, .cd-form textarea:focus { outline: none; border-color: var(--mrri-bleu, #1B3FAE); box-shadow: 0 0 0 3px rgba(27,63,174,.14); }
-    .cd-form-btn { padding: 11px 24px; border: none; border-radius: 8px; background: var(--mrri-bleu, #1B3FAE); color: #fff; font-weight: 700; cursor: pointer; }
-    .cd-form-btn:hover { background: var(--mrri-bleu-dark, #142F86); }
-    .cd-aide { font-size: .8rem; color: #68717d; margin-top: -8px; margin-bottom: 14px; }
-</style>
+<link rel="stylesheet" href="../../publique/css/theme.css">
 
 <main class="cd-page">
     <a class="cd-retour" href="consultations.php">← Retour aux consultations</a>

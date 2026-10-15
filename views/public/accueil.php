@@ -17,7 +17,7 @@ $actu = $db->query("
     JOIN structure 
         ON actualites.id_structure = structure.id_struc
     ORDER BY date_publication DESC
-    LIMIT 8
+    LIMIT 3
 ");
 $actualites = $actu->fetchAll(PDO::FETCH_ASSOC);
 
@@ -59,7 +59,7 @@ $secteursAAIIds = array_map('intval', array_column($secteursAAI, 'id_cat'));
 /* =========================================================
    STRUCTURES
    ========================================================= */
-$parPage = 9;
+$parPage = 3;
 $page = isset($_GET['page'])
     ? max(1, (int) $_GET['page'])
     : 1;
@@ -276,6 +276,126 @@ require '../../includes/header.php';
   .mrri-hero-grid { grid-template-columns: 1fr; }
   .mrri-hero-image-col { display: none; }
 }
+
+
+/* =========================================================
+   REFONTE VISUELLE — ACCUEIL MRRI
+   Styles de présentation uniquement : logique PHP conservée.
+   ========================================================= */
+:root { scroll-behavior: smooth; }
+.mrri-top-band { height: 5px; background: linear-gradient(90deg, var(--mrri-vert) 0 33.33%, var(--mrri-or) 33.33% 66.66%, var(--mrri-bleu) 66.66% 100%); }
+.search-section { margin-top: -38px; margin-bottom: 3.5rem; }
+.search-box { gap: 1rem; padding: clamp(1rem, 2vw, 1.5rem); border-radius: 16px; box-shadow: 0 16px 40px rgba(11,29,77,.12); }
+.search-title { white-space: normal; }
+.search-input, .search-button, .search-filtres-btn { min-height: 48px; border-radius: 9px; }
+.search-button { transition: background .2s ease, transform .2s ease; }
+.search-button:hover { transform: translateY(-1px); }
+.citation-section { position: relative; overflow: hidden; padding: 5rem 0; background: var(--mrri-bleu-nuit); }
+.citation-fond { position: absolute; inset: 0; background-position: center; background-size: cover; opacity: .34; }
+.citation-voile { position: absolute; inset: 0; background: linear-gradient(110deg, rgba(11,29,77,.94), rgba(11,29,77,.64)); }
+.citation-section .container { position: relative; z-index: 1; }
+.citation-carte { max-width: 850px; margin-inline: auto; padding: clamp(1.5rem, 4vw, 3rem); text-align: center; color: #fff; border: 1px solid rgba(255,255,255,.22); border-radius: 20px; background: rgba(255,255,255,.08); backdrop-filter: blur(4px); }
+.citation-portrait { width: 88px; height: 88px; object-fit: cover; border-radius: 50%; border: 3px solid rgba(255,255,255,.8); }
+.citation-guillemet { display: block; margin-top: .5rem; color: var(--mrri-or); font-size: 3.5rem; line-height: .9; font-family: Georgia, serif; }
+.citation-texte { margin: .5rem auto 1.25rem; max-width: 26ch; color: #fff; font-family: var(--font-title); font-size: clamp(1.5rem, 3.4vw, 2.4rem); line-height: 1.25; }
+.citation-trait { width: 54px; height: 3px; margin: 0 auto 1.1rem; background: var(--mrri-or); }
+.citation-auteur { max-width: 65ch; margin: 0 auto .5rem; color: rgba(255,255,255,.9); font-size: .9rem; font-weight: 700; }
+.citation-date { margin: 0; color: rgba(255,255,255,.7); font-size: .8rem; }
+.quick-access { padding: 4rem 0; background: #f5f8fc; }
+.quick-access .row { align-items: stretch; }
+.quick-access [class*="col-"] { display: flex; }
+.quick-card { width: 100%; height: 100%; padding: 1.6rem; border: 1px solid #e6ebf2; border-radius: 16px; box-shadow: 0 5px 22px rgba(11,29,77,.045); }
+.quick-card:hover { border-color: rgba(27,63,174,.2); }
+.quick-top { align-items: center; }
+.quick-icon { width: 52px; height: 52px; border-radius: 14px; }
+.quick-card h3 { color: var(--mrri-bleu-nuit); }
+.quick-card p { flex: 1; }
+.structures-section { padding: clamp(3rem, 6vw, 5rem) 0; background: #fff; }
+.section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; margin-bottom: 1.75rem; }
+.section-heading h2 { margin-bottom: .6rem; color: var(--mrri-bleu-nuit); font-family: var(--font-title); font-size: clamp(1.6rem, 3vw, 2.15rem); font-weight: 700; }
+.section-heading p { margin: .8rem 0 0; color: var(--mrri-text-light); }
+.heading-line { width: 58px; height: 3px; border-radius: 3px; background: var(--mrri-vert); }
+.section-heading .btn { flex-shrink: 0; border-radius: 8px; padding: .7rem 1rem; font-weight: 700; }
+.category-filters { gap: .55rem; margin-bottom: 1.75rem; }
+.category-filter { padding: .6rem .95rem; color: #4f5c70; transition: all .2s ease; text-decoration: none; }
+.category-filter.active { box-shadow: 0 4px 12px rgba(15,138,75,.16); }
+.structure-card { padding: 1.35rem; border-radius: 15px; box-shadow: 0 4px 16px rgba(11,29,77,.035); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.structure-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(11,29,77,.09); }
+.structure-card-top { align-items: center; }
+.structure-icon { width: 50px; height: 50px; border-radius: 50%; }
+.structure-category { max-width: 65%; text-align: right; line-height: 1.35; }
+.structure-card h3 { margin-top: .2rem; color: var(--mrri-bleu-nuit); font-family: var(--font-title); font-size: 1.08rem; }
+.structure-sigle { letter-spacing: .04em; }
+.structure-address { display: flex; align-items: flex-start; gap: .45rem; line-height: 1.5; }
+.structure-address svg { flex: 0 0 16px; margin-top: 2px; }
+.structure-link { margin-top: auto; text-decoration: none; }
+.news-section { padding: clamp(3rem, 6vw, 5rem) 0; background: #f5f8fc; }
+.news-card { border-radius: 15px; border-color: #e5eaf1; box-shadow: 0 4px 16px rgba(11,29,77,.04); transition: transform .2s ease, box-shadow .2s ease; }
+.news-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(11,29,77,.1); }
+.news-image { height: 195px; }
+.news-image img { transition: transform .35s ease; }
+.news-card:hover .news-image img { transform: scale(1.035); }
+.news-badge { max-width: calc(100% - 28px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.news-content { padding: 1.2rem; }
+.news-date { margin-bottom: .55rem; }
+.news-content h3 { color: var(--mrri-bleu-nuit); font-size: 1.03rem; }
+.pagination { gap: .35rem; }
+.pagination .page-link { border-radius: 8px; border-color: #e1e7ef; color: var(--mrri-bleu); }
+.pagination .page-item.active .page-link { background: var(--mrri-bleu); border-color: var(--mrri-bleu); }
+.alert-light { border-radius: 12px; padding: 1.25rem; }
+@media (max-width: 900px) {
+  .mrri-hero-grid { grid-template-columns: 1fr; }
+  .mrri-hero-image-col { display: none; }
+  .search-section { margin-top: -24px; }
+  .search-box { align-items: stretch; }
+  .search-title { width: 100%; }
+  .search-form { min-width: 0; }
+}
+@media (max-width: 575.98px) {
+  .search-section { margin-bottom: 2.5rem; }
+  .search-form { flex-direction: column; width: 100%; }
+  .search-button, .search-filtres-btn { justify-content: center; width: 100%; }
+  .section-heading { align-items: flex-start; flex-direction: column; }
+  .citation-section { padding: 3rem 0; }
+  .quick-access { padding: 2.75rem 0; }
+  .structure-card { padding: 1.1rem; }
+  .news-image { height: 185px; }
+}
+
+
+/* Accueil allégée : moins de texte, plus d'invitation à cliquer */
+.quick-access { padding: 2.25rem 0 3rem; background: #f7f9fc; }
+.quick-access .row { max-width: 1040px; margin-inline: auto; }
+.quick-card { min-height: 132px; padding: 1.25rem 1.35rem; display: flex; flex-direction: column; justify-content: center; gap: .8rem; border: 1px solid #e5eaf1; border-radius: 15px; box-shadow: 0 5px 18px rgba(11,29,77,.045); }
+.quick-top { margin: 0; gap: .85rem; }
+.quick-icon { width: 46px; height: 46px; border-radius: 13px; }
+.quick-card h3 { font-size: 1rem; }
+.quick-card p { display: none; }
+.quick-link { align-self: flex-start; font-size: .84rem; margin-left: 3.8rem; margin-top: -.35rem; text-decoration: none; }
+.structures-section { padding: 3.25rem 0; }
+.structures-section .section-heading { margin-bottom: 1.25rem; }
+.structures-section .section-heading p, .news-section .section-heading p { max-width: 38ch; font-size: .9rem; }
+.structure-card { padding: 1.15rem; }
+.structure-card-top { margin-bottom: .85rem; }
+.structure-icon { width: 44px; height: 44px; }
+.structure-card h3 { min-height: 0; margin-bottom: .35rem; font-size: 1rem; }
+.structure-sigle { margin-bottom: .6rem; }
+.structure-address { font-size: .78rem; margin-bottom: .75rem; }
+.structure-link { padding-top: .7rem; }
+.news-section { padding: 3.25rem 0; }
+.news-section .row { --bs-gutter-y: 1.15rem; }
+.news-image { height: 165px; }
+.news-content { padding: 1rem; }
+.news-content h3 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: .98rem; }
+.news-badge { font-size: .65rem; }
+@media (max-width: 767px) {
+  .quick-access { padding: 1.5rem 0 2rem; }
+  .quick-card { min-height: 0; padding: 1rem; }
+  .quick-link { margin-left: 0; }
+  .structures-section, .news-section { padding: 2.5rem 0; }
+  .section-heading { margin-bottom: 1.25rem; }
+}
+
 </style>
 <div class="mrri-top-band"></div>
 <?php require '../../includes/hero_actualites.php'; ?>
@@ -322,7 +442,7 @@ require '../../includes/header.php';
     <div class="container">
         <div class="row g-4 justify-content-center">
             <!-- CARTE 1 -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <div class="quick-card">
                     <div class="quick-top">
                         <div class="quick-icon green">
@@ -339,19 +459,15 @@ require '../../includes/header.php';
                             I.C &  A.A.I
                         </h3>
                     </div>
-                    <p>
-                        Découvrez la liste des Institutions Constitutionnelles
-                        et des AAI.
-                    </p>
                     <a href="catalogue.php"
                        class="quick-link green-link">
-                        Accéder à la liste
+                        Explorer les institutions
                         <span>→</span>
                     </a>
                 </div>
             </div>
             <!-- CARTE 3 -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
 
                 <div class="quick-card">
                     <div class="quick-top">
@@ -367,19 +483,15 @@ require '../../includes/header.php';
                             Actualités
                         </h3>
                     </div>
-                    <p>
-                        Restez informé des dernières actualités
-                        du ministère et de ses institutions.
-                    </p>
                     <a href="actualite.php"
                        class="quick-link gold-link">
-                        Voir toutes les actualités
+                        Découvrir les actualités
                         <span>→</span>
                     </a>
                 </div>
             </div>
             <!-- CARTE 4 -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <div class="quick-card">
                     <div class="quick-top">
                         <div class="quick-icon dark">
@@ -393,13 +505,9 @@ require '../../includes/header.php';
                             À propos du MRRI
                         </h3>
                     </div>
-                    <p>
-                        Le ministère au service de la réforme
-                        des institutions et du développement du Gabon.
-                    </p>
                     <a href="https://relations-institutions.gouv.ga/"
                        class="quick-link dark-link">
-                        Découvrir le ministère
+                        En savoir plus
                         <span>→</span>
                     </a>
                 </div>
@@ -430,64 +538,7 @@ require '../../includes/header.php';
             </a>
         </div>
 
-        <!-- FILTRES -->
-
-        <div class="category-filters">
-
-            <a
-                href="accueil.php"
-                class="category-filter <?= $catFiltre === null ? 'active' : '' ?>"
-            >
-                Toutes 
-            </a>
-
-            <?php foreach ($categories as $cat): ?>
-
-                <a
-                    href="accueil.php?cat=<?= $cat['id_cat'] ?>"
-                    class="category-filter <?= $catFiltre === (int) $cat['id_cat'] ? 'active' : '' ?>"
-                >
-
-                    <?= htmlspecialchars($cat['nom_cat']) ?>
-
-                </a>
-
-            <?php endforeach; ?>
-
-            <?php if ($aai): ?>
-                <?php
-                    $aaiActif = $catFiltre === (int) $aai['id_cat']
-                        || in_array($catFiltre, $secteursAAIIds, true);
-                ?>
-                <div class="dropdown">
-                    <a
-                        href="#"
-                        class="category-filter dropdown-toggle <?= $aaiActif ? 'active' : '' ?>"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                    >
-                        <?= htmlspecialchars($aai['nom_cat']) ?>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="accueil.php?cat=<?= $aai['id_cat'] ?>">
-                                Toute l'AAI
-                            </a>
-                        </li>
-                        <?php foreach ($secteursAAI as $secteur): ?>
-                            <li>
-                                <a class="dropdown-item" href="accueil.php?cat=<?= $secteur['id_cat'] ?>">
-                                    <?= htmlspecialchars($secteur['nom_cat']) ?>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
-
-        </div>
-
-
+        <!-- Aperçu volontairement épuré : les filtres complets sont disponibles dans le catalogue. -->
 
         <?php if (empty($structuresListe)): ?>
 
@@ -525,11 +576,6 @@ require '../../includes/header.php';
                                 </div>
 
 
-                                <span class="structure-category">
-
-                                    <?= htmlspecialchars($s['nom_cat']) ?>
-
-                                </span>
 
                             </div>
 
@@ -581,49 +627,6 @@ require '../../includes/header.php';
                     </div>
                 <?php endforeach; ?>
             </div>
-            <!-- PAGINATION -->
-            <?php if ($totalPages > 1): ?>
-                <nav
-                    class="mt-5"
-                    aria-label="Pagination des structures"
-                >
-                    <ul class="pagination justify-content-center">
-                        <li
-                            class="page-item <?= $page <= 1 ? 'disabled' : '' ?>"
-                        >
-                            <a
-                                class="page-link"
-                                href="?page=<?= $page - 1 ?><?= $catFiltre ? '&cat=' . $catFiltre : '' ?>"
-                            >
-                                Précédent
-                            </a>
-                        </li>
-                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <li
-                                class="page-item <?= $i === $page ? 'active' : '' ?>"
-                            >
-                                <a
-                                    class="page-link"
-                                    href="?page=<?= $i ?><?= $catFiltre ? '&cat=' . $catFiltre : '' ?>"
-                                >
-                                    <?= $i ?>
-                                </a>
-                            </li>
-                        <?php endfor; ?>
-                        <li
-                            class="page-item <?= $page >= $totalPages ? 'disabled' : '' ?>"
-                        >
-
-                            <a
-                                class="page-link"
-                                href="?page=<?= $page + 1 ?><?= $catFiltre ? '&cat=' . $catFiltre : '' ?>"
-                            >
-                                Suivant
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            <?php endif; ?>
 
 
         <?php endif; ?>

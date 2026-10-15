@@ -7,44 +7,7 @@ include '../../includes/header.php';
 <head>
     <meta charset="UTF-8">
     <title>À propos — MRRI</title>
-    <style>
-        body {
-            font-family: "Inter", sans-serif;
-            background: #F4EEDB;
-            margin: 0;
-            padding: 0;
-            color: #0B3D2E;
-        }
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            background: #FFFFFF;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
-        }
-        h1 {
-            font-size: 32px;
-            margin-bottom: 20px;
-        }
-        h2 {
-            margin-top: 40px;
-            font-size: 24px;
-        }
-        p {
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        .emoji {
-            font-size: 22px;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 14px;
-            color: #4A4A4A;
-        }
-    </style>
+   <link rel="stylesheet" href="../../publique/css/theme.css">
 </head>
 
 <body>

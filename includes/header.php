@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Structures sous tutelle — Ministère des Réformes et des Relations avec les Institutions</title>
+<title>Plateforme de consultation publique</title>
+<link rel="icon" type="image/jpeg" href="/maquette/publique/image/logo1.jpeg">
 <link href="../../publique/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="../../publique/vendor/fonts/fonts.css" rel="stylesheet">
 <style>

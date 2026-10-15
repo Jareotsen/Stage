@@ -99,27 +99,7 @@ $token = generer_token_csrf();
 require '../../includes/header_dashboard.php';
 ?>
 
-<style>
-    .mod-onglets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-    .mod-onglet { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid #E4E7EC; border-radius: 999px; background: #fff; color: #667085; font-size: .85rem; font-weight: 600; text-decoration: none; }
-    .mod-onglet:hover { border-color: #1B3FAE; color: #1B3FAE; }
-    .mod-onglet.actif { background: #1B3FAE; border-color: #1B3FAE; color: #fff; }
-    .mod-onglet .nb { background: rgba(0,0,0,.08); border-radius: 999px; padding: 1px 8px; font-size: .75rem; }
-    .mod-onglet.actif .nb { background: rgba(255,255,255,.25); }
-
-    .mod-carte { background: #fff; border: 1px solid #E4E7EC; border-radius: 10px; padding: 18px 20px; margin-bottom: 14px; }
-    .mod-meta { color: #667085; font-size: .78rem; margin-bottom: 8px; }
-    .mod-meta strong { color: #172033; }
-    .mod-texte { line-height: 1.6; margin-bottom: 14px; white-space: pre-line; }
-    .mod-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .mod-btn { padding: 8px 18px; border-radius: 7px; font-weight: 700; font-size: .82rem; border: 1px solid; background: #fff; cursor: pointer; }
-    .mod-btn.valider { border-color: #0F8A4B; color: #0F8A4B; }
-    .mod-btn.valider:hover { background: #0F8A4B; color: #fff; }
-    .mod-btn.rejeter { border-color: #c0392b; color: #c0392b; }
-    .mod-btn.rejeter:hover { background: #c0392b; color: #fff; }
-    .mod-trace { color: #667085; font-size: .78rem; }
-    .mod-vide { text-align: center; padding: 2.5rem 1rem; color: #667085; border: 1px dashed #E4E7EC; border-radius: 10px; }
-</style>
+<link rel="stylesheet" href="../../publique/css/theme.css">
 
 <div class="mrri-dashboard dashboard-agent">
 <?php $pageActive = 'moderation'; require '../../includes/sidebar_agent.php'; ?>

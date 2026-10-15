@@ -48,29 +48,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link href="../../publique/vendor/fonts/fonts.css" rel="stylesheet">
 
 <style>
+    :root{    --bleu-roi: #1B3FAE;
+        --bleu-fonce: #102A73;
+    
+        --vert-irlandais: #009A44;
+        --vert-fonce: #006B30;
+    
+        --jaune-or: #D4AF37;
+        --jaune-clair: #F4E7B5;
+    
+        --blanc: #FFFFFF;
+        --blanc-casse: #F7F9FC;
+    
+        --texte: #172033;
+        --gris: #758096;
+    
+        --font: "Public Sans", Arial, sans-serif;}
+
+    /*connexion*/
 
 /* =========================================================
    PALETTE MRRI
 ========================================================= */
 
-:root {
-    --bleu-roi: #1B3FAE;
-    --bleu-fonce: #102A73;
 
-    --vert-irlandais: #009A44;
-    --vert-fonce: #006B30;
-
-    --jaune-or: #D4AF37;
-    --jaune-clair: #F4E7B5;
-
-    --blanc: #FFFFFF;
-    --blanc-casse: #F7F9FC;
-
-    --texte: #172033;
-    --gris: #758096;
-
-    --font: "Public Sans", Arial, sans-serif;
-}
 
 
 /* =========================================================
@@ -154,12 +155,10 @@ body {
     border-radius: 50%;
 
     background:
-        radial-gradient(
-            circle,
+        radial-gradient(circle,
             rgba(0, 154, 68, 0.13),
             rgba(0, 154, 68, 0.04) 55%,
-            transparent 70%
-        );
+            transparent 70%);
 }
 
 
@@ -177,11 +176,9 @@ body {
     border-radius: 50%;
 
     background:
-        radial-gradient(
-            circle,
+        radial-gradient(circle,
             rgba(27, 63, 174, 0.08),
-            transparent 70%
-        );
+            transparent 70%);
 }
 
 
@@ -314,12 +311,10 @@ body {
     border-radius: 5px;
 
     background:
-        linear-gradient(
-            90deg,
+        linear-gradient(90deg,
             var(--vert-irlandais) 0 33%,
             var(--jaune-or) 33% 66%,
-            var(--bleu-roi) 66% 100%
-        );
+            var(--bleu-roi) 66% 100%);
 }
 
 
@@ -352,7 +347,6 @@ body {
     line-height: 1.75;
 }
 
-
 /* =========================================================
    BANDE TRICOLORE
 ========================================================= */
@@ -366,12 +360,10 @@ body {
     border-radius: 5px;
 
     background:
-        linear-gradient(
-            90deg,
+        linear-gradient(90deg,
             var(--vert-irlandais) 0 33%,
             var(--jaune-or) 33% 66%,
-            var(--bleu-roi) 66% 100%
-        );
+            var(--bleu-roi) 66% 100%);
 }
 
 
@@ -434,11 +426,9 @@ body {
     padding: 40px;
 
     background:
-        linear-gradient(
-            145deg,
+        linear-gradient(145deg,
             var(--vert-fonce),
-            var(--vert-irlandais)
-        );
+            var(--vert-irlandais));
 
     color: white;
 }
@@ -459,11 +449,11 @@ body {
 
     border-radius: 50%;
 
-    border: 1px solid rgba(255,255,255,0.10);
+    border: 1px solid rgba(255, 255, 255, 0.10);
 
     box-shadow:
-        0 0 0 60px rgba(255,255,255,0.025),
-        0 0 0 120px rgba(255,255,255,0.018);
+        0 0 0 60px rgba(255, 255, 255, 0.025),
+        0 0 0 120px rgba(255, 255, 255, 0.018);
 }
 
 
@@ -511,9 +501,9 @@ body {
 
     border-radius: 50%;
 
-    background: rgba(255,255,255,0.12);
+    background: rgba(255, 255, 255, 0.12);
 
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.15);
 
     color: var(--jaune-or);
 
@@ -539,7 +529,7 @@ body {
 .login-subtitle {
     margin: 0 0 30px;
 
-    color: rgba(255,255,255,0.72);
+    color: rgba(255, 255, 255, 0.72);
 
     font-size: 13px;
 
@@ -561,7 +551,7 @@ body {
 
     margin-bottom: 7px;
 
-    color: rgba(255,255,255,0.88);
+    color: rgba(255, 255, 255, 0.88);
 
     font-size: 12px;
 
@@ -582,7 +572,7 @@ body {
 
     transform: translateY(-50%);
 
-    color: rgba(255,255,255,0.55);
+    color: rgba(255, 255, 255, 0.55);
 
     font-size: 14px;
 
@@ -596,13 +586,13 @@ body {
 
     padding: 0 15px 0 42px;
 
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 
     border-radius: 23px;
 
     outline: none;
 
-    background: rgba(0,0,0,0.18);
+    background: rgba(0, 0, 0, 0.18);
 
     color: white;
 
@@ -615,22 +605,22 @@ body {
 
 
 .login-input::placeholder {
-    color: rgba(255,255,255,0.45);
+    color: rgba(255, 255, 255, 0.45);
 }
 
 
 .login-input:hover {
-    background: rgba(0,0,0,0.23);
+    background: rgba(0, 0, 0, 0.23);
 }
 
 
 .login-input:focus {
     border-color: var(--jaune-or);
 
-    background: rgba(0,0,0,0.24);
+    background: rgba(0, 0, 0, 0.24);
 
     box-shadow:
-        0 0 0 3px rgba(212,175,55,0.12);
+        0 0 0 3px rgba(212, 175, 55, 0.12);
 }
 
 
@@ -650,9 +640,9 @@ body {
 
     border-radius: 9px;
 
-    background: rgba(255,255,255,0.10);
+    background: rgba(255, 255, 255, 0.10);
 
-    border: 1px solid rgba(255,120,120,0.35);
+    border: 1px solid rgba(255, 120, 120, 0.35);
 
     color: #ffd4d4;
 
@@ -701,7 +691,7 @@ body {
     transform: translateY(-2px);
 
     box-shadow:
-        0 9px 22px rgba(0,0,0,0.20);
+        0 9px 22px rgba(0, 0, 0, 0.20);
 }
 
 
@@ -719,11 +709,11 @@ body {
 
     padding-top: 18px;
 
-    border-top: 1px solid rgba(255,255,255,0.10);
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
 
     text-align: center;
 
-    color: rgba(255,255,255,0.52);
+    color: rgba(255, 255, 255, 0.52);
 
     font-size: 11px;
 
@@ -750,12 +740,10 @@ body {
     height: 4px;
 
     background:
-        linear-gradient(
-            90deg,
+        linear-gradient(90deg,
             var(--vert-irlandais) 0 33.33%,
             var(--jaune-or) 33.33% 66.66%,
-            var(--bleu-roi) 66.66% 100%
-        );
+            var(--bleu-roi) 66.66% 100%);
 }
 
 
@@ -860,7 +848,6 @@ body {
         padding: 45px 23px 50px;
     }
 }
-
 </style>
 
 
@@ -910,15 +897,14 @@ body {
 
             <h1 class="brand-title">
                 Plateforme de consultation
-                des structures sous tutelle
+                publique
             </h1>
 
 
             <p class="brand-description">
                 Un espace professionnel dédié à la consultation,
                 au suivi et à la centralisation des informations
-                relatives aux structures placées sous la tutelle
-                du Ministère.
+                
             </p>
 
 
