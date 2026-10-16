@@ -21,7 +21,7 @@ $offset = ($page - 1) * $parPage;
 
 // LEFT JOIN : une consultation générale n'a pas de structure (id_structure NULL)
 $consultationStmt = $db->query(
-    "SELECT c.id_consultation, c.titre, c.contenu, c.date_ouverture, c.date_fermeture,
+    "SELECT c.id_consultation, c.titre, c.date_ouverture, c.date_fermeture,
             c.id_structure, s.nom_struc
      FROM consultations c
      LEFT JOIN structure s ON c.id_structure = s.id_struc

@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="../../publique/css/theme.css">
 <?php
 require_once '../../includes/auth.php';
 require_once '../../config/database.php';

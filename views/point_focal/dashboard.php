@@ -28,7 +28,7 @@ if ($structure) {
 
 require '../../includes/header_dashboard.php';
 ?>
-
+<link rel="stylesheet" href="../../publique/css/theme.css">
 <div class="mrri-dashboard dashboard-point-focal">
 
   <?php $pageActive = 'dashboard'; require '../../includes/sidebar_point_focal.php'; ?>

@@ -43,4 +43,4 @@ require '../../includes/header.php';
     <?php endforeach; ?>
 </main>
 
-<?php require '../../includes/footer.php'; ?>
+<?php require '../../includes/footer_dashboard.php'; ?>

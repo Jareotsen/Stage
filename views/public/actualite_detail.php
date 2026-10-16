@@ -56,7 +56,17 @@ $escape = static fn (string $value): string => htmlspecialchars($value, ENT_QUOT
 require '../../includes/header.php';
 ?>
 
-<link rel="stylesheet" href="../../publique/css/theme.css">
+<style>
+	.actualite-detail-page main { max-width: 850px; margin: 40px auto; padding: 0 20px; }
+	.actualite-detail-page article { overflow: hidden; background: #fff; border-radius: 8px; box-shadow: 0 2px 12px #00000012; }
+	.actualite-detail-page .contenu { padding: 28px; }
+	.actualite-detail-page h1 { margin: 0 0 10px; font-size: 2rem; }
+	.actualite-detail-page .meta { color: #68717d; font-size: .9rem; }
+	.actualite-detail-page img { display: block; width: 100%; max-height: 400px; object-fit: cover; }
+	.actualite-detail-page .texte { white-space: pre-line; margin-top: 25px; }
+	.actualite-detail-page .retour { display: inline-block; margin-bottom: 20px; color: #2457a6; text-decoration: none; }
+	.actualite-detail-page .erreur { padding: 35px; text-align: center; }
+</style>
 
 <div class="actualite-detail-page">
 	<main>

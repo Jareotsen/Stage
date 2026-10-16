@@ -1,5 +1,5 @@
 
-Consultation helpers · PHP
+
 <?php
 // Fonctions partagées par consultations.php et consultation_detail.php
  

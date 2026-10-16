@@ -310,7 +310,7 @@ require '../../includes/header.php';
 .quick-icon { width: 52px; height: 52px; border-radius: 14px; }
 .quick-card h3 { color: var(--mrri-bleu-nuit); }
 .quick-card p { flex: 1; }
-.structures-section { padding: clamp(3rem, 6vw, 5rem) 0; background: #fff; }
+.structures-section { padding: clamp(3rem, 6vw, 5rem) 0; background: #EEF3F7; }
 .section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; margin-bottom: 1.75rem; }
 .section-heading h2 { margin-bottom: .6rem; color: var(--mrri-bleu-nuit); font-family: var(--font-title); font-size: clamp(1.6rem, 3vw, 2.15rem); font-weight: 700; }
 .section-heading p { margin: .8rem 0 0; color: var(--mrri-text-light); }

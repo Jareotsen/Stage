@@ -146,7 +146,7 @@ require '../../includes/header.php';
     <div class="container">
       <div class="catalogue-kicker">Portail institutionnel du Gabon</div>
       <h1>Catalogue des structures</h1>
-      <p>Retrouvez les informations essentielles sur les structures placées sous la tutelle du Ministère des Réformes et des Relations avec les Institutions.</p>
+      <p>Retrouvez les informations essentielles sur les Institutions constitutionnelles et les A.A.I</p>
       <div class="catalogue-stats" aria-label="Résumé du catalogue">
         <span class="catalogue-stat"><strong><?= $totalStructures ?></strong> structure(s) affichée(s) selon vos critères</span>
         <span class="catalogue-stat">Répertoire institutionnel officiel</span>

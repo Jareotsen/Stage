@@ -1,4 +1,5 @@
-```php
+<link rel="stylesheet" href="../../publique/css/theme.css">
+
 <?php
 require_once '../../config/database.php';
 require_once '../../includes/auth.php';
@@ -171,7 +172,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
 // Générer le jeton CSRF une seule fois pour le formulaire
 $token = generer_token_csrf();
 

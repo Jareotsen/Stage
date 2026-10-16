@@ -563,20 +563,85 @@ body {
     position: relative;
 }
 
-
-.login-input-wrapper i {
+.login-input-wrapper > i.bi-lock,
+.login-input-wrapper > i.bi-person {
     position: absolute;
-
     left: 15px;
     top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 14px;
+    pointer-events: none;
+}
 
+.login-input-wrapper .toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: 15px;
     transform: translateY(-50%);
 
-    color: rgba(255, 255, 255, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    font-size: 14px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
 
+    border: none;
+    background: transparent;
+    color: rgba(211, 15, 15, 0.75);
+
+    cursor: pointer;
+    z-index: 5;
+}
+
+.login-input-wrapper .toggle-btn i {
+    position: static;
+    transform: none;
+    color: inherit;
+    font-size: 15px;
     pointer-events: none;
+}
+
+.login-input-wrapper .toggle-btn:hover {
+    color: var(--jaune-or);
+}
+
+.login-input {
+    padding-right: 45px;
+}
+/* Bouton afficher/masquer le mot de passe */
+.toggle-btn {
+position: absolute;
+right: 15px;
+top: 50%;
+transform: translateY(-50%);
+
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+padding: 0;
+border: none;
+background: transparent;
+color: rgba(233, 233, 233, 0.65);
+
+font-size: 16px;
+cursor: pointer;
+z-index: 2;
+
+}
+
+.toggle-btn:hover {
+color: var(--jaune-or);
+}
+
+/* Éviter que le texte touche l'icône */
+.login-input-wrapper .login-input[type="password"],
+.login-input-wrapper .login-input[type="text"] {
+padding-right: 45px;
 }
 
 
@@ -719,7 +784,7 @@ body {
 
     line-height: 1.6;
 }
-
+/*icon eye*/
 
 .login-footer i {
     color: var(--jaune-or);
@@ -1007,22 +1072,37 @@ body {
                     </div>
                 </div>
                 <!-- Password -->
-                <div class="login-field">
-                    <label for="password">
-                        Mot de passe
-                    </label>
-                    <div class="login-input-wrapper">
-                        <i class="bi bi-lock"></i>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="login-input"
-                            placeholder="Entrez votre mot de passe"
-                            autocomplete="current-password"
-                            required >
-                    </div>
-                </div>
+              <div class="login-field">
+    <label for="password">Mot de passe</label>
+
+
+<div class="login-input-wrapper">
+    <i class="bi bi-lock"></i>
+
+    <input
+        type="password"
+        id="password"
+        name="password"
+        class="login-input"
+        placeholder="Entrez votre mot de passe"
+        autocomplete="current-password"
+        required
+    >
+
+    <button
+        type="button"
+        class="toggle-btn"
+        id="togglePassword"
+        aria-label="Afficher le mot de passe"
+        aria-pressed="false"
+    >
+        <i class="bi bi-eye"></i>
+    </button>
+</div>
+
+
+</div>
+
                 <!-- Bouton -->
                 <button
                     type="submit"
@@ -1041,3 +1121,15 @@ body {
         <div class="color-strip"></div>
     </section>
 </main>
+<script>
+    const password = document.getElementById("password");
+    const toggle = document.getElementById("togglePassword");
+
+    toggle.addEventListener("click", () => {
+        const type = password.getAttribute("type") === "password" ? "text" : "password";
+        password.setAttribute("type", type);
+
+        toggle.querySelector("i").className = type === "password" ? "bi bi-eye" : "bi bi-eye-slash";
+        toggle.setAttribute("aria-label", type === "password" ? "Afficher le mot de passe" : "Masquer le mot de passe");
+    });
+</script>

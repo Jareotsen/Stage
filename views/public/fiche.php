@@ -1,6 +1,9 @@
+<link href="../../publique/css/theme.css" rel="stylesheet">
+<link href="../../publique/css/public.css" rel="stylesheet">
 <?php 
 session_start();
 require '../../config/database.php';
+require_once '../../includes/dates.php';
 
 if (!isset($_GET['id'])) {
     die("Aucune structure sélectionnée.");
@@ -27,142 +30,221 @@ if ($structure) {
     $actualitesStmt = $db->prepare("SELECT * FROM actualites WHERE id_structure = :id ORDER BY date_publication DESC");
     $actualitesStmt->execute([':id' => $id]);
     $actualites = $actualitesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    /* ---------- Préparation de l'affichage (aucune requête supplémentaire) ---------- */
+    $h = static function ($valeur): string {
+        return htmlspecialchars((string) ($valeur ?? ''), ENT_QUOTES, 'UTF-8');
+    };
+
+    $nomStructure = trim($structure['nom_struc'] ?? '') ?: 'Structure sans nom';
+    $photoPrincipale = !empty($photosStructure) ? $photosStructure[0]['Photos_url'] : null;
+    $autresPhotos = count($photosStructure) > 1 ? $photosStructure : [];
+
+    $adresse   = trim($structure['adresse'] ?? '');
+    $telephone = trim($structure['telephone'] ?? '');
+    $email     = trim($structure['email'] ?? '');
+    $siteWeb   = trim($structure['site_web'] ?? '');
+    $directeur = trim($structure['directeur_general'] ?? '');
+    $mission   = trim($structure['mission'] ?? '');
+
+    // Liens sécurisés : on n'affiche un lien que pour un schéma http(s), une adresse email valide
+    // ou un numéro composé de chiffres (empêche par exemple un lien "javascript:").
+    if ($siteWeb !== '' && !preg_match('#^[a-z][a-z0-9+.\-]*:#i', $siteWeb)) {
+        $siteWeb = 'https://' . $siteWeb;
+    }
+    $siteWebLien = ($siteWeb !== '' && preg_match('#^https?://#i', $siteWeb) && filter_var($siteWeb, FILTER_VALIDATE_URL))
+        ? $siteWeb : null;
+    $siteWebTexte = preg_replace('#^https?://#i', '', $siteWeb);
+    $emailLien = filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : null;
+    $telLien = preg_replace('/[^0-9+]/', '', $telephone);
 }
 
 require '../../includes/header.php';
 ?>
 
 <?php if ($structure): ?>
-<main class="container my-4">
-    <p class="small"><a href="catalogue.php" class="link-secondary">Structures</a> / <?= htmlspecialchars($structure['nom_struc']) ?></p>
 
-    <div class="d-flex align-items-start gap-3 border-bottom pb-3 mb-4">
-        <?php if (!empty($photosStructure)): ?>
-            <img src="../../uploads/photos/<?= htmlspecialchars($photosStructure[0]['Photos_url']) ?>" alt="Photo de <?= htmlspecialchars($structure['nom_struc']) ?>" class="rounded border" style="width: 84px; height: 84px; object-fit: cover;">
-        <?php endif; ?>
-        <div>
-            <h1 class="h3 mb-1"><?= htmlspecialchars($structure['nom_struc'] ?? 'Aucun nom défini.') ?></h1>
-            <span class="badge bg-secondary-subtle text-secondary me-1"><?= htmlspecialchars($structure['sigle'] ?? 'Sigle non renseigné') ?></span>
-            <span class="badge bg-warning-subtle text-warning-emphasis"><?= htmlspecialchars($structure['nom_cat'] ?? 'Catégorie non définie') ?></span>
-        </div>
-    </div>
+<!-- =========================================================
+     EN-TÊTE DE LA FICHE : identité + coordonnées
+     ========================================================= -->
+<section class="fiche-hero">
+    <div class="container">
 
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card shadow-sm mb-3">
-                <div class="card-body">
-                  <h2 class="h5">Informations générales</h2>
-<div class="row row-cols-2 g-3">
+        <nav class="fiche-fil" aria-label="Fil d'Ariane">
+            <a href="catalogue.php">Structures</a>
+            <span aria-hidden="true">/</span>
+            <a href="catalogue.php?cat=<?= (int) $structure['id_cat'] ?>"><?= $h($structure['nom_cat'] ?? '') ?></a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page"><?= $h($nomStructure) ?></span>
+        </nav>
 
-    <div class="col">
-        <p class="small text-secondary mb-0">Directeur général</p>
-        <p class="fw-semibold"><?= htmlspecialchars($structure['directeur_general'] ?? 'Non renseigné') ?></p>
-    </div>
-
-    <div class="col">
-        <p class="small text-secondary mb-0">Adresse</p>
-        <p class="fw-semibold"><?= htmlspecialchars($structure['adresse'] ?? 'Non renseignée') ?></p>
-    </div>
-
-    <div class="col">
-        <p class="small text-secondary mb-0">Email</p>
-        <p class="fw-semibold"><?= htmlspecialchars($structure['email'] ?? 'Non renseigné') ?></p>
-    </div>
-
-    <div class="col">
-        <p class="small text-secondary mb-0">Téléphone</p>
-        <p class="fw-semibold"><?= htmlspecialchars($structure['telephone'] ?? 'Non renseigné') ?></p>
-    </div>
-
-    <div class="col-12">
-        <p class="small text-secondary mb-0">Site web</p>
-        <p class="fw-semibold">
-            <?php if (!empty($structure['site_web'])): ?>
-                <a href="<?= htmlspecialchars($structure['site_web']) ?>" target="_blank">
-                    <?= htmlspecialchars($structure['site_web']) ?>
-                </a>
-            <?php else: ?>
-                Non renseigné
-            <?php endif; ?>
-        </p>
-    </div>
-
-    <div class="col">
-        <p class="small text-secondary mb-0">Missions</p>
-        <p class="fw-semibold mt-3 mb-0"><?= htmlspecialchars($structure['mission'] ?? 'Non renseigné') ?></p>
-    </div>
-
-</div>
-
-                    
+        <div class="fiche-hero-grille">
+            <div class="fiche-hero-texte">
+                <div class="fiche-etiquettes">
+                    <?php if (!empty($structure['sigle'])): ?>
+                        <span class="fiche-etiquette fiche-etiquette-sigle"><?= $h($structure['sigle']) ?></span>
+                    <?php endif; ?>
+                    <span class="fiche-etiquette"><?= $h($structure['nom_cat'] ?? 'Catégorie non définie') ?></span>
                 </div>
+
+                <h1><?= $h($nomStructure) ?></h1>
+
+                <?php if ($directeur !== ''): ?>
+                    <p class="fiche-directeur">Directeur général&nbsp;: <strong><?= $h($directeur) ?></strong></p>
+                <?php endif; ?>
             </div>
 
-            <?php if (count($photosStructure) > 1): ?>
-                <div class="card shadow-sm mb-3">
-                    <div class="card-body">
-                        <h2 class="h5">Photos</h2>
-                        <div class="row row-cols-3 g-2">
-                            <?php foreach ($photosStructure as $photo): ?>
-                                <div class="col"><img src="../../uploads/photos/<?= htmlspecialchars($photo['Photos_url']) ?>" class="img-fluid rounded border" style="aspect-ratio: 4/3; object-fit: cover; width: 100%;" alt="Photo de <?= htmlspecialchars($structure['nom_struc']) ?>"></div>
-                            <?php endforeach; ?>
-                        </div>
+            <div class="fiche-hero-media">
+                <?php if ($photoPrincipale): ?>
+                    <img src="../../uploads/photos/<?= $h($photoPrincipale) ?>"
+                         alt="Photo de <?= $h($nomStructure) ?>">
+                <?php else: ?>
+                    <div class="fiche-hero-vide" aria-hidden="true">
+                        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="21" x2="21" y2="21"/><line x1="5" y1="21" x2="5" y2="10"/><line x1="19" y1="21" x2="19" y2="10"/><line x1="9" y1="21" x2="9" y2="10"/><line x1="15" y1="21" x2="15" y2="10"/><polygon points="12 3 21 9 3 9"/></svg>
                     </div>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        </div>
 
-            <div class="card shadow-sm mb-3">
-                <div class="card-body">
-                    <h2 class="h5">Actualités</h2>
-                    <?php if (empty($actualites)): ?>
-                        <p class="text-secondary">Aucune actualité publiée pour le moment.</p>
+        <!-- Coordonnées : une ligne unique, sans carte -->
+        <dl class="fiche-coordonnees">
+            <div>
+                <dt>Adresse</dt>
+                <dd><?= $adresse !== '' ? $h($adresse) : '<span class="fiche-vide">Non renseignée</span>' ?></dd>
+            </div>
+            <div>
+                <dt>Téléphone</dt>
+                <dd>
+                    <?php if ($telephone !== '' && $telLien !== ''): ?>
+                        <a href="tel:<?= $h($telLien) ?>"><?= $h($telephone) ?></a>
+                    <?php else: ?>
+                        <span class="fiche-vide">Non renseigné</span>
                     <?php endif; ?>
+                </dd>
+            </div>
+            <div>
+                <dt>Email</dt>
+                <dd>
+                    <?php if ($emailLien): ?>
+                        <a href="mailto:<?= $h($emailLien) ?>"><?= $h($emailLien) ?></a>
+                    <?php elseif ($email !== ''): ?>
+                        <?= $h($email) ?>
+                    <?php else: ?>
+                        <span class="fiche-vide">Non renseigné</span>
+                    <?php endif; ?>
+                </dd>
+            </div>
+            <div>
+                <dt>Site web</dt>
+                <dd>
+                    <?php if ($siteWebLien): ?>
+                        <a href="<?= $h($siteWebLien) ?>" target="_blank" rel="noopener noreferrer"><?= $h($siteWebTexte) ?></a>
+                    <?php elseif ($siteWeb !== ''): ?>
+                        <?= $h($siteWeb) ?>
+                    <?php else: ?>
+                        <span class="fiche-vide">Non renseigné</span>
+                    <?php endif; ?>
+                </dd>
+            </div>
+        </dl>
+
+    </div>
+</section>
+
+<!-- =========================================================
+     CORPS : contenu principal + colonne latérale
+     ========================================================= -->
+<div class="container fiche-corps">
+
+    <div class="fiche-principal">
+
+        <section class="fiche-section" aria-labelledby="fiche-mission-titre">
+            <h2 id="fiche-mission-titre">Mission</h2>
+            <?php if ($mission !== ''): ?>
+                <p class="fiche-mission"><?= nl2br($h($mission)) ?></p>
+            <?php else: ?>
+                <p class="fiche-vide">La mission de cette structure n'a pas encore été renseignée.</p>
+            <?php endif; ?>
+        </section>
+
+        <?php if (!empty($autresPhotos)): ?>
+            <section class="fiche-section" aria-labelledby="fiche-photos-titre">
+                <h2 id="fiche-photos-titre">Photos</h2>
+                <div class="fiche-galerie">
+                    <?php foreach ($autresPhotos as $photo): ?>
+                        <img src="../../uploads/photos/<?= $h($photo['Photos_url']) ?>"
+                             alt="Photo de <?= $h($nomStructure) ?>" loading="lazy">
+                    <?php endforeach; ?>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <section class="fiche-section" aria-labelledby="fiche-actu-titre">
+            <h2 id="fiche-actu-titre">Actualités</h2>
+
+            <?php if (empty($actualites)): ?>
+                <p class="fiche-vide">Aucune actualité publiée pour le moment.</p>
+            <?php else: ?>
+                <ul class="fiche-actualites">
                     <?php foreach ($actualites as $actualite): ?>
-                        <div class="border-bottom pb-3 mb-3">
-                            <h3 class="h6"><?= htmlspecialchars($actualite['titre']) ?></h3>
-                            <p><?= htmlspecialchars($actualite['contenu']) ?></p>
-                            <p class="small text-secondary"><?= htmlspecialchars($actualite['date_publication']) ?></p>
-                            <?php
+                        <?php
                             $photosActuStmt = $db->prepare("SELECT * FROM actualites_photos WHERE id_actualites = :id ORDER BY Position");
                             $photosActuStmt->execute([':id' => $actualite['id_actu']]);
                             $photosActualite = $photosActuStmt->fetchAll(PDO::FETCH_ASSOC);
-                            ?>
+                        ?>
+                        <li class="fiche-actualite">
                             <?php if ($photosActualite): ?>
-                                <div class="row row-cols-3 g-2">
-                                    <?php foreach ($photosActualite as $photo): ?>
-                                        <div class="col"><img src="../../uploads/photos/<?= htmlspecialchars($photo['Photos_actu_url']) ?>" class="img-fluid rounded border" style="aspect-ratio: 4/3; object-fit: cover; width: 100%;" alt="Photo de l'actualité"></div>
-                                    <?php endforeach; ?>
-                                </div>
+                                <a class="fiche-actualite-vignette" href="actualite_detail.php?id=<?= (int) $actualite['id_actu'] ?>" tabindex="-1" aria-hidden="true">
+                                    <img src="../../uploads/photos/<?= $h($photosActualite[0]['Photos_actu_url']) ?>" alt="" loading="lazy">
+                                </a>
                             <?php endif; ?>
-                        </div>
+                            <div class="fiche-actualite-texte">
+                                <time datetime="<?= $h($actualite['date_publication']) ?>"><?= $h(formaterDateFr($actualite['date_publication'])) ?></time>
+                                <h3>
+                                    <a href="actualite_detail.php?id=<?= (int) $actualite['id_actu'] ?>"><?= $h($actualite['titre']) ?></a>
+                                </h3>
+                                <p><?= $h(mb_strimwidth($actualite['contenu'] ?? '', 0, 220, '…')) ?></p>
+                            </div>
+                        </li>
                     <?php endforeach; ?>
-                </div>
-            </div>
-        </div>
+                </ul>
+            <?php endif; ?>
+        </section>
 
-        <div class="col-lg-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h2 class="h5">Documents<?= $estAgent ? '' : ' publics' ?></h2>
-                    <?php if ($documents): ?>
-                        <ul class="list-unstyled">
-                            <?php foreach ($documents as $document): ?>
-                                <li class="d-flex justify-content-between align-items-center border-bottom py-2">
-                                    <a href="../../uploads/documents/<?= htmlspecialchars($document['doc_url']) ?>" target="_blank"><?= htmlspecialchars($document['nom_affichage']) ?></a>
-                                    <?php if ($estAgent): ?>
-                                        <span class="badge <?= $document['est_public'] ? 'bg-success' : 'bg-danger' ?>"><?= $document['est_public'] ? 'Public' : 'Confidentiel' ?></span>
-                                    <?php endif; ?>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php else: ?>
-                        <p class="text-secondary">Aucun document public disponible.</p>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
     </div>
-</main>
+
+    <aside class="fiche-lateral" aria-label="Informations complémentaires">
+
+        <section class="fiche-bloc" aria-labelledby="fiche-doc-titre">
+            <h2 id="fiche-doc-titre">Documents<?= $estAgent ? '' : ' publics' ?></h2>
+
+            <?php if ($documents): ?>
+                <ul class="fiche-documents">
+                    <?php foreach ($documents as $document): ?>
+                        <li>
+                            <a href="../../uploads/documents/<?= $h($document['doc_url']) ?>" target="_blank" rel="noopener noreferrer">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                <span><?= $h($document['nom_affichage']) ?></span>
+                            </a>
+                            <?php if ($estAgent): ?>
+                                <span class="fiche-statut <?= $document['est_public'] ? 'public' : 'confidentiel' ?>">
+                                    <?= $document['est_public'] ? 'Public' : 'Confidentiel' ?>
+                                </span>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php else: ?>
+                <p class="fiche-vide">Aucun document public disponible.</p>
+            <?php endif; ?>
+        </section>
+
+        <!-- Emplacement réservé : carte de localisation de la structure (étape suivante) -->
+
+    </aside>
+
+</div>
+
 <?php else: ?>
     <div class="container my-5"><div class="alert alert-light border text-center">Structure introuvable.</div></div>
 <?php endif; ?>
