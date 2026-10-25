@@ -836,6 +836,78 @@ textarea:focus-visible {
     line-height: 1.2;
 }
 
+.st-demographics {
+    margin-bottom: 22px;
+}
+
+.st-demographics > .mrri-page-header {
+    margin-bottom: 14px;
+}
+
+.st-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.st-chart-card {
+    min-width: 0;
+}
+
+.st-chart-card .mrri-panel-body {
+    overflow: hidden;
+}
+
+.st-chart-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.st-chart-gridline {
+    stroke: #E8ECF2;
+    stroke-width: 1;
+}
+
+.st-chart-axis,
+.st-chart-category {
+    fill: var(--mrri-texte-leger);
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.st-chart-line {
+    fill: none;
+    stroke: var(--mrri-bleu);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3;
+}
+
+.st-chart-point {
+    fill: #fff;
+    stroke: var(--mrri-vert);
+    stroke-width: 3;
+}
+
+.st-chart-value {
+    fill: var(--mrri-bleu-nuit);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.st-chart-empty,
+.st-chart-note {
+    color: var(--mrri-texte-leger);
+    font-size: .82rem;
+}
+
+.st-chart-note {
+    margin: 10px 0 0;
+}
+
 .st-table-wrap {
     overflow-x: auto;
 }
@@ -1095,158 +1167,6 @@ textarea:focus-visible {
         width: 100%;
     }
 }
-
-/*nouvelle_demande*/
-.demande-hero {
-    background: linear-gradient(135deg, var(--mrri-vert) 0%, var(--mrri-vert-fonce) 100%);
-    color: #fff;
-    border-radius: 14px;
-    padding: 2rem 2.25rem;
-    margin-bottom: -2.5rem;
-    position: relative;
-    z-index: 1;
-}
-
-.demande-hero-icone {
-    width: 52px;
-    height: 52px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0.9rem;
-}
-
-.demande-hero h1 {
-    font-weight: 700;
-    margin-bottom: 0.35rem;
-}
-
-.demande-hero p {
-    color: rgba(255, 255, 255, 0.88);
-    margin: 0;
-    max-width: 60ch;
-}
-
-.demande-carte {
-    position: relative;
-    z-index: 2;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 10px 34px rgba(0, 0, 0, 0.08);
-    padding: 2.25rem;
-    margin-top: 3.5rem;
-}
-
-.demande-section {
-    padding-left: 1rem;
-    border-left: 4px solid var(--mrri-vert);
-    margin-bottom: 1.75rem;
-}
-
-.demande-section-entete {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 1rem;
-}
-
-.demande-section-icone {
-    width: 34px;
-    height: 34px;
-    border-radius: 9px;
-    background: #E7F4EB;
-    color: var(--mrri-vert);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.demande-section h2 {
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin: 0;
-}
-
-.demande-section .section-soustitre {
-    font-size: 0.82rem;
-    color: #8a8a80;
-    margin: 0;
-}
-
-.demande-carte .form-control,
-.demande-carte .form-select {
-    border-color: #e2e2e2;
-    padding: 0.65rem 0.9rem;
-}
-
-.demande-carte .form-control:focus,
-.demande-carte .form-select:focus {
-    border-color: var(--mrri-vert);
-    box-shadow: 0 0 0 3px rgba(22, 122, 16, 0.12);
-}
-
-.demande-carte label.form-label {
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.structures-liste {
-    max-height: 220px;
-    overflow-y: auto;
-    border: 1px solid #e2e2e2;
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    background: #FAFAF7;
-}
-
-.structures-liste .form-check {
-    padding-top: 0.3rem;
-    padding-bottom: 0.3rem;
-}
-
-.structures-liste .form-check-input:checked {
-    background-color: var(--mrri-vert);
-    border-color: var(--mrri-vert);
-}
-
-.btn-envoyer-demande {
-    background: var(--mrri-vert);
-    color: #fff;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 10px;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn-envoyer-demande:hover {
-    background: var(--mrri-vert-fonce);
-    color: #fff;
-}
-
-/* Champs obligatoires en rouge */
-.form-control.required,
-.form-select.required {
-    border: 2px solid var(--mrri-danger) !important;
-}
-
-/* Quand c'est valide → bordure verte */
-.form-control.valid,
-.form-select.valid {
-    border: 2px solid var(--mrri-vert) !important;
-}
-
-/* Quand c'est invalide → bordure rouge */
-.form-control.invalid,
-.form-select.invalid {
-    border: 2px solid var(--mrri-danger) !important;
-}
-
 
 /* ---------- Actualités ---------- */
 .news-section {
@@ -1935,7 +1855,7 @@ textarea:focus-visible {
 }
 
 .actualite-detail-page .texte {
-    white-space: pre-line;
+  
     margin-top: 25px;
 }
 
@@ -2572,6 +2492,38 @@ textarea:focus-visible {
     font-size: .85rem;
 }
 
+.cd-vote-champ {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 140px;
+    color: var(--mrri-texte-leger);
+    font-size: .72rem;
+    font-weight: 600;
+}
+
+.cd-vote-champ input[type="email"],
+.cd-vote-champ select {
+    width: 100%;
+    min-height: 36px;
+    padding: 0 8px;
+    border: 1px solid var(--mrri-bordure);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--mrri-texte);
+    font: inherit;
+    font-size: .82rem;
+}
+
+.cd-vote-consentement {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 170px;
+    color: var(--mrri-texte-leger);
+    font-size: .7rem;
+}
+
 .cd-btn-vote {
     height: 36px;
     padding: 0 14px;
@@ -2615,6 +2567,7 @@ textarea:focus-visible {
 }
 
 .cd-form input[type="email"],
+.cd-form select,
 .cd-form textarea {
     width: 100%;
     padding: 10px 12px;
@@ -2625,10 +2578,28 @@ textarea:focus-visible {
 }
 
 .cd-form input:focus,
+.cd-form select:focus,
 .cd-form textarea:focus {
     outline: none;
     border-color: var(--mrri-bleu, var(--mrri-bleu));
     box-shadow: 0 0 0 3px rgba(2, 31, 146, .14);
+}
+
+.cd-consentement {
+    display: flex !important;
+    align-items: flex-start;
+    gap: 8px;
+    font-weight: 400 !important;
+}
+
+.cd-consentement input {
+    margin-top: 4px;
+}
+
+@media (max-width: 900px) {
+    .st-chart-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .cd-form-btn {

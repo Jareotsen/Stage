@@ -106,12 +106,7 @@ require '../../includes/header_dashboard.php';
                                         <p class="mrri-page-description" style="margin-top:4px;">Public ou confidentiel</p>
                                     </a>
                                 </div>
-                                <div class="col">
-                                    <a href="nouvelle_demande.php" class="mrri-panel" style="display:block; padding:16px;">
-                                        <strong style="font-size:.85rem;">Soumettre une demande</strong>
-                                        <p class="mrri-page-description" style="margin-top:4px;">Contacter le Ministère</p>
-                                    </a>
-                                </div>
+                                
 <div class="col">
     <a href="../point_focal/mes_consultations.php" class="mrri-panel" style="display:block; padding:16px;">
         <strong style="font-size:.85rem;">Créer une consultation</strong>

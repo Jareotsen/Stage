@@ -239,7 +239,27 @@ require '../../includes/header.php';
             <?php endif; ?>
         </section>
 
-        <!-- Emplacement réservé : carte de localisation de la structure (étape suivante) -->
+        <section class="fiche-section fiche-localisation" aria-labelledby="fiche-localisation-titre">
+            <h2 id="fiche-localisation-titre">Localisation</h2>
+            <?php
+                $latitudeStructure = $structure['latitude'] ?? null;
+                $longitudeStructure = $structure['longitude'] ?? null;
+                $coordonneesValides = is_numeric($latitudeStructure)
+                    && is_numeric($longitudeStructure)
+                    && (float) $latitudeStructure >= -90
+                    && (float) $latitudeStructure <= 90
+                    && (float) $longitudeStructure >= -180
+                    && (float) $longitudeStructure <= 180;
+            ?>
+            <?php if ($coordonneesValides): ?>
+                <p>Consultez la position géographique de cette structure sur la carte interactive.</p>
+                <a class="localisation-bouton" href="localisation.php?id=<?= (int) $structure['id_struc'] ?>">
+                    <i class="bi bi-geo-alt" aria-hidden="true"></i> Afficher sur la carte
+                </a>
+            <?php else: ?>
+                <p class="fiche-vide">La position géographique de cette structure n’a pas encore été renseignée.</p>
+            <?php endif; ?>
+        </section>
 
     </aside>
 

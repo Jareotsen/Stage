@@ -245,6 +245,8 @@ CREATE TABLE IF NOT EXISTS `structure` (
   `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `mission` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `site_web` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `latitude` decimal(10,7) DEFAULT NULL,
+  `longitude` decimal(10,7) DEFAULT NULL,
   `date_creation` date DEFAULT NULL,
   `directeur_general` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `id_cat` int NOT NULL,

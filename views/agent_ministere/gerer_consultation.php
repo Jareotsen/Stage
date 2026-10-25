@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($erreur === null) {
             definir_flash("Consultation publiée avec succès.");
-            header('Location: gerer_consultations.php');
+            header('Location: gerer_consultation.php');
             exit();
         }
     } elseif ($action === 'fermer') {
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $ok ? "Consultation fermée." : "Cette consultation est introuvable ou déjà fermée.",
             $ok ? 'succes' : 'erreur'
         );
-        header('Location: gerer_consultations.php');
+        header('Location: gerer_consultation.php');
         exit();
     }
 }

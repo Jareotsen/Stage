@@ -430,8 +430,8 @@ require '../../includes/header.php';
       <span class="citation-guillemet">"</span>
       <p class="citation-texte">Les réformes sont un pro­ces­sus continu, pas une fin en soi</p>
       <div class="citation-trait"></div>
-      <p class="citation-auteur">FRANÇOIS NDONG OBIANG, Ministre de la Réforme et des Relations avec les Institutions</p>
-      <p class="citation-date">09 mai 2025</p>
+      <p class="citation-auteur">Aimé Martial Massamba, Ministre de la Réforme et des Relations avec les Institutions</p>
+      <p class="citation-date">11 octobre 2026</p>
     </div>
   </div>
 </section>

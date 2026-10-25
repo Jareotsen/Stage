@@ -25,15 +25,32 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
     $compteCible = $verif->fetch(PDO::FETCH_ASSOC);
     if (!$compteCible || $compteCible['role'] === 'super_admin') {
         $erreur = "Action non autorisée sur ce compte.";
-    } elseif ($action === 'supprimer') {
+   } elseif ($action === 'supprimer') {
+    try {
+        $db->beginTransaction();
+
         $detacher = $db->prepare("UPDATE structure SET id_responsable = NULL WHERE id_responsable = :id");
         $detacher->execute([':id' => $idCible]);
+
         $supprimer = $db->prepare("DELETE FROM utilisateurs WHERE id = :id");
         $supprimer->execute([':id' => $idCible]);
+
+        $db->commit();
         definir_flash("Compte supprimé.");
-        header("Location: gerer_compte.php");
-        exit();
-    } elseif ($action === 'modifier') {
+    } catch (PDOException $e) {
+        if ($db->inTransaction()) {
+            $db->rollBack();   // annule aussi le détachement de la structure
+        }
+        if (($e->errorInfo[1] ?? null) === 1451) {
+            definir_flash("Suppression impossible : ce compte est lié à des demandes ou à d'autres données qui doivent être conservées.", 'erreur');
+        } else {
+            error_log("Suppression compte : " . $e->getMessage());
+            definir_flash("Impossible de supprimer le compte. Veuillez réessayer.", 'erreur');
+        }
+    }
+    header("Location: gerer_compte.php");
+    exit();
+} elseif ($action === 'modifier') {
         $nouveauRole = in_array($_POST['role'] ?? '', ['point_focal', 'agent_ministere'], true) ? $_POST['role'] : '';
         if ($nouveauRole === '') {
             exit('Rôle invalide.');

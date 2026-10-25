@@ -102,6 +102,91 @@ $nbParticipants = (int) $db->query(
      ) t"
 )->fetchColumn();
 
+$labelsDemographiques = [
+    'genre' => ['femme' => 'Femme', 'homme' => 'Homme'],
+    'age' => [
+        'moins_18' => 'Moins de 18 ans',
+        '18_24' => '18 à 24 ans',
+        '25_34' => '25 à 34 ans',
+        '35_44' => '35 à 44 ans',
+        '45_54' => '45 à 54 ans',
+        '55_plus' => '55 ans et plus',
+    ],
+    'secteur' => [
+        'secteur_public' => 'Secteur public',
+        'secteur_prive' => 'Secteur privé',
+        'independant' => 'Travailleur indépendant',
+        'etudiant' => 'Étudiant(e)',
+        'sans_emploi' => 'Sans emploi',
+        'autre' => 'Autre',
+    ],
+];
+$requeteDemographique = static function (PDO $db, string $colonne, array $labels): array {
+    $resultats = array_fill_keys(array_keys($labels), 0);
+    $stmt = $db->query("SELECT {$colonne} AS categorie, COUNT(*) AS total FROM citoyens GROUP BY {$colonne}");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $ligne) {
+        if (array_key_exists($ligne['categorie'], $resultats)) {
+            $resultats[$ligne['categorie']] = (int) $ligne['total'];
+        }
+    }
+    return $resultats;
+};
+$donneesDemographiques = [
+    'genre' => $requeteDemographique($db, 'genre', $labelsDemographiques['genre']),
+    'age' => $requeteDemographique($db, 'tranche_age', $labelsDemographiques['age']),
+    'secteur' => $requeteDemographique($db, 'secteur_activite', $labelsDemographiques['secteur']),
+];
+
+$rendreGraphiqueLigne = static function (string $titre, array $labels, array $valeurs): string {
+    if (array_sum($valeurs) === 0) {
+        return '<p class="st-chart-empty">Aucune adresse email vérifiée pour le moment.</p>';
+    }
+
+    $largeur = 720;
+    $gauche = 54;
+    $droite = 18;
+    $haut = 22;
+    $bas = 210;
+    $maximum = max(1, (int) ceil(max($valeurs) / 4) * 4);
+    $largeurTrace = $largeur - $gauche - $droite;
+    $hauteurTrace = $bas - $haut;
+    $points = [];
+    $marqueurs = [];
+    $elements = [
+        '<svg class="st-chart-svg" viewBox="0 0 720 330" role="img" aria-label="' . htmlspecialchars($titre, ENT_QUOTES, 'UTF-8') . '">',
+        '<title>' . htmlspecialchars($titre, ENT_QUOTES, 'UTF-8') . '</title>',
+    ];
+
+    for ($i = 0; $i <= 4; $i++) {
+        $valeurAxe = (int) round($maximum * $i / 4);
+        $y = $bas - ($hauteurTrace * $i / 4);
+        $elements[] = '<line class="st-chart-gridline" x1="' . $gauche . '" y1="' . $y
+            . '" x2="' . ($largeur - $droite) . '" y2="' . $y . '"></line>';
+        $elements[] = '<text class="st-chart-axis" x="' . ($gauche - 10) . '" y="' . ($y + 4)
+            . '" text-anchor="end">' . $valeurAxe . '</text>';
+    }
+
+    $nombre = count($valeurs);
+    foreach (array_values($valeurs) as $index => $valeur) {
+        $x = $nombre === 1
+            ? $gauche + $largeurTrace / 2
+            : $gauche + ($largeurTrace * $index / ($nombre - 1));
+        $y = $bas - ($hauteurTrace * $valeur / $maximum);
+        $points[] = round($x, 2) . ',' . round($y, 2);
+        $etiquette = htmlspecialchars($labels[array_keys($valeurs)[$index]], ENT_QUOTES, 'UTF-8');
+        $marqueurs[] = '<circle class="st-chart-point" cx="' . $x . '" cy="' . $y . '" r="4"></circle>';
+        $marqueurs[] = '<text class="st-chart-value" x="' . $x . '" y="' . max($haut + 12, $y - 10)
+            . '" text-anchor="middle">' . (int) $valeur . '</text>';
+        $marqueurs[] = '<text class="st-chart-category" x="' . $x . '" y="238" transform="rotate(-38 '
+            . $x . ' 238)" text-anchor="start">' . $etiquette . '</text>';
+    }
+
+    $elements[] = '<polyline class="st-chart-line" points="' . implode(' ', $points) . '"></polyline>';
+    array_push($elements, ...$marqueurs);
+    $elements[] = '</svg>';
+    return implode('', $elements);
+};
+
 require '../../includes/header_dashboard.php';
 ?>
 
@@ -158,6 +243,32 @@ require '../../includes/header_dashboard.php';
                     <div class="lib">contributeurs + votants</div>
                 </div>
             </div>
+
+            <section class="st-demographics" aria-labelledby="st-demographics-title">
+                <div class="mrri-page-header">
+                    <div>
+                        <h2 class="mrri-panel-title" id="st-demographics-title">Profil des participants vérifiés</h2>
+                        <p class="mrri-page-description">Répartition des adresses email vérifiées, tous les graphiques sont agrégés.</p>
+                    </div>
+                </div>
+                <div class="st-chart-grid">
+                    <?php foreach ([
+                        'age' => 'Répartition par tranche d’âge',
+                        'genre' => 'Répartition par genre',
+                        'secteur' => 'Répartition par secteur d’activité',
+                    ] as $cle => $titre): ?>
+                        <article class="mrri-panel st-chart-card">
+                            <div class="mrri-panel-header">
+                                <h3 class="mrri-panel-title"><?= htmlspecialchars($titre, ENT_QUOTES, 'UTF-8') ?></h3>
+                            </div>
+                            <div class="mrri-panel-body">
+                                <?= $rendreGraphiqueLigne($titre, $labelsDemographiques[$cle], $donneesDemographiques[$cle]) ?>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+                <p class="st-chart-note">Les données démographiques ne sont enregistrées qu’après validation du code envoyé par email.</p>
+            </section>
 
             <div class="mrri-panel">
                 <div class="mrri-panel-header">

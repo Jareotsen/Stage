@@ -16,6 +16,9 @@ if ($_SESSION['role'] !== 'point_focal') {
 $resultat = $db->prepare("SELECT * FROM structure WHERE id_responsable = :id_responsable");
 $resultat->execute([':id_responsable' => $_SESSION['user_id']]);
 $structures = $resultat->fetch(PDO::FETCH_ASSOC);
+$erreurCoordonnees = null;
+$latitudeAffichee = $structures['latitude'] ?? '';
+$longitudeAffichee = $structures['longitude'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
@@ -28,13 +31,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $telephone = $_POST['telephone'] ?? '';
     $site_web = $_POST['site_web'] ?? '';
+    $latitudeSaisie = trim((string) ($_POST['latitude'] ?? ''));
+    $longitudeSaisie = trim((string) ($_POST['longitude'] ?? ''));
+    $latitudeAffichee = $latitudeSaisie;
+    $longitudeAffichee = $longitudeSaisie;
+    $latitude = null;
+    $longitude = null;
 
-    $updateStmt = $db->prepare("UPDATE structure SET adresse = :adresse, directeur_general = :directeur_general, mission = :mission, email = :email, telephone = :telephone, site_web = :site_web WHERE id_responsable = :id_responsable");
-    $updateStmt->execute([
-        ':adresse' => $adresse, ':directeur_general' => $directeur_general, ':mission' => $mission,
-        ':email' => $email, ':telephone' => $telephone, ':site_web' => $site_web,
-        ':id_responsable' => $_SESSION['user_id']
-    ]);
+    if ($latitudeSaisie !== '' || $longitudeSaisie !== '') {
+        $latitudeValide = $latitudeSaisie !== '' && filter_var($latitudeSaisie, FILTER_VALIDATE_FLOAT) !== false;
+        $longitudeValide = $longitudeSaisie !== '' && filter_var($longitudeSaisie, FILTER_VALIDATE_FLOAT) !== false;
+        if (!$latitudeValide || !$longitudeValide
+            || (float) $latitudeSaisie < -90 || (float) $latitudeSaisie > 90
+            || (float) $longitudeSaisie < -180 || (float) $longitudeSaisie > 180) {
+            $erreurCoordonnees = "Saisissez une latitude entre -90 et 90 et une longitude entre -180 et 180, ou laissez les deux champs vides.";
+        } else {
+            $latitude = (float) $latitudeSaisie;
+            $longitude = (float) $longitudeSaisie;
+        }
+    }
+
+    if ($erreurCoordonnees === null) {
+        $updateStmt = $db->prepare(
+            "UPDATE structure
+             SET adresse = :adresse, directeur_general = :directeur_general,
+                 mission = :mission, email = :email, telephone = :telephone,
+                 site_web = :site_web, latitude = :latitude, longitude = :longitude
+             WHERE id_responsable = :id_responsable"
+        );
+        $updateStmt->execute([
+            ':adresse' => $adresse, ':directeur_general' => $directeur_general, ':mission' => $mission,
+            ':email' => $email, ':telephone' => $telephone, ':site_web' => $site_web,
+            ':latitude' => $latitude, ':longitude' => $longitude,
+            ':id_responsable' => $_SESSION['user_id']
+        ]);
      
      $photosRejetees = [];
     if (isset($_FILES['photos']) && is_array($_FILES['photos']['name'])) {
@@ -66,6 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     header("Location: dashboard.php");
     exit();
+    }
 }
 
 
@@ -76,6 +107,10 @@ require '../../includes/header_dashboard.php';
     <h1 class="h3">Modifier la structure</h1>
     <p><span class="badge bg-secondary-subtle text-secondary me-1"><?= htmlspecialchars($structures['sigle'] ?? '') ?></span> <?= htmlspecialchars($structures['nom_struc'] ?? '') ?></p>
 
+    <?php if ($erreurCoordonnees !== null): ?>
+        <div class="alert alert-danger" role="alert"><?= htmlspecialchars($erreurCoordonnees, ENT_QUOTES, 'UTF-8') ?></div>
+    <?php endif; ?>
+
     <form action="" method="post" enctype="multipart/form-data">
         <div class="mb-3"><label class="form-label">Adresse</label><input type="text" name="adresse" class="form-control" value="<?= htmlspecialchars($structures['adresse'] ?? '') ?>"></div>
         <div class="mb-3"><label class="form-label">Directeur général</label><input type="text" name="directeur_general" class="form-control" value="<?= htmlspecialchars($structures['directeur_general'] ?? '') ?>"></div>
@@ -83,6 +118,18 @@ require '../../includes/header_dashboard.php';
         <div class="mb-3"><label class="form-label">Email</label><input type="email" name="email" class="form-control" value="<?= htmlspecialchars($structures['email'] ?? '') ?>"></div>
         <div class="mb-3"><label class="form-label">Téléphone</label><input type="text" name="telephone" class="form-control" value="<?= htmlspecialchars($structures['telephone'] ?? '') ?>"></div>
         <div class="mb-3"><label class="form-label">Site web</label><input type="text" name="site_web" class="form-control" value="<?= htmlspecialchars($structures['site_web'] ?? '') ?>"></div>
+        <div class="mb-3">
+            <label class="form-label" for="latitude">Latitude</label>
+            <input type="number" id="latitude" name="latitude" class="form-control" min="-90" max="90" step="any"
+                   value="<?= htmlspecialchars($latitudeAffichee, ENT_QUOTES, 'UTF-8') ?>">
+            <div class="form-text">Coordonnée comprise entre -90 et 90 degrés.</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="longitude">Longitude</label>
+            <input type="number" id="longitude" name="longitude" class="form-control" min="-180" max="180" step="any"
+                   value="<?= htmlspecialchars($longitudeAffichee, ENT_QUOTES, 'UTF-8') ?>">
+            <div class="form-text">Coordonnée comprise entre -180 et 180 degrés. Laissez les deux champs vides si la position n’est pas connue.</div>
+        </div>
         <div class="mb-3">
             <label class="form-label">Photos de la structure</label>
             <input type="file" name="photos[]" accept="image/*" multiple class="form-control">

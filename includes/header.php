@@ -9,6 +9,10 @@
 <!-- Ordre important : le thème partagé d'abord, puis les styles propres au site public -->
 <link href="../../publique/css/theme.css" rel="stylesheet">
 <link href="../../publique/css/public.css" rel="stylesheet">
+<?php if (basename($_SERVER['SCRIPT_NAME'] ?? '') === 'localisation.php'): ?>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<?php endif; ?>
 </head>
 <body>
 <?php
@@ -108,12 +112,12 @@ $menuStructuresDisponible = !empty($racinesMenu);
         <a href="../public/catalogue.php"<?= $attrActif(['catalogue.php', 'fiche.php']) ?>>Structures</a>
       <?php endif; ?>
 
+      <a href="../public/localisation.php"<?= $attrActif(['localisation.php']) ?>>Localisation</a>
       <a href="../public/actualite.php"<?= $attrActif(['actualite.php', 'actualite_detail.php']) ?>>Actualités</a>
       <a href="../public/consultations.php"<?= $attrActif(['consultations.php', 'consultation_detail.php']) ?>>Consultations</a>
 
       <?php if ($estAgentMinistere): ?>
-        <a href="../agent_ministere/demandes.php">Demandes</a>
-        <a href="../agent_ministere/gerer_consultations.php">Gérer les consultations</a>
+        <a href="../agent_ministere/gerer_consultation.php">Gérer les consultations</a>
       <?php endif; ?>
     </nav>
 

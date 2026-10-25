@@ -49,15 +49,14 @@ require '../../includes/header_dashboard.php';
             <div class="mrri-page-header">
                 <div>
                     <div class="mrri-breadcrumb">Espace professionnel / <span class="active">Structures</span></div>
-                    <h1 class="mrri-page-title">Vue d'ensemble des structures sous tutelle</h1>
+                    <h1 class="mrri-page-title">Vue d'ensemble des I.C et A.A.I</h1>
                     <p class="mrri-page-description">Accès agent du Ministère — <?= $nbStructures ?> structure(s) enregistrée(s)</p>
                 </div>
-                <a href="demandes.php" class="mrri-btn mrri-btn-blue">Voir les demandes reçues</a>
             </div>
 
             <div class="mrri-panel">
                 <div class="mrri-panel-header">
-                    <h2 class="mrri-panel-title">Structures sous tutelle</h2>
+                    <h2 class="mrri-panel-title">Institutions Constitutionnelles et Autorité Administrative Indépendante</h2>
                 </div>
                 <div class="mrri-panel-body">
                     <div class="row row-cols-1 row-cols-md-3 g-3">

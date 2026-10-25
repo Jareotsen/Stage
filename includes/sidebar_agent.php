@@ -4,7 +4,7 @@
  * Usage dans une page de views/agent_ministere/ :
  *     <?php $pageActive = 'moderation'; require '../../includes/sidebar_agent.php'; ?>
  *
- * Clés possibles : structures, demandes, consultations, moderation, statistiques
+ * Clés possibles : structures, consultations, moderation, statistiques
  *
  * @var string $pageActive
  */
@@ -14,8 +14,6 @@ $pageActive = $pageActive ?? '';
 $liens = [
     'structures' => ['dashboard.php', 'Structures',
         '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>'],
-    'demandes' => ['demandes.php', 'Demandes reçues',
-        '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'],
     'consultations' => ['gerer_consultation.php', 'Consultations',
         '<rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/>'],
     'moderation' => ['moderation.php', 'Modération',

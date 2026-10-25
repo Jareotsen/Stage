@@ -98,6 +98,7 @@ require '../../includes/header_dashboard.php';
                     <form action="" method="post" onsubmit="return confirm('Supprimer cette catégorie ?');">
                         <input type="hidden" name="action" value="supprimer">
                         <input type="hidden" name="id_cat" value="<?= $cat['id_cat'] ?>">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
                         <button type="submit" class="btn btn-outline-danger btn-sm">Supprimer</button>
                     </form>
                 </div>
