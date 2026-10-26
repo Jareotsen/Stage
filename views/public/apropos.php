@@ -1,18 +1,10 @@
 <?php
-include '../../includes/header.php';
+session_start();
+require '../../config/database.php';
+require '../../includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>À propos — MRRI</title>
-   <link rel="stylesheet" href="../../publique/css/theme.css">
-</head>
-
-<body>
-
-<div class="container">
+<div class="container apropos-page">
 
     <h1>À propos du MRRI 😄</h1>
 
@@ -91,11 +83,10 @@ include '../../includes/header.php';
         et avec moins de classeurs perdus. 
     </p>
     
-    <div class="footer">
+    <p class="apropos-pied">
         © 2026 — Ministère des Réformes et des Liaisons avec les Institutions
-    </div>
+    </p>
 
 </div>
 
-</body>
-</html>
+<?php require '../../includes/footer.php'; ?>

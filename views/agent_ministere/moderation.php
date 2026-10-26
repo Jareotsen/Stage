@@ -3,6 +3,7 @@ require_once '../../includes/auth.php';
 require_once '../../config/database.php';
 require_once '../../includes/flash.php';
 require_once '../../includes/csrf.php';
+require_once '../../includes/dates.php';
 is_authenticated();
 
 // Seul l'agent du ministère (rôle modérateur) accède à cette page
@@ -99,7 +100,6 @@ $token = generer_token_csrf();
 require '../../includes/header_dashboard.php';
 ?>
 
-<link rel="stylesheet" href="../../publique/css/theme.css">
 
 <div class="mrri-dashboard dashboard-agent">
 <?php $pageActive = 'moderation'; require '../../includes/sidebar_agent.php'; ?>
@@ -154,8 +154,8 @@ require '../../includes/header_dashboard.php';
                 <article class="mod-carte">
                     <div class="mod-meta">
                         Consultation : <strong><?= htmlspecialchars($c['titre_consultation']) ?></strong>
-                        · <?= htmlspecialchars($c['email_contributeur']) ?>
-                        · déposée le <?= htmlspecialchars($c['date_contribution']) ?>
+                        · <?= htmlspecialchars($c['email_contributeur'] ?? 'email non renseigné') ?>
+                        · déposée le <?= formaterDateFr($c['date_contribution']) ?> à <?= date('H:i', strtotime((string) $c['date_contribution'])) ?>
                     </div>
 
                     <div class="mod-texte"><?= nl2br(htmlspecialchars($c['contenu'])) ?></div>
@@ -172,7 +172,7 @@ require '../../includes/header_dashboard.php';
                         <div class="mod-trace">
                             <?= $c['statut'] === 'validee' ? 'Validée' : 'Rejetée' ?>
                             <?php if (!empty($c['moderateur'])): ?>par <strong><?= htmlspecialchars($c['moderateur']) ?></strong><?php endif; ?>
-                            <?php if (!empty($c['date_moderation'])): ?>le <?= htmlspecialchars($c['date_moderation']) ?><?php endif; ?>
+                            <?php if (!empty($c['date_moderation'])): ?>le <?= formaterDateFr($c['date_moderation']) ?><?php endif; ?>
                         </div>
                     <?php endif; ?>
                 </article>

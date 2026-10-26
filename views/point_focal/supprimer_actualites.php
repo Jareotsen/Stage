@@ -69,7 +69,7 @@ $photos = $photosStmt->fetchAll(PDO::FETCH_COLUMN);
         // 3.3 Valider la transaction
         $db->commit();
         foreach ($photos as $nomFichier) {
-    $chemin = '../../uploads/photos/' . $nomFichier;
+    $chemin = '../../uploads/photos/' . basename((string) $nomFichier);
     if (file_exists($chemin)) {
         unlink($chemin);
     }
@@ -77,8 +77,14 @@ $photos = $photosStmt->fetchAll(PDO::FETCH_COLUMN);
 
     } catch (Exception $e) {
         // En cas d’erreur → rollback
-        $db->rollBack();
-        exit("Erreur lors de la suppression : " . $e->getMessage());
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+        // Détail technique dans les logs uniquement
+        error_log("Suppression actualité : " . $e->getMessage());
+        definir_flash("Impossible de supprimer cette actualité. Veuillez réessayer.", 'erreur');
+        header("Location: mes_actualites.php");
+        exit();
     }
     definir_flash( "Actualité supprimée avec succès.");
     header("Location: mes_actualites.php");

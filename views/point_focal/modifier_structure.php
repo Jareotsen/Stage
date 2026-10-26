@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="../../publique/css/theme.css">
 <?php 
 require_once '../../includes/auth.php';
 require_once '../../config/database.php';
@@ -24,13 +23,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
     exit('Requête invalide.');
 }
+    // Sans structure rattachée, rien à mettre à jour (évite des photos orphelines)
+    if (!$structures) {
+        definir_flash("Aucune structure ne vous est rattachée : contactez l'administrateur.", 'erreur');
+        header("Location: dashboard.php");
+        exit();
+    }
 
-    $adresse = $_POST['adresse'] ?? '';
-    $directeur_general = $_POST['directeur_general'] ?? '';
-    $mission = $_POST['mission'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $telephone = $_POST['telephone'] ?? '';
-    $site_web = $_POST['site_web'] ?? '';
+    $adresse = trim($_POST['adresse'] ?? '');
+    $directeur_general = trim($_POST['directeur_general'] ?? '');
+    $mission = trim($_POST['mission'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $telephone = trim($_POST['telephone'] ?? '');
+    $site_web = trim($_POST['site_web'] ?? '');
+
+    // Longueurs maximales des colonnes : au-delà, MySQL tronquerait sans prévenir
+    $limites = [
+        'Adresse' => [$adresse, 255], 'Directeur général' => [$directeur_general, 200],
+        'Mission' => [$mission, 1000], 'Email' => [$email, 100],
+        'Téléphone' => [$telephone, 20], 'Site web' => [$site_web, 255],
+    ];
+    foreach ($limites as $champ => [$valeur, $maximum]) {
+        if (mb_strlen($valeur) > $maximum) {
+            $erreurCoordonnees = "Le champ « {$champ} » ne doit pas dépasser {$maximum} caractères.";
+            break;
+        }
+    }
+    if ($erreurCoordonnees === null && $email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $erreurCoordonnees = "L'adresse email n'est pas valide.";
+    }
+    // Les valeurs saisies restent affichées en cas d'erreur
+    $structures = array_merge($structures, [
+        'adresse' => $adresse, 'directeur_general' => $directeur_general, 'mission' => $mission,
+        'email' => $email, 'telephone' => $telephone, 'site_web' => $site_web,
+    ]);
     $latitudeSaisie = trim((string) ($_POST['latitude'] ?? ''));
     $longitudeSaisie = trim((string) ($_POST['longitude'] ?? ''));
     $latitudeAffichee = $latitudeSaisie;
@@ -38,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $latitude = null;
     $longitude = null;
 
-    if ($latitudeSaisie !== '' || $longitudeSaisie !== '') {
+    if ($erreurCoordonnees === null && ($latitudeSaisie !== '' || $longitudeSaisie !== '')) {
         $latitudeValide = $latitudeSaisie !== '' && filter_var($latitudeSaisie, FILTER_VALIDATE_FLOAT) !== false;
         $longitudeValide = $longitudeSaisie !== '' && filter_var($longitudeSaisie, FILTER_VALIDATE_FLOAT) !== false;
         if (!$latitudeValide || !$longitudeValide
@@ -69,6 +95,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
      $photosRejetees = [];
     if (isset($_FILES['photos']) && is_array($_FILES['photos']['name'])) {
         $nombrePhotos = count($_FILES['photos']['name']);
+        // Les nouvelles photos se placent après celles déjà en ligne
+        $positionStmt = $db->prepare("SELECT COALESCE(MAX(Position), 0) FROM structure_photos WHERE id_structure = :id");
+        $positionStmt->execute([':id' => $structures['id_struc']]);
+        $positionSuivante = (int) $positionStmt->fetchColumn() + 1;
         for ($i = 0; $i < $nombrePhotos; $i++) {
             if ($_FILES['photos']['error'][$i] === UPLOAD_ERR_OK) {
                 $extension = pathinfo($_FILES['photos']['name'][$i], PATHINFO_EXTENSION);
@@ -81,8 +111,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 if (move_uploaded_file($_FILES['photos']['tmp_name'][$i], $uploadFile)) {
                     $insertLogoStmt = $db->prepare("INSERT INTO structure_photos (photos_url, id_structure, Position) VALUES (:nom_fichier, :id_structure, :position)");
-                    $insertLogoStmt->execute([':nom_fichier' => $nomFichierServeur, ':id_structure' => $structures['id_struc'], ':position' => $i + 1]);
+                    $insertLogoStmt->execute([':nom_fichier' => $nomFichierServeur, ':id_structure' => $structures['id_struc'], ':position' => $positionSuivante++]);
                 }
+            } elseif ($_FILES['photos']['error'][$i] !== UPLOAD_ERR_NO_FILE) {
+                $photosRejetees[] = $_FILES['photos']['name'][$i] . " (trop lourd ou erreur d'envoi)";
             }
         }
     }
@@ -111,13 +143,16 @@ require '../../includes/header_dashboard.php';
         <div class="alert alert-danger" role="alert"><?= htmlspecialchars($erreurCoordonnees, ENT_QUOTES, 'UTF-8') ?></div>
     <?php endif; ?>
 
+    <?php if (!$structures): ?>
+        <div class="alert alert-warning">Aucune structure ne vous est rattachée : contactez l'administrateur.</div>
+    <?php else: ?>
     <form action="" method="post" enctype="multipart/form-data">
-        <div class="mb-3"><label class="form-label">Adresse</label><input type="text" name="adresse" class="form-control" value="<?= htmlspecialchars($structures['adresse'] ?? '') ?>"></div>
-        <div class="mb-3"><label class="form-label">Directeur général</label><input type="text" name="directeur_general" class="form-control" value="<?= htmlspecialchars($structures['directeur_general'] ?? '') ?>"></div>
-        <div class="mb-3"><label class="form-label">Mission</label><input type="text" name="mission" class="form-control" value="<?= htmlspecialchars($structures['mission'] ?? '') ?>"></div>
-        <div class="mb-3"><label class="form-label">Email</label><input type="email" name="email" class="form-control" value="<?= htmlspecialchars($structures['email'] ?? '') ?>"></div>
-        <div class="mb-3"><label class="form-label">Téléphone</label><input type="text" name="telephone" class="form-control" value="<?= htmlspecialchars($structures['telephone'] ?? '') ?>"></div>
-        <div class="mb-3"><label class="form-label">Site web</label><input type="text" name="site_web" class="form-control" value="<?= htmlspecialchars($structures['site_web'] ?? '') ?>"></div>
+        <div class="mb-3"><label class="form-label" for="adresse">Adresse</label><input type="text" id="adresse" name="adresse" maxlength="255" class="form-control" value="<?= htmlspecialchars($structures['adresse'] ?? '') ?>"></div>
+        <div class="mb-3"><label class="form-label" for="directeur_general">Directeur général</label><input type="text" id="directeur_general" name="directeur_general" maxlength="200" class="form-control" value="<?= htmlspecialchars($structures['directeur_general'] ?? '') ?>"></div>
+        <div class="mb-3"><label class="form-label" for="mission">Mission</label><textarea id="mission" name="mission" maxlength="1000" rows="4" class="form-control"><?= htmlspecialchars($structures['mission'] ?? '') ?></textarea><div class="form-text">1000 caractères maximum.</div></div>
+        <div class="mb-3"><label class="form-label" for="email">Email</label><input type="email" id="email" name="email" maxlength="100" class="form-control" value="<?= htmlspecialchars($structures['email'] ?? '') ?>"></div>
+        <div class="mb-3"><label class="form-label" for="telephone">Téléphone</label><input type="tel" id="telephone" name="telephone" maxlength="20" class="form-control" value="<?= htmlspecialchars($structures['telephone'] ?? '') ?>"></div>
+        <div class="mb-3"><label class="form-label" for="site_web">Site web</label><input type="text" id="site_web" name="site_web" maxlength="255" class="form-control" placeholder="https://…" value="<?= htmlspecialchars($structures['site_web'] ?? '') ?>"></div>
         <div class="mb-3">
             <label class="form-label" for="latitude">Latitude</label>
             <input type="number" id="latitude" name="latitude" class="form-control" min="-90" max="90" step="any"
@@ -138,6 +173,7 @@ require '../../includes/header_dashboard.php';
          <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
         <button type="submit" class="btn btn-mrri">Mettre à jour</button>
     </form>
+    <?php endif; ?>
 </main>
 
 <?php require '../../includes/footer_dashboard.php'; ?>

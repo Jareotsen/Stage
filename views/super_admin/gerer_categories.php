@@ -1,8 +1,6 @@
-<link rel="stylesheet" href="../../publique/css/public.css">
-<link rel="stylesheet" href="../../publique/css/theme.css">
 <?php
-require_once '../../includes/auth.php';
 require_once '../../config/database.php';
+require_once '../../includes/auth.php';
 require_once '../../includes/flash.php';
 require_once '../../includes/csrf.php';
 is_authenticated();
@@ -22,12 +20,25 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
 
     if ($action === 'ajouter') {
         $nomCat = trim($_POST['nom_cat'] ?? '');
+        // Catégorie parente facultative : doit être une catégorie racine existante
+        $parentId = filter_var($_POST['parent_id'] ?? '', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) ?: null;
+        $parentValide = true;
+        if ($parentId !== null) {
+            $verifParent = $db->prepare("SELECT COUNT(*) FROM categories WHERE id_cat = :id AND parent_id IS NULL");
+            $verifParent->execute([':id' => $parentId]);
+            $parentValide = (int) $verifParent->fetchColumn() === 1;
+        }
+
         if ($nomCat === '') {
             $erreur = "Le nom de la catégorie ne peut pas être vide.";
+        } elseif (mb_strlen($nomCat) > 150) {
+            $erreur = "Le nom de la catégorie ne doit pas dépasser 150 caractères.";
+        } elseif (!$parentValide) {
+            $erreur = "La catégorie parente choisie est invalide.";
         } else {
             try {
-                $ajouter = $db->prepare("INSERT INTO categories (nom_cat) VALUES (:nom_cat)");
-                $ajouter->execute([':nom_cat' => $nomCat]);
+                $ajouter = $db->prepare("INSERT INTO categories (nom_cat, parent_id) VALUES (:nom_cat, :parent_id)");
+                $ajouter->execute([':nom_cat' => $nomCat, ':parent_id' => $parentId]);
                 definir_flash("Catégorie ajoutée avec succès.");
                 header("Location: gerer_categories.php");
                 exit();
@@ -36,35 +47,49 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
             }
         }
     } elseif ($action === 'supprimer') {
-        $idCat = $_POST['id_cat'] ?? null;
+        $idCat = (int) ($_POST['id_cat'] ?? 0);
         $compter = $db->prepare("SELECT COUNT(*) AS nb FROM structure WHERE id_cat = :id_cat");
         $compter->execute([':id_cat' => $idCat]);
         $nbStructures = $compter->fetch(PDO::FETCH_ASSOC)['nb'];
 
+        // Une catégorie parente ne peut pas disparaître tant qu'elle a des sous-catégories
+        $compterEnfants = $db->prepare("SELECT COUNT(*) FROM categories WHERE parent_id = :id_cat");
+        $compterEnfants->execute([':id_cat' => $idCat]);
+        $nbSousCategories = (int) $compterEnfants->fetchColumn();
+
         if ($nbStructures > 0) {
             $erreur = "Impossible de supprimer : " . $nbStructures . " structure(s) utilisent encore cette catégorie.";
+        } elseif ($nbSousCategories > 0) {
+            $erreur = "Impossible de supprimer : cette catégorie contient " . $nbSousCategories . " sous-catégorie(s). Supprimez-les d'abord.";
         } else {
-            $supprimer = $db->prepare("DELETE FROM categories WHERE id_cat = :id_cat");
-            $supprimer->execute([':id_cat' => $idCat]);
-            definir_flash("Catégorie supprimée.");
-            header("Location: gerer_categories.php");
-            exit();
+            try {
+                $supprimer = $db->prepare("DELETE FROM categories WHERE id_cat = :id_cat");
+                $supprimer->execute([':id_cat' => $idCat]);
+                definir_flash("Catégorie supprimée.");
+                header("Location: gerer_categories.php");
+                exit();
+            } catch (PDOException $e) {
+                error_log("Suppression catégorie : " . $e->getMessage());
+                $erreur = "Impossible de supprimer cette catégorie : elle est encore utilisée.";
+            }
         }
     }
 }
 
 $categoriesStmt = $db->query("
-    SELECT categories.id_cat, categories.nom_cat, COUNT(structure.id_struc) AS nb_structures
+    SELECT categories.id_cat, categories.nom_cat, categories.parent_id, parent.nom_cat AS nom_parent,
+           (SELECT COUNT(*) FROM structure WHERE structure.id_cat = categories.id_cat) AS nb_structures,
+           (SELECT COUNT(*) FROM categories enfant WHERE enfant.parent_id = categories.id_cat) AS nb_sous_categories
     FROM categories
-    LEFT JOIN structure ON structure.id_cat = categories.id_cat
-    GROUP BY categories.id_cat, categories.nom_cat
-    ORDER BY categories.nom_cat
+    LEFT JOIN categories parent ON parent.id_cat = categories.parent_id
+    ORDER BY COALESCE(parent.nom_cat, categories.nom_cat), categories.parent_id IS NOT NULL, categories.nom_cat
 ");
 $categories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC);
+$categoriesRacines = array_filter($categories, static fn($c) => $c['parent_id'] === null);
 
 require '../../includes/header_dashboard.php';
 ?>
-<?php $pageActive = 'moderation'; require '../../includes/sidebar_super_admin.php'; ?>
+<?php $pageActive = 'categories'; require '../../includes/sidebar_super_admin.php'; ?>
 <main class="container my-4" style="max-width: 560px;">
     <?php afficher_flash(); ?>
     <h1 class="h3">Gestion des catégories</h1>
@@ -75,13 +100,24 @@ require '../../includes/header_dashboard.php';
     <div class="card shadow-sm mb-3">
         <div class="card-body">
             <h2 class="h5">Ajouter une catégorie</h2>
-            <form action="" method="post" class="d-flex gap-2 align-items-end">
+            <form action="" method="post">
                 <input type="hidden" name="action" value="ajouter">
-                <div class="flex-grow-1">
-                    <label class="form-label">Nom de la catégorie</label>
-                    <input type="text" name="nom_cat" class="form-control" placeholder="Ex. : Autorité Administrative Indépendante" required>
+                <div class="mb-3">
+                    <label class="form-label" for="nom_cat">Nom de la catégorie</label>
+                    <input type="text" id="nom_cat" name="nom_cat" class="form-control" maxlength="150"
+                           placeholder="Ex. : Autorité Administrative Indépendante" required>
                 </div>
-                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
+                <div class="mb-3">
+                    <label class="form-label" for="parent_id">Catégorie parente (facultatif)</label>
+                    <select id="parent_id" name="parent_id" class="form-select">
+                        <option value="">Aucune — catégorie principale</option>
+                        <?php foreach ($categoriesRacines as $racine): ?>
+                            <option value="<?= (int) $racine['id_cat'] ?>"><?= htmlspecialchars($racine['nom_cat']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="form-text">Une sous-catégorie apparaît sous sa catégorie parente dans le menu « Structures ».</div>
+                </div>
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
                 <button type="submit" class="btn btn-mrri">Ajouter</button>
             </form>
         </div>
@@ -94,7 +130,13 @@ require '../../includes/header_dashboard.php';
 
             <?php foreach ($categories as $cat): ?>
                 <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                    <div><?= htmlspecialchars($cat['nom_cat']) ?> <span class="small text-secondary"><?= $cat['nb_structures'] ?> structure(s)</span></div>
+                    <div<?= $cat['parent_id'] !== null ? ' class="ps-4"' : '' ?>>
+                        <?= $cat['parent_id'] !== null ? '<span class="text-secondary" aria-hidden="true">↳ </span>' : '' ?>
+                        <?= htmlspecialchars($cat['nom_cat']) ?>
+                        <span class="small text-secondary">
+                            <?= (int) $cat['nb_structures'] ?> structure(s)<?= (int) $cat['nb_sous_categories'] > 0 ? ' · ' . (int) $cat['nb_sous_categories'] . ' sous-catégorie(s)' : '' ?>
+                        </span>
+                    </div>
                     <form action="" method="post" onsubmit="return confirm('Supprimer cette catégorie ?');">
                         <input type="hidden" name="action" value="supprimer">
                         <input type="hidden" name="id_cat" value="<?= $cat['id_cat'] ?>">

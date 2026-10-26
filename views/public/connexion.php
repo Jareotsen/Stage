@@ -39,6 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — Espace professionnel MRRI</title>
 
 <link
     rel="stylesheet" href="../../publique/vendor/bootstrap-icons/bootstrap-icons.min.css">
@@ -487,6 +493,42 @@ body {
 }
 
 
+/* Lien retour accueil */
+
+.login-back {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 28px;
+
+    color: rgba(255, 255, 255, 0.60);
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    text-decoration: none;
+
+    transition: color 0.2s ease;
+}
+
+.login-back i {
+    font-size: 13px;
+
+    transition: transform 0.2s ease;
+}
+
+.login-back:hover {
+    color: var(--jaune-or);
+}
+
+.login-back:hover i {
+    transform: translateX(-3px);
+}
+
+
 /* Petit logo au-dessus */
 
 .login-symbol {
@@ -914,6 +956,8 @@ padding-right: 45px;
     }
 }
 </style>
+</head>
+<body>
 
 
 <!-- =========================================================
@@ -1031,6 +1075,12 @@ padding-right: 45px;
         <div class="login-box">
 
 
+            <!-- Retour accueil -->
+            <a href="accueil.php" class="login-back">
+                <i class="bi bi-arrow-left"></i>
+                Retour à l'accueil
+            </a>
+
             <!-- Symbole -->
             <div class="login-symbol">
                 <i class="bi bi-shield-lock-fill"></i>
@@ -1132,4 +1182,5 @@ padding-right: 45px;
         toggle.querySelector("i").className = type === "password" ? "bi bi-eye" : "bi bi-eye-slash";
         toggle.setAttribute("aria-label", type === "password" ? "Afficher le mot de passe" : "Masquer le mot de passe");
     });
-</script>
+</script></body>
+</html>

@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="../../publique/css/theme.css">
-
 <?php
 require_once '../../config/database.php';
 require_once '../../includes/auth.php';
@@ -28,7 +26,14 @@ $structures = $resultat->fetch(PDO::FETCH_ASSOC);
 
 $erreur = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST'
+    && empty($_POST)
+    && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+
+    // Envoi plus gros que post_max_size : PHP vide $_POST et $_FILES
+    $erreur = "Le fichier dépasse la taille autorisée.";
+
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 1. Vérifier le jeton CSRF
     if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
@@ -48,6 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($titre === '') {
             $erreur = "Le titre du document est obligatoire.";
+
+        } elseif (mb_strlen($titre) > 225) {
+            $erreur = "Le titre ne doit pas dépasser 225 caractères.";
 
         } elseif (!in_array($visibility, ['public', 'prive'], true)) {
             $erreur = "La visibilité sélectionnée est invalide.";
@@ -213,7 +221,7 @@ require '../../includes/sidebar_point_focal.php';
                 name="nom_affichage"
                 class="form-control"
                 placeholder="Ex. : Rapport annuel 2026"
-                maxlength="255"
+                maxlength="225"
                 required
             >
         </div>

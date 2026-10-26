@@ -82,39 +82,111 @@ require '../../includes/header.php';
 ?>
 
 <style>
-.actualite-page {
+/* Largeur commune au bandeau, à la recherche et à la liste */
+.actualite-contenu {
     max-width: 1180px;
     margin: 0 auto;
-    padding: 42px 26px 76px;
+    padding: 0 26px;
+}
+.actualite-page {
+    padding-top: 34px;
+    padding-bottom: 76px;
     color: #24364b;
 }
+
+/* Bandeau d'en-tête, sur le modèle du catalogue des structures */
 .actualite-hero {
-    margin-bottom: 28px;
-    padding-bottom: 22px;
-    border-bottom: 1px solid #dce4ec;
+    position: relative;
+    overflow: hidden;
+    padding: clamp(2.5rem, 5vw, 4.4rem) 0 3.3rem;
+    color: #fff;
+    background: linear-gradient(118deg, #0B1D4D 0%, #173B91 68%, #176B58 100%);
+}
+.actualite-hero::before,
+.actualite-hero::after {
+    content: "";
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, .13);
+    border-radius: 50%;
+    pointer-events: none;
+}
+.actualite-hero::before { width: 360px; height: 360px; right: -90px; top: -190px; }
+.actualite-hero::after { width: 240px; height: 240px; right: 70px; bottom: -175px; }
+.actualite-hero .actualite-contenu {
+    position: relative;
+    z-index: 1;
+}
+.actualite-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    margin-bottom: .9rem;
+    color: #F7EACB;
+    font-size: .75rem;
+    font-weight: 800;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+}
+.actualite-kicker::before {
+    content: "";
+    width: 28px;
+    height: 3px;
+    border-radius: 5px;
+    background: #C9972C;
 }
 .actualite-hero h1 {
-    margin: 0;
-    color: #145ca8;
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 600;
-    letter-spacing: -.035em;
-    line-height: 1.15;
+    max-width: 760px;
+    margin: 0 0 1rem;
+    color: #fff;
+    font-family: var(--font-title);
+    font-size: clamp(2rem, 4vw, 3.15rem);
+    line-height: 1.12;
 }
 .actualite-hero p {
-    margin: 12px 0 0;
-    color: #5e7185;
+    max-width: 680px;
+    margin: 0;
+    color: rgba(255, 255, 255, .82);
     font-size: 1rem;
-    line-height: 1.65;
+    line-height: 1.8;
+}
+.actualite-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .7rem;
+    margin-top: 1.5rem;
+}
+.actualite-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .55rem .85rem;
+    border: 1px solid rgba(255, 255, 255, .22);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .08);
+    color: #fff;
+    font-size: .82rem;
+}
+.actualite-stat strong {
+    color: #fff;
+    font-size: .95rem;
+}
+
+/* Recherche : carte blanche qui chevauche le bas du bandeau */
+.actualite-tools {
+    position: relative;
+    z-index: 3;
+    margin-top: -1.45rem;
 }
 .actualite-search {
     display: flex;
     align-items: end;
     gap: 12px;
-    margin: 0 0 30px;
-    padding: 20px;
-    background: #f5f8fb;
-    border: 1px solid #e0e7ee;
+    margin: 0;
+    padding: 1rem 1.25rem 1.15rem;
+    background: #fff;
+    border: 1px solid var(--mrri-border);
+    border-radius: 16px;
+    box-shadow: 0 14px 38px rgba(11, 29, 77, .12);
 }
 .actualite-search-field {
     display: flex;
@@ -131,15 +203,16 @@ require '../../includes/header.php';
     width: 100%;
     min-height: 46px;
     padding: 11px 13px;
-    border: 1px solid #cbd7e2;
-    border-radius: 3px;
+    border: 1px solid #D7DDE7;
+    border-radius: 10px;
     background: #fff;
     color: #24364b;
     font: inherit;
 }
 .actualite-search input:focus {
-    outline: 3px solid rgba(18, 98, 173, .16);
-    border-color: #1262ad;
+    outline: 0;
+    border-color: var(--mrri-vert);
+    box-shadow: 0 0 0 3px rgba(15, 138, 75, .12);
 }
 .actualite-search button,
 .actualite-reset {
@@ -148,9 +221,9 @@ require '../../includes/header.php';
     align-items: center;
     justify-content: center;
     padding: 11px 18px;
-    border: 1px solid #1262ad;
-    border-radius: 3px;
-    background: #1262ad;
+    border: 1px solid var(--mrri-bleu);
+    border-radius: 10px;
+    background: var(--mrri-bleu);
     color: #fff;
     font: inherit;
     font-size: .9rem;
@@ -159,7 +232,7 @@ require '../../includes/header.php';
     cursor: pointer;
 }
 .actualite-search button:hover {
-    background: #0e4e8a;
+    background: var(--mrri-bleu-dark);
 }
 .actualite-reset {
     border-color: #cbd7e2;
@@ -341,8 +414,15 @@ require '../../includes/header.php';
     .actualite-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 }
 @media (max-width: 640px) {
+    .actualite-contenu {
+        padding: 0 15px;
+    }
     .actualite-page {
-        padding: 28px 15px 48px;
+        padding-top: 26px;
+        padding-bottom: 48px;
+    }
+    .actualite-hero {
+        padding-bottom: 2.8rem;
     }
     .actualite-search {
         align-items: stretch;
@@ -373,12 +453,22 @@ require '../../includes/header.php';
 }
 </style>
 
-<main class="actualite-page">
-    <header class="actualite-hero">
+<section class="actualite-hero">
+    <div class="actualite-contenu">
+        <div class="actualite-kicker">Portail institutionnel du Gabon</div>
         <h1>Actualités</h1>
         <p>Retrouvez les informations, annonces et publications officielles des structures.</p>
-    </header>
+        <div class="actualite-stats" aria-label="Résumé des actualités">
+            <span class="actualite-stat">
+                <strong><?= $totalActualites ?></strong>
+                actualité<?= $totalActualites > 1 ? 's' : '' ?> <?= $recherche !== '' ? 'correspondant à votre recherche' : 'publiée' . ($totalActualites > 1 ? 's' : '') ?>
+            </span>
+            <span class="actualite-stat">Publications officielles des structures</span>
+        </div>
+    </div>
+</section>
 
+<div class="actualite-contenu actualite-tools">
     <form class="actualite-search" action="actualite.php" method="get" role="search">
         <div class="actualite-search-field">
             <label for="actualite-q">Mots clés</label>
@@ -395,11 +485,13 @@ require '../../includes/header.php';
             <a class="actualite-reset" href="actualite.php">Réinitialiser</a>
         <?php endif; ?>
     </form>
+</div>
 
+<main class="actualite-contenu actualite-page">
     <div class="actualite-results-heading">
         <h2><?= $recherche !== '' ? 'Résultats de recherche' : 'Toutes les actualités' ?></h2>
         <span class="actualite-count">
-            <?= count($actualites) ?> résultat<?= count($actualites) > 1 ? 's' : '' ?>
+            <?= $totalActualites ?> résultat<?= $totalActualites > 1 ? 's' : '' ?>
         </span>
     </div>
 

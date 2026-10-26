@@ -6,9 +6,14 @@
 <title>Structures sous tutelle — Ministère des Réformes et des Relations avec les Institutions</title>
 <link href="../../publique/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="../../publique/vendor/fonts/fonts.css" rel="stylesheet">
+<link href="../../publique/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
 <!-- Ordre important : le thème partagé d'abord, puis les styles propres au site public -->
-<link href="../../publique/css/theme.css" rel="stylesheet">
-<link href="../../publique/css/public.css" rel="stylesheet">
+<?php
+// ?v=date de modification : le navigateur recharge la feuille de style dès qu'elle change
+$versionCss = static fn(string $fichier): int => (int) @filemtime(__DIR__ . '/../publique/css/' . $fichier);
+?>
+<link href="../../publique/css/theme.css?v=<?= $versionCss('theme.css') ?>" rel="stylesheet">
+<link href="../../publique/css/public.css?v=<?= $versionCss('public.css') ?>" rel="stylesheet">
 <?php if (basename($_SERVER['SCRIPT_NAME'] ?? '') === 'localisation.php'): ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">

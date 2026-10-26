@@ -1,0 +1,2 @@
+# Fichiers de configuration (identifiants) : jamais accessibles depuis le navigateur
+Require all denied

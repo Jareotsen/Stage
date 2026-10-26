@@ -1,7 +1,3 @@
-<link rel="stylesheet" href="../../publique/css/public.css">
-<link rel="stylesheet" href="../../publique/css/theme.css">
-
-link
 <?php
 require_once '../../includes/auth.php';
 require_once '../../config/database.php';
@@ -14,7 +10,7 @@ if ($_SESSION['role'] !== 'super_admin') {
     exit();
 }
 
-$struc = $db->prepare("SELECT structure.nom_struc, structure.id_struc FROM structure");
+$struc = $db->prepare("SELECT nom_struc, id_struc, id_responsable FROM structure ORDER BY nom_struc");
 $struc->execute();
 $structures = $struc->fetchAll(PDO::FETCH_ASSOC);
 
@@ -28,16 +24,42 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     $role = $_POST['role'] ?? '';
-    $structure = $_POST['structure'] ?? null;
+    $structure = filter_var($_POST['structure'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+    // Structure choisie pour un point focal : doit exister et ne pas avoir déjà de responsable
+    $structureChoisie = null;
+    if ($role === 'point_focal' && $structure) {
+        $verifStructure = $db->prepare("SELECT id_struc, id_responsable FROM structure WHERE id_struc = :id");
+        $verifStructure->execute([':id' => $structure]);
+        $structureChoisie = $verifStructure->fetch(PDO::FETCH_ASSOC);
+    }
 
     // Vérification des champs
     if ($username === '' || $password === '') {
 
         $erreur = "Veuillez remplir tous les champs obligatoires.";
 
-    } elseif ($role === 'point_focal' && !$structure) {
+    } elseif (!preg_match('/^[A-Za-z0-9._-]{3,20}$/', $username)) {
+
+        // La colonne username fait 20 caractères : au-delà, MySQL tronquerait l'identifiant
+        $erreur = "L'identifiant doit contenir de 3 à 20 caractères (lettres, chiffres, point, tiret ou tiret bas).";
+
+    } elseif (mb_strlen($password) < 8) {
+
+        $erreur = "Le mot de passe doit contenir au moins 8 caractères.";
+
+    } elseif (!in_array($role, ['point_focal', 'agent_ministere'], true)) {
+
+        // Liste blanche : on ne peut pas créer de super administrateur depuis ce formulaire
+        $erreur = "Rôle invalide.";
+
+    } elseif ($role === 'point_focal' && !$structureChoisie) {
 
         $erreur = "Veuillez sélectionner une structure pour le point focal.";
+
+    } elseif ($role === 'point_focal' && !empty($structureChoisie['id_responsable'])) {
+
+        $erreur = "Cette structure a déjà un point focal. Modifiez d'abord son rattachement dans « Gérer les comptes ».";
 
     } else {
 
@@ -60,6 +82,9 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
         } else {
 
             try {
+
+                // Compte + rattachement à la structure : tout ou rien
+                $db->beginTransaction();
 
                 $hashedPassword = password_hash(
                     $password,
@@ -97,11 +122,15 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
                     ]);
                 }
 
+                $db->commit();
                 definir_flash("Compte créé avec succès.");
 
                 header("Location: dashboard.php");
                 exit();
             } catch (PDOException $e) {
+                if ($db->inTransaction()) {
+                    $db->rollBack();
+                }
                 // Détail technique uniquement dans les logs
                 error_log(
                     "Erreur création compte : " . $e->getMessage()
@@ -123,7 +152,7 @@ require '../../includes/header_dashboard.php';
 
 <div class="mrri-dashboard dashboard-super-admin">
 
-  <?php $pageActive = 'moderation'; require '../../includes/sidebar_super_admin.php'; ?>
+  <?php $pageActive = 'dashboard'; require '../../includes/sidebar_super_admin.php'; ?>
 
     <main class="mrri-main">
         <header class="mrri-topbar">
@@ -161,29 +190,7 @@ require '../../includes/header_dashboard.php';
                 </div>
                 <div class="mrri-stat-card stat-bleu">
                     <div class="mrri-stat-icon">
-                         <svg width="64" height="64" viewBox="0 0 64 64" 
-     xmlns="http://www.w3.org/2000/svg" fill="none">
-  <!-- Socle -->
-  <rect x="10" y="46" width="44" height="6" fill="#2F3B4C"/>
-
-  <!-- Colonnes -->
-  <rect x="14" y="26" width="6" height="20" fill="#4A5A70"/>
-  <rect x="29" y="26" width="6" height="20" fill="#4A5A70"/>
-  <rect x="44" y="26" width="6" height="20" fill="#4A5A70"/>
-
-  <!-- Fronton -->
-  <polygon points="32,12 8,26 56,26" fill="#2F3B4C"/>
-
-  <!-- Balance au centre -->
-  <line x1="32" y1="16" x2="32" y2="24" stroke="#D9A441" stroke-width="2"/>
-  <line x1="24" y1="20" x2="40" y2="20" stroke="#D9A441" stroke-width="2"/>
-
-  <!-- Plateaux -->
-  <circle cx="24" cy="24" r="3" stroke="#D9A441" stroke-width="2" fill="white"/>
-  <circle cx="40" cy="24" r="3" stroke="#D9A441" stroke-width="2" fill="white"/>
-</svg>
-
-                    </svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"/><line x1="5" y1="21" x2="5" y2="10"/><line x1="19" y1="21" x2="19" y2="10"/><line x1="9" y1="21" x2="9" y2="10"/><line x1="15" y1="21" x2="15" y2="10"/><polygon points="12 3 21 9 3 9"/></svg>
                     </div>
                     <div class="mrri-stat-label">Structures</div>
                     <div class="mrri-stat-value"><?= $nbStructures ?></div>
@@ -210,26 +217,34 @@ require '../../includes/header_dashboard.php';
                             <?php endif; ?>
 
                             <form action="" method="post">
+                                <?php $roleSaisi = $_POST['role'] ?? 'point_focal'; ?>
                                 <div class="mb-3">
-                                    <label class="mrri-form-label">Identifiant</label>
-                                    <input type="text" name="username" class="mrri-form-control">
+                                    <label class="mrri-form-label" for="username">Identifiant</label>
+                                    <input type="text" id="username" name="username" class="mrri-form-control"
+                                           required minlength="3" maxlength="20" pattern="[A-Za-z0-9._\-]{3,20}"
+                                           autocomplete="off" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
+                                    <div class="form-text">3 à 20 caractères : lettres, chiffres, point, tiret, tiret bas.</div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="mrri-form-label">Mot de passe</label>
-                                    <input type="password" name="password" class="mrri-form-control">
+                                    <label class="mrri-form-label" for="password">Mot de passe</label>
+                                    <input type="password" id="password" name="password" class="mrri-form-control"
+                                           required minlength="8" autocomplete="new-password">
+                                    <div class="form-text">8 caractères minimum.</div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="mrri-form-label">Rôle</label>
+                                    <label class="mrri-form-label" for="role">Rôle</label>
                                     <select name="role" id="role" class="mrri-form-control">
-                                        <option value="point_focal">Point Focal</option>
-                                        <option value="agent_ministere">Agent Ministère</option>
+                                        <option value="point_focal" <?= $roleSaisi === 'point_focal' ? 'selected' : '' ?>>Point Focal</option>
+                                        <option value="agent_ministere" <?= $roleSaisi === 'agent_ministere' ? 'selected' : '' ?>>Agent Ministère</option>
                                     </select>
                                 </div>
-                                <div class="mb-3" id="champ_structure">
-                                    <label class="mrri-form-label">Structure rattachée</label>
-                                    <select name="structure" class="mrri-form-control">
+                                <div class="mb-3" id="champ_structure" <?= $roleSaisi === 'agent_ministere' ? 'style="display:none"' : '' ?>>
+                                    <label class="mrri-form-label" for="structure">Structure rattachée</label>
+                                    <select name="structure" id="structure" class="mrri-form-control">
                                         <?php foreach ($structures as $s): ?>
-                                            <option value="<?= $s['id_struc'] ?>"><?= htmlspecialchars($s['nom_struc']) ?></option>
+                                            <option value="<?= (int) $s['id_struc'] ?>" <?= !empty($s['id_responsable']) ? 'disabled' : '' ?>>
+                                                <?= htmlspecialchars($s['nom_struc']) ?><?= !empty($s['id_responsable']) ? ' — déjà un point focal' : '' ?>
+                                            </option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>

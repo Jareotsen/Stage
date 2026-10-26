@@ -3,6 +3,7 @@ require_once '../../config/database.php';
 require_once '../../includes/auth.php';
 require_once '../../includes/flash.php';
 require_once '../../includes/csrf.php';
+require_once '../../includes/dates.php';
 
 is_authenticated();
 
@@ -56,7 +57,6 @@ $pageActive = 'actualites';
 require '../../includes/header_dashboard.php';
 ?>
 
-<link rel="stylesheet" href="../../publique/css/theme.css">
 
 <div class="page-avec-sidebar">
 
@@ -107,7 +107,7 @@ require '../../includes/header_dashboard.php';
                                 </h3>
 
                                 <div class="actu-date">
-                                    <?= htmlspecialchars($actualite['date_publication']) ?>
+                                    Publiée le <?= formaterDateFr($actualite['date_publication']) ?>
                                 </div>
                             </div>
 

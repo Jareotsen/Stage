@@ -734,20 +734,6 @@ require '../../includes/header.php';
         <?php endif; ?>
     </div>
 </section>
-<!-- =========================================================
-     BLOC INSTITUTIONNEL
-     ========================================================= -->
-
-<section
-    class="institution-section"
-    id="institution"
->
-
-        </div>
-    </div>
-</section>
-
-
 
 <?php require '../../includes/footer.php'; ?>
 

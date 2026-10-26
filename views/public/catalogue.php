@@ -105,7 +105,9 @@ require '../../includes/header.php';
 .catalogue-result-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--mrri-vert); box-shadow: 0 0 0 4px #E5F5EC; }
 .catalogue-sort { display: flex; align-items: center; gap: .55rem; color: var(--mrri-text-light); font-size: .82rem; }
 .catalogue-sort select { min-height: 40px; max-width: 235px; padding: .45rem 2rem .45rem .7rem; border: 1px solid #D7DDE7; border-radius: 9px; background: #fff; color: var(--mrri-text); font: inherit; }
-.structure-carte-2 { position: relative; display: flex; flex-direction: column; align-items: stretch; height: 100%; min-height: 300px; padding: 0 1.25rem 1.25rem; margin-top: 2.5rem; overflow: visible; border: 1px solid #E1E6EF; border-radius: 18px; background: #fff; box-shadow: 0 5px 18px rgba(11,29,77,.045); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+/* L'espace du logo qui dépasse est réservé sur la colonne : la carte reste dans sa case et ne déborde plus sur la rangée suivante */
+.catalogue-grille > .col { display: flex; flex-direction: column; padding-top: 2.5rem; }
+.structure-carte-2 { position: relative; display: flex; flex: 1 1 auto; flex-direction: column; align-items: stretch; min-height: 300px; padding: 0 1.25rem 1.25rem; overflow: visible; border: 1px solid #E1E6EF; border-radius: 18px; background: #fff; box-shadow: 0 5px 18px rgba(11,29,77,.045); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
 .structure-carte-2::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--mrri-vert), var(--mrri-or)); opacity: 0; transition: opacity .2s ease; }
 .structure-carte-2:hover { transform: translateY(-4px); border-color: #C9D4E8; box-shadow: 0 13px 28px rgba(11,29,77,.09); }
 .structure-carte-2:hover::before { opacity: 1; }
@@ -124,7 +126,7 @@ require '../../includes/header.php';
 .catalogue-empty-icon { display: flex; align-items: center; justify-content: center; width: 58px; height: 58px; margin: 0 auto 1rem; border-radius: 16px; background: #F0F4FB; color: var(--mrri-bleu); }
 .catalogue-empty h2 { margin-bottom: .4rem; font-size: 1.2rem; }
 .catalogue-empty p { margin: 0; color: var(--mrri-text-light); font-size: .9rem; }
-.pagination-ronde { display: flex; justify-content: center; flex-wrap: wrap; gap: .45rem; margin-top: 2.2rem; }
+.pagination-ronde { position: relative; z-index: 1; display: flex; justify-content: center; flex-wrap: wrap; gap: .45rem; margin-top: 3rem; }
 .pagination-ronde a, .pagination-ronde span { display: inline-flex; align-items: center; justify-content: center; min-width: 39px; height: 39px; padding: 0 .65rem; border: 1px solid #DDE3EB; border-radius: 10px; background: #fff; color: var(--mrri-text); font-size: .85rem; font-weight: 750; }
 .pagination-ronde a:hover { border-color: var(--mrri-vert); color: var(--mrri-vert-dark); }
 .pagination-ronde .actif { border-color: var(--mrri-bleu); background: var(--mrri-bleu); color: #fff; }
@@ -216,7 +218,7 @@ require '../../includes/header.php';
         <p>Essayez avec un autre mot-clé ou choisissez une autre catégorie.</p>
       </div>
     <?php else: ?>
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 gy-4 catalogue-grille">
         <?php foreach ($structures as $s): ?>
           <div class="col">
             <article class="structure-carte-2">

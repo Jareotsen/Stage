@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 session_start();
 require '../../config/database.php';
+require_once '../../includes/dates.php';
 
 /* Récupération de l'actualité en base à partir de l'id passé en URL */
 $id = $_GET['id'] ?? '';
@@ -70,7 +71,7 @@ require '../../includes/header.php';
 
 <div class="actualite-detail-page">
 	<main>
-		<a class="retour" href="javascript:history.back()">← Retour aux actualités</a>
+		<a class="retour" href="actualite.php">← Retour aux actualités</a>
 		<article>
 			<?php if ($actualite && $image !== ''): ?>
 				<img src="<?= $escape($image) ?>" alt="">
@@ -82,7 +83,7 @@ require '../../includes/header.php';
 					<h1><?= $escape($titre) ?></h1>
 					<?php if ($date !== '' || $auteur !== ''): ?>
 						<div class="meta">
-							<?= $date !== '' ? $escape($date) : '' ?>
+							<?= $date !== '' ? $escape(formaterDateFr($date)) : '' ?>
 							<?= $date !== '' && $auteur !== '' ? ' · ' : '' ?>
 							<?= $auteur !== '' ? 'Par ' . $escape($auteur) : '' ?>
 						</div>

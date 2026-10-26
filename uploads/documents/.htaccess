@@ -1,0 +1,11 @@
+# Accès direct interdit : les documents sont servis uniquement par views/telecharger.php
+Require all denied
+
+# Ne jamais exécuter de script dans ce dossier
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+Options -Indexes -ExecCGI
