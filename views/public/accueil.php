@@ -1,799 +1,404 @@
 <?php
 session_start();
 require '../../config/database.php';
+require_once '../../includes/dates.php';
 
-// ID de la catégorie "Autorité Administrative Indépendante" en base.
-// (id_cat = 5 dans la table categories,)
-define('AAI_ID', 5);
-
+/* =========================================================
+   ACTUALITÉS RÉCENTES (avec leur première photo)
+   ========================================================= */
 $actu = $db->query("
-    SELECT 
-        id_actu,
-        titre,
-        contenu,
-        structure.nom_struc,
-        date_publication
-    FROM actualites
-    JOIN structure 
-        ON actualites.id_structure = structure.id_struc
-    ORDER BY date_publication DESC
+    SELECT a.id_actu, a.titre, a.contenu, a.date_publication, s.nom_struc,
+           (SELECT p.Photos_actu_url
+              FROM actualites_photos p
+             WHERE p.id_actualites = a.id_actu
+             ORDER BY p.Position
+             LIMIT 1) AS photo
+    FROM actualites a
+    JOIN structure s ON a.id_structure = s.id_struc
+    ORDER BY a.date_publication DESC, a.id_actu DESC
     LIMIT 3
 ");
 $actualites = $actu->fetchAll(PDO::FETCH_ASSOC);
 
 /* =========================================================
-   CATÉGORIES
+   CATÉGORIES "FEUILLES" (raccourcis sous la recherche)
+   Les catégories intermédiaires sans structure directe sont exclues.
    ========================================================= */
-
-// Catégories "feuilles" affichées comme boutons simples,
-// en excluant les secteurs de l'AAI (traités à part en dropdown)
-// et les catégories intermédiaires sans structure directe (ex: id 2).
-$categoriesStmt = $db->prepare("
+$categories = $db->query("
     SELECT id_cat, nom_cat
     FROM categories
     WHERE id_cat NOT IN (
         SELECT DISTINCT parent_id FROM categories WHERE parent_id IS NOT NULL
     )
-    AND (parent_id IS NULL OR parent_id != :aai)
     ORDER BY nom_cat
-");
-$categoriesStmt->execute([':aai' => AAI_ID]);
-$categories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Catégorie AAI elle-même (pour le libellé du menu déroulant)
-$aaiStmt = $db->prepare("SELECT id_cat, nom_cat FROM categories WHERE id_cat = :aai");
-$aaiStmt->execute([':aai' => AAI_ID]);
-$aai = $aaiStmt->fetch(PDO::FETCH_ASSOC);
-
-// Les secteurs de l'AAI (contenu du menu déroulant)
-$secteursStmt = $db->prepare("
-    SELECT id_cat, nom_cat
-    FROM categories
-    WHERE parent_id = :aai
-    ORDER BY nom_cat
-");
-$secteursStmt->execute([':aai' => AAI_ID]);
-$secteursAAI = $secteursStmt->fetchAll(PDO::FETCH_ASSOC);
-$secteursAAIIds = array_map('intval', array_column($secteursAAI, 'id_cat'));
+")->fetchAll(PDO::FETCH_ASSOC);
 
 /* =========================================================
-   STRUCTURES
+   APERÇU DES STRUCTURES
    ========================================================= */
-$parPage = 3;
-$page = isset($_GET['page'])
-    ? max(1, (int) $_GET['page'])
-    : 1;
-$catFiltre = isset($_GET['cat'])
-    ? (int) $_GET['cat']
-    : null;
-
-$conditions = [];
-$parametres = [];
-if ($catFiltre) {
-    // Deux cas possibles :
-    // - la structure est rattachée directement à la catégorie cliquée
-    //   (ex: "Juridictionnelles")
-    // - la catégorie de la structure a pour parent la catégorie cliquée
-    //   (ex: clic sur "AAI" -> ramène les structures des 4 secteurs)
-    $conditions[] = "(structure.id_cat = :cat OR categories.parent_id = :cat)";
-    $parametres[':cat'] = $catFiltre;
-}
-$whereSQL = $conditions
-    ? " WHERE " . implode(" AND ", $conditions)
-    : "";
-
-/* Nombre total (le JOIN est nécessaire ici aussi,
-   puisque le WHERE référence categories.parent_id) */
-$compteStmt = $db->prepare("
-    SELECT COUNT(*)
+$structuresListe = $db->query("
+    SELECT structure.id_struc, structure.nom_struc, structure.sigle,
+           structure.adresse, categories.nom_cat
     FROM structure
-    JOIN categories
-        ON structure.id_cat = categories.id_cat
-    $whereSQL
-");
-$compteStmt->execute($parametres);
-$totalStructures = (int) $compteStmt->fetchColumn();
-$totalPages = max(
-    1,
-    (int) ceil($totalStructures / $parPage)
-);
-$page = min($page, $totalPages);
-$offset = ($page - 1) * $parPage;
-
-/* Liste */
-$structuresStmt = $db->prepare("
-    SELECT
-        structure.id_struc,
-        structure.nom_struc,
-        structure.sigle,
-        structure.adresse,
-        categories.nom_cat
-    FROM structure
-    JOIN categories
-        ON structure.id_cat = categories.id_cat
-    $whereSQL
+    JOIN categories ON structure.id_cat = categories.id_cat
     ORDER BY structure.nom_struc ASC
-    LIMIT $parPage
-    OFFSET $offset
-");
-
-$structuresStmt->execute($parametres);
-
-$structuresListe = $structuresStmt->fetchAll(PDO::FETCH_ASSOC);
-
+    LIMIT 3
+")->fetchAll(PDO::FETCH_ASSOC);
 
 /* =========================================================
-   HEADER
+   CHIFFRES CLÉS
    ========================================================= */
+$totalStructures = (int) $db->query("SELECT COUNT(*) FROM structure")->fetchColumn();
+$totalActualites = (int) $db->query("SELECT COUNT(*) FROM actualites")->fetchColumn();
+$totalConsultations = (int) $db->query("
+    SELECT COUNT(*) FROM consultations
+    WHERE statut = 'ouverte' AND (date_fermeture IS NULL OR date_fermeture >= NOW())
+")->fetchColumn();
+
+function h(?string $valeur): string {
+    return htmlspecialchars($valeur ?? '', ENT_QUOTES, 'UTF-8');
+}
+
+// Les noms de catégories sont stockés en majuscules : on les rend plus lisibles.
+function libelleCategorie(string $nom): string {
+    return mb_convert_case(mb_strtolower($nom, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+}
 
 require '../../includes/header.php';
 ?>
 <style>
-/* ---------- Hero (accueil uniquement) ---------- */
-.mrri-hero { position: relative; min-height: 480px; overflow: hidden; background: var(--mrri-bleu-nuit); }
-.mrri-hero-grid { display: grid; grid-template-columns: 1fr 1fr; min-height: 480px; }
-.mrri-hero-texte { padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 2; }
-.mrri-hero-image-col { position: relative; overflow: hidden; }
-.mrri-hero-image-col img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
-.mrri-hero-image-col::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--mrri-bleu-nuit) 0%, rgba(11,29,77,0) 25%); z-index: 1; }
-.mrri-hero-tagline { position: absolute; right: 2rem; bottom: 1.5rem; z-index: 2; color: #fff; font-weight: 600; font-size: 0.95rem; background: rgba(11,29,77,0.55); padding: 0.5rem 1rem; border-radius: 6px; }
+/* Composants communs (couleurs, titres, cartes) : publique/css/portail.css */
 
-.mrri-hero-accent { width: 40px; height: 3px; background: var(--mrri-or); margin-bottom: 1.1rem; }
-.mrri-hero-texte h1 { color: #fff; font-size: clamp(2rem, 4vw, 2.75rem); line-height: 1.15; margin-bottom: 1rem; }
-.mrri-hero-texte p { color: rgba(255,255,255,0.85); font-size: 1rem; max-width: 46ch; margin-bottom: 1.75rem; }
+/* ---------- Recherche ---------- */
+.acc-recherche { padding: 2.6rem 0; border-bottom: 1px solid var(--acc-ligne); background: #fff; }
+.acc-recherche-grille { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.4fr); gap: 2.5rem; align-items: center; }
+.acc-recherche h2 { margin: 0 0 .35rem; color: var(--acc-encre); font-family: var(--font-title); font-size: clamp(1.4rem, 2.4vw, 1.8rem); font-weight: 600; }
+.acc-recherche-intro { margin: 0; color: var(--acc-gris); font-size: .92rem; }
+.acc-recherche-form { position: relative; display: flex; }
+.acc-raccourcis { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-top: .9rem; color: var(--acc-gris); font-size: .8rem; }
+.acc-raccourcis a { padding: .35rem .75rem; border: 1px solid var(--acc-ligne); border-radius: 999px; color: var(--acc-encre); font-weight: 600; transition: border-color .2s ease, color .2s ease; }
+.acc-raccourcis a:hover { border-color: var(--acc-vert); color: var(--acc-vert-fonce); }
+.acc-resultats { position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 30; max-height: 360px; overflow-y: auto; padding: .6rem; border: 1px solid var(--acc-ligne); border-radius: 6px; background: #fff; box-shadow: 0 18px 40px rgba(10,26,51,.16); }
+.acc-resultats:empty { display: none; }
+.acc-resultats .border { border-color: var(--acc-ligne) !important; }
 
-.mrri-hero-points { display: flex; gap: 1.5rem; flex-wrap: wrap; }
-.mrri-hero-point { display: flex; align-items: center; gap: 10px; }
-.mrri-hero-point-icone { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.05rem; }
-.mrri-hero-point-icone.vert { background: var(--mrri-vert); color: #fff; }
-.mrri-hero-point-icone.bleu { background: var(--mrri-bleu); color: #fff; }
-.mrri-hero-point-icone.or { background: var(--mrri-or); color: #fff; }
-.mrri-hero-point span { color: #fff; font-size: 0.85rem; font-weight: 600; line-height: 1.25; }
-
-/* ---------- Recherche flottante ---------- */
-.search-section { position: relative; z-index: 10; margin-top: -48px; margin-bottom: 4.5rem; }
-.search-box { background: #fff; border: 1px solid var(--mrri-border); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 1.5rem; display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; }
-.search-title { font-family: var(--font-title); font-size: 1.15rem; font-weight: 700; color: var(--mrri-bleu-nuit); white-space: nowrap; }
-.search-form { display: flex; gap: 10px; flex: 1; min-width: 280px; }
-.search-input-wrapper { position: relative; flex: 1; }
-.search-input-wrapper svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--mrri-text-light); }
-.search-input { width: 100%; height: 50px; padding: 0 16px 0 46px; border: 1px solid var(--mrri-border); border-radius: 7px; font-size: 0.92rem; outline: none; }
-.search-input:focus { border-color: var(--mrri-vert); box-shadow: 0 0 0 3px rgba(15,138,75,.10); }
-.search-button { height: 50px; padding: 0 22px; border: none; border-radius: 7px; background: var(--mrri-vert); color: #fff; font-weight: 700; white-space: nowrap; }
-.search-button:hover { background: var(--mrri-vert-dark); }
-.search-filtres-btn { height: 50px; padding: 0 18px; border: 1px solid var(--mrri-border); border-radius: 7px; background: #fff; color: var(--mrri-text); font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
-.search-filtres-btn:hover { border-color: var(--mrri-bleu); color: var(--mrri-bleu); }
-#results { position: relative; z-index: 20; }
+/* ---------- Mot du Ministre + chiffres clés ---------- */
+.acc-ministre-grille { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
+.acc-ministre-photo { position: relative; max-width: 380px; }
+.acc-ministre-photo img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: top; border-radius: 4px; }
+.acc-ministre-photo::after { content: ""; position: absolute; right: -14px; bottom: -14px; z-index: -1; width: 60%; height: 60%; border-radius: 4px; background: var(--acc-vert); }
+.acc-citation { margin: 0; }
+.acc-citation blockquote { position: relative; margin: 0 0 1.6rem; padding-left: 1.6rem; border-left: 4px solid var(--acc-jaune); color: var(--acc-encre); font-family: var(--font-title); font-size: clamp(1.55rem, 3vw, 2.35rem); font-weight: 500; line-height: 1.25; }
+.acc-citation figcaption { color: var(--acc-gris); font-size: .92rem; line-height: 1.55; }
+.acc-citation figcaption strong { display: block; color: var(--acc-encre); font-size: 1rem; }
+.acc-chiffres { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 2.6rem; border-top: 1px solid var(--acc-ligne); }
+.acc-chiffre { padding: 1.4rem 1rem 0 0; }
+.acc-chiffre + .acc-chiffre { padding-left: 1.2rem; border-left: 1px solid var(--acc-ligne); }
+.acc-chiffre strong { display: block; color: var(--acc-encre); font-family: var(--font-title); font-size: clamp(2rem, 3.6vw, 2.8rem); font-weight: 600; line-height: 1; }
+.acc-chiffre span { display: block; margin-top: .45rem; color: var(--acc-gris); font-size: .84rem; }
 
 /* ---------- Accès rapides ---------- */
-.quick-section {
-  padding: 2.5rem 0 4.5rem;
-  display: flex;
-  justify-content: center; /* Centre le bloc de cartes horizontalement */
-  align-items: center;     /* Centre verticalement si nécessaire */
-  gap: 1.5rem;            /* Espacement entre les cartes (ajustez selon vos besoins) */
-  flex-wrap: wrap;        /* Permet un bon comportement sur écran mobile */
-}
-.quick-card {
-  height: 89%;
-  background: #fff;
-  border: none;
-  border-radius: 16px;
-  padding: 1.6rem 1.75rem;
-  box-shadow: 0 4px 18px rgba(11,29,77,0.06);
-  transition: transform .2s ease, box-shadow .2s ease;
-}
-.quick-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(11,29,77,0.10); }
+.acc-acces { background: var(--acc-fond); }
+.acc-acces-grille { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+.acc-tuile { position: relative; display: flex; flex-direction: column; min-height: 210px; padding: 1.6rem 1.5rem 1.4rem; border: 1px solid var(--acc-ligne); border-radius: 4px; background: #fff; color: var(--acc-encre); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.acc-tuile:hover { transform: translateY(-4px); border-color: #C8D2E1; box-shadow: 0 16px 32px rgba(10,26,51,.09); color: var(--acc-encre); }
+.acc-tuile-icone { display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; margin-bottom: 1.2rem; border-radius: 50%; background: #E8F0FA; color: var(--acc-bleu-fonce); transition: background .2s ease, color .2s ease; }
+.acc-tuile:hover .acc-tuile-icone { background: var(--acc-bleu); color: #fff; }
+.acc-tuile h3 { margin: 0 0 .45rem; font-family: var(--font-title); font-size: 1.2rem; font-weight: 600; }
+.acc-tuile p { flex: 1; margin: 0 0 1.1rem; color: var(--acc-gris); font-size: .86rem; line-height: 1.55; }
+.acc-tuile-fleche { display: inline-flex; align-items: center; gap: .4rem; color: var(--acc-bleu-fonce); font-size: .85rem; font-weight: 700; }
+.acc-tuile-fleche span { transition: transform .2s ease; }
+.acc-tuile:hover .acc-tuile-fleche span { transform: translateX(4px); }
+.acc-tuile-badge { position: absolute; top: 1.4rem; right: 1.3rem; padding: .25rem .6rem; border-radius: 999px; background: #E3F5EC; color: var(--acc-vert-fonce); font-size: .72rem; font-weight: 800; }
 
-.quick-top {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.1rem;
-}
+/* ---------- Actualités : une à la une + deux secondaires ---------- */
+.acc-actus { background: var(--acc-fond); }
+.acc-actus-grille { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 1.75rem; }
+.acc-actus-cote { display: grid; gap: 1.75rem; align-content: start; }
 
-.quick-icon {
-  width: 56px;
-  height: 56px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.35rem;
-  color: #fff;
-}
-.quick-icon.green { background: var(--mrri-vert); }
-.quick-icon.blue { background: var(--mrri-bleu); }
-.quick-icon.gold { background: var(--mrri-or); }
-.quick-icon.dark { background: var(--mrri-bleu-nuit); }
-
-.quick-card h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  line-height: 1.3;
-  margin: 0;
-}
-
-.quick-card p {
-  color: var(--mrri-text-light);
-  font-size: 0.88rem;
-  line-height: 1.55;
-  margin-bottom: 1.4rem;
-}
-
-.quick-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 700;
-  font-size: 0.92rem;
-}
-.quick-link span { transition: transform 0.15s ease; }
-.quick-link:hover span { transform: translateX(3px); }
-
-.green-link { color: var(--mrri-vert); }
-.green-link:hover { color: var(--mrri-vert-dark); }
-.blue-link { color: var(--mrri-bleu); }
-.blue-link:hover { color: var(--mrri-bleu-dark); }
-.gold-link { color: var(--mrri-or); }
-.gold-link:hover { color: #8A6511; }
-.dark-link { color: var(--mrri-bleu-nuit); }
-.dark-link:hover { color: #000; }
-
-/* ---------- Catalogue (section aperçu) ---------- */
-.structures-section { padding: 4.5rem 0; background: #fff; border-top: 1px solid var(--mrri-border); border-bottom: 1px solid var(--mrri-border); }
-.category-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 2rem; }
-.category-filter { display: inline-flex; align-items: center; padding: 8px 15px; border: 1px solid var(--mrri-border); border-radius: 50px; background: #fff; color: var(--mrri-text-light); font-size: .8rem; font-weight: 600; }
-.category-filter:hover { border-color: var(--mrri-vert); color: var(--mrri-vert); }
-.category-filter.active { background: var(--mrri-vert); border-color: var(--mrri-vert); color: #fff; }
-.category-filter.dropdown-toggle::after { margin-left: 8px; }
-
-.structure-card { height: 100%; display: flex; flex-direction: column; background: #fff; border: 1px solid var(--mrri-border); border-radius: var(--radius-md); padding: 1.4rem; }
-.structure-card:hover { transform: translateY(-3px); border-color: rgba(27,63,174,.3); box-shadow: var(--shadow-sm); }
-.structure-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
-.structure-icon { flex-shrink: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 9px; background: #E5F5EC; color: var(--mrri-vert); font-size: 1.05rem; }
-.structure-category { display: inline-block; padding: 5px 9px; border-radius: 5px; background: #E5F5EC; color: var(--mrri-vert-dark); font-size: .68rem; font-weight: 700; }
-.structure-card h3 { min-height: 50px; margin-bottom: 5px; font-size: 1.02rem; line-height: 1.35; }
-.structure-sigle { color: var(--mrri-bleu); font-size: .76rem; font-weight: 700; margin-bottom: 12px; }
-.structure-address { flex-grow: 1; color: var(--mrri-text-light); font-size: .8rem; margin-bottom: 1.1rem; }
-.structure-link { display: inline-flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--mrri-border); color: var(--mrri-bleu); font-size: .8rem; font-weight: 700; }
-.structure-link:hover { color: var(--mrri-bleu-dark); }
-
-/* ---------- Actualités ---------- */
-.news-section { padding: 4.5rem 0; }
-.news-card { height: 100%; overflow: hidden; background: #fff; border: 1px solid var(--mrri-border); border-radius: var(--radius-md); }
-.news-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }
-.news-image { position: relative; height: 180px; overflow: hidden; background: var(--mrri-bleu-nuit); }
-.news-image img { width: 100%; height: 100%; object-fit: cover; }
-.news-image-placeholder { height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--mrri-bleu), var(--mrri-bleu-nuit)); color: rgba(255,255,255,.8); }
-.news-badge { position: absolute; left: 14px; bottom: 14px; padding: 5px 10px; border-radius: 5px; background: var(--mrri-vert); color: #fff; font-size: .68rem; font-weight: 700; }
-.news-content { padding: 1.1rem; }
-.news-date { color: var(--mrri-text-light); font-size: .7rem; margin-bottom: 6px; }
-.news-content h3 { font-size: 1rem; line-height: 1.4; margin: 0; }
-
-@media (max-width: 900px) {
-  .mrri-hero-grid { grid-template-columns: 1fr; }
-  .mrri-hero-image-col { display: none; }
-}
+/* ---------- Appel à participation ---------- */
+.acc-appel { position: relative; overflow: hidden; padding: clamp(3rem, 6vw, 4.5rem) 0; background: var(--acc-nuit); color: #fff; }
+.acc-appel::before { content: ""; position: absolute; top: -140px; right: -100px; width: 420px; height: 420px; border: 1px solid rgba(255,255,255,.08); border-radius: 50%; }
+.acc-appel-grille { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+.acc-appel .acc-surtitre { color: var(--acc-jaune); }
+.acc-appel h2 { max-width: 24ch; margin: 0 0 .6rem; color: #fff; font-family: var(--font-title); font-size: clamp(1.6rem, 3vw, 2.3rem); font-weight: 600; line-height: 1.2; }
+.acc-appel p { max-width: 56ch; margin: 0; color: rgba(255,255,255,.75); }
+.acc-bouton-clair { display: inline-flex; flex-shrink: 0; align-items: center; gap: .6rem; padding: .95rem 1.5rem; border-radius: 4px; background: var(--acc-jaune); color: var(--acc-nuit); font-weight: 800; transition: background .2s ease, transform .2s ease; }
+.acc-bouton-clair:hover { background: #fff; color: var(--acc-nuit); transform: translateY(-2px); }
 
 
-/* =========================================================
-   REFONTE VISUELLE — ACCUEIL MRRI
-   Styles de présentation uniquement : logique PHP conservée.
-   ========================================================= */
-:root { scroll-behavior: smooth; }
-.mrri-top-band { height: 5px; background: linear-gradient(90deg, var(--mrri-vert) 0 33.33%, var(--mrri-or) 33.33% 66.66%, var(--mrri-bleu) 66.66% 100%); }
-.search-section { margin-top: -38px; margin-bottom: 3.5rem; }
-.search-box { gap: 1rem; padding: clamp(1rem, 2vw, 1.5rem); border-radius: 16px; box-shadow: 0 16px 40px rgba(11,29,77,.12); }
-.search-title { white-space: normal; }
-.search-input, .search-button, .search-filtres-btn { min-height: 48px; border-radius: 9px; }
-.search-button { transition: background .2s ease, transform .2s ease; }
-.search-button:hover { transform: translateY(-1px); }
-.citation-section { position: relative; overflow: hidden; padding: 5rem 0; background: var(--mrri-bleu-nuit); }
-.citation-fond { position: absolute; inset: 0; background-position: center; background-size: cover; opacity: .34; }
-.citation-voile { position: absolute; inset: 0; background: linear-gradient(110deg, rgba(11,29,77,.94), rgba(11,29,77,.64)); }
-.citation-section .container { position: relative; z-index: 1; }
-.citation-carte { max-width: 850px; margin-inline: auto; padding: clamp(1.5rem, 4vw, 3rem); text-align: center; color: #fff; border: 1px solid rgba(255,255,255,.22); border-radius: 20px; background: rgba(255,255,255,.08); backdrop-filter: blur(4px); }
-.citation-portrait { width: 88px; height: 88px; object-fit: cover; border-radius: 50%; border: 3px solid rgba(255,255,255,.8); }
-.citation-guillemet { display: block; margin-top: .5rem; color: var(--mrri-or); font-size: 3.5rem; line-height: .9; font-family: Georgia, serif; }
-.citation-texte { margin: .5rem auto 1.25rem; max-width: 26ch; color: #fff; font-family: var(--font-title); font-size: clamp(1.5rem, 3.4vw, 2.4rem); line-height: 1.25; }
-.citation-trait { width: 54px; height: 3px; margin: 0 auto 1.1rem; background: var(--mrri-or); }
-.citation-auteur { max-width: 65ch; margin: 0 auto .5rem; color: rgba(255,255,255,.9); font-size: .9rem; font-weight: 700; }
-.citation-date { margin: 0; color: rgba(255,255,255,.7); font-size: .8rem; }
-.quick-access { padding: 4rem 0; background: #f5f8fc; }
-.quick-access .row { align-items: stretch; }
-.quick-access [class*="col-"] { display: flex; }
-.quick-card { width: 100%; height: 100%; padding: 1.6rem; border: 1px solid #e6ebf2; border-radius: 16px; box-shadow: 0 5px 22px rgba(11,29,77,.045); }
-.quick-card:hover { border-color: rgba(27,63,174,.2); }
-.quick-top { align-items: center; }
-.quick-icon { width: 52px; height: 52px; border-radius: 14px; }
-.quick-card h3 { color: var(--mrri-bleu-nuit); }
-.quick-card p { flex: 1; }
-.structures-section { padding: clamp(3rem, 6vw, 5rem) 0; background: #EEF3F7; }
-.section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; margin-bottom: 1.75rem; }
-.section-heading h2 { margin-bottom: .6rem; color: var(--mrri-bleu-nuit); font-family: var(--font-title); font-size: clamp(1.6rem, 3vw, 2.15rem); font-weight: 700; }
-.section-heading p { margin: .8rem 0 0; color: var(--mrri-text-light); }
-.heading-line { width: 58px; height: 3px; border-radius: 3px; background: var(--mrri-vert); }
-.section-heading .btn { flex-shrink: 0; border-radius: 8px; padding: .7rem 1rem; font-weight: 700; }
-.category-filters { gap: .55rem; margin-bottom: 1.75rem; }
-.category-filter { padding: .6rem .95rem; color: #4f5c70; transition: all .2s ease; text-decoration: none; }
-.category-filter.active { box-shadow: 0 4px 12px rgba(15,138,75,.16); }
-.structure-card { padding: 1.35rem; border-radius: 15px; box-shadow: 0 4px 16px rgba(11,29,77,.035); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-.structure-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(11,29,77,.09); }
-.structure-card-top { align-items: center; }
-.structure-icon { width: 50px; height: 50px; border-radius: 50%; }
-.structure-category { max-width: 65%; text-align: right; line-height: 1.35; }
-.structure-card h3 { margin-top: .2rem; color: var(--mrri-bleu-nuit); font-family: var(--font-title); font-size: 1.08rem; }
-.structure-sigle { letter-spacing: .04em; }
-.structure-address { display: flex; align-items: flex-start; gap: .45rem; line-height: 1.5; }
-.structure-address svg { flex: 0 0 16px; margin-top: 2px; }
-.structure-link { margin-top: auto; text-decoration: none; }
-.news-section { padding: clamp(3rem, 6vw, 5rem) 0; background: #f5f8fc; }
-.news-card { border-radius: 15px; border-color: #e5eaf1; box-shadow: 0 4px 16px rgba(11,29,77,.04); transition: transform .2s ease, box-shadow .2s ease; }
-.news-card:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(11,29,77,.1); }
-.news-image { height: 195px; }
-.news-image img { transition: transform .35s ease; }
-.news-card:hover .news-image img { transform: scale(1.035); }
-.news-badge { max-width: calc(100% - 28px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.news-content { padding: 1.2rem; }
-.news-date { margin-bottom: .55rem; }
-.news-content h3 { color: var(--mrri-bleu-nuit); font-size: 1.03rem; }
-.pagination { gap: .35rem; }
-.pagination .page-link { border-radius: 8px; border-color: #e1e7ef; color: var(--mrri-bleu); }
-.pagination .page-item.active .page-link { background: var(--mrri-bleu); border-color: var(--mrri-bleu); }
-.alert-light { border-radius: 12px; padding: 1.25rem; }
-@media (max-width: 900px) {
-  .mrri-hero-grid { grid-template-columns: 1fr; }
-  .mrri-hero-image-col { display: none; }
-  .search-section { margin-top: -24px; }
-  .search-box { align-items: stretch; }
-  .search-title { width: 100%; }
-  .search-form { min-width: 0; }
+@media (max-width: 991.98px) {
+  .acc-recherche-grille, .acc-ministre-grille, .acc-actus-grille { grid-template-columns: 1fr; }
+  .acc-ministre-photo { max-width: 260px; }
+  .acc-acces-grille { grid-template-columns: repeat(2, 1fr); }
+  .acc-appel-grille { flex-direction: column; align-items: flex-start; }
 }
 @media (max-width: 575.98px) {
-  .search-section { margin-bottom: 2.5rem; }
-  .search-form { flex-direction: column; width: 100%; }
-  .search-button, .search-filtres-btn { justify-content: center; width: 100%; }
-  .section-heading { align-items: flex-start; flex-direction: column; }
-  .citation-section { padding: 3rem 0; }
-  .quick-access { padding: 2.75rem 0; }
-  .structure-card { padding: 1.1rem; }
-  .news-image { height: 185px; }
+  .acc-acces-grille { grid-template-columns: 1fr; }
+  .acc-tuile { min-height: 0; }
+  .acc-chiffre + .acc-chiffre { padding-left: .8rem; }
+  .acc-chiffre span { font-size: .76rem; }
+  .acc-ministre-photo::after { right: -8px; bottom: -8px; }
 }
-
-
-/* Accueil allégée : moins de texte, plus d'invitation à cliquer */
-.quick-access { padding: 2.25rem 0 3rem; background: #f7f9fc; }
-.quick-access .row { max-width: 1040px; margin-inline: auto; }
-.quick-card { min-height: 132px; padding: 1.25rem 1.35rem; display: flex; flex-direction: column; justify-content: center; gap: .8rem; border: 1px solid #e5eaf1; border-radius: 15px; box-shadow: 0 5px 18px rgba(11,29,77,.045); }
-.quick-top { margin: 0; gap: .85rem; }
-.quick-icon { width: 46px; height: 46px; border-radius: 13px; }
-.quick-card h3 { font-size: 1rem; }
-.quick-card p { display: none; }
-.quick-link { align-self: flex-start; font-size: .84rem; margin-left: 3.8rem; margin-top: -.35rem; text-decoration: none; }
-.structures-section { padding: 3.25rem 0; }
-.structures-section .section-heading { margin-bottom: 1.25rem; }
-.structures-section .section-heading p, .news-section .section-heading p { max-width: 38ch; font-size: .9rem; }
-.structure-card { padding: 1.15rem; }
-.structure-card-top { margin-bottom: .85rem; }
-.structure-icon { width: 44px; height: 44px; }
-.structure-card h3 { min-height: 0; margin-bottom: .35rem; font-size: 1rem; }
-.structure-sigle { margin-bottom: .6rem; }
-.structure-address { font-size: .78rem; margin-bottom: .75rem; }
-.structure-link { padding-top: .7rem; }
-.news-section { padding: 3.25rem 0; }
-.news-section .row { --bs-gutter-y: 1.15rem; }
-.news-image { height: 165px; }
-.news-content { padding: 1rem; }
-.news-content h3 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: .98rem; }
-.news-badge { font-size: .65rem; }
-@media (max-width: 767px) {
-  .quick-access { padding: 1.5rem 0 2rem; }
-  .quick-card { min-height: 0; padding: 1rem; }
-  .quick-link { margin-left: 0; }
-  .structures-section, .news-section { padding: 2.5rem 0; }
-  .section-heading { margin-bottom: 1.25rem; }
+@media (prefers-reduced-motion: reduce) {
+  .acc-tuile, .acc-bouton-clair { transition: none; }
 }
-
 </style>
-<div class="mrri-top-band"></div>
+
 <?php require '../../includes/hero_actualites.php'; ?>
-<section class="search-section">
-  <div class="container">
-    <div class="search-box">
-      <div class="search-title">Rechercher une Information</div>
-      <form action="catalogue.php" method="get" class="search-form">
-        <div class="search-input-wrapper">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-          <input id="search" type="text" name="q" class="search-input" placeholder="Nom de la structure, sigle, mot-clé..." autocomplete="off">
-        </div>
-        <button type="submit" class="search-button">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px; margin-right:6px;"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-          Rechercher
-        </button>
+
+<!-- =========================================================
+     RECHERCHE
+     ========================================================= -->
+<section class="acc-recherche" aria-labelledby="titre-recherche">
+  <div class="container acc-recherche-grille">
+    <div>
+      <h2 id="titre-recherche">Rechercher une information</h2>
+      <p class="acc-recherche-intro">Trouvez une institution par son nom, son sigle ou un mot-clé.</p>
+    </div>
+    <div>
+      <form action="catalogue.php" method="get" class="acc-recherche-form acc-champ" role="search">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <label for="search" class="visually-hidden">Rechercher une structure</label>
+        <input id="search" type="text" name="q" placeholder="Nom de la structure, sigle, mot-clé…" autocomplete="off" aria-controls="results">
+        <button type="submit">Rechercher</button>
+        <div id="results" class="acc-resultats" aria-live="polite"></div>
       </form>
-      <a href="catalogue.php" class="search-filtres-btn">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-        Filtres avancés
-      </a>
-    </div>
-    <div id="results" class="mt-3"></div>
-  </div>
-</section>
-<section class="citation-section">
-  <div class="citation-fond" style="background-image: url('../../public/image/GA.jpeg');"></div>
-  <div class="citation-voile"></div>
-  <div class="container">
-    <div class="citation-carte">
-      <img src="../../publique/image/minis.jpeg" alt="[Nom de la personne citée]" class="citation-portrait">
-      <span class="citation-guillemet">"</span>
-      <p class="citation-texte">Les réformes sont un pro­ces­sus continu, pas une fin en soi</p>
-      <div class="citation-trait"></div>
-      <p class="citation-auteur">Aimé Martial Massamba, Ministre de la Réforme et des Relations avec les Institutions</p>
-      <p class="citation-date">11 octobre 2026</p>
+      <div class="acc-raccourcis">
+        <span>Parcourir :</span>
+        <?php foreach ($categories as $cat): ?>
+          <a href="catalogue.php?cat=<?= (int) $cat['id_cat'] ?>"><?= h(libelleCategorie($cat['nom_cat'])) ?></a>
+        <?php endforeach; ?>
+        <a href="catalogue.php">Filtres avancés</a>
+      </div>
     </div>
   </div>
 </section>
+
+<!-- =========================================================
+     MOT DU MINISTRE + CHIFFRES CLÉS
+     ========================================================= -->
+<section class="acc-section" aria-labelledby="titre-ministre">
+  <div class="container acc-ministre-grille">
+    <div class="acc-ministre-photo">
+      <img src="../../publique/image/minis.jpeg" alt="Aimé Martial Massamba, Ministre de la Réforme et des Relations avec les Institutions">
+    </div>
+    <div>
+      <span class="acc-surtitre" id="titre-ministre">Le mot du Ministre</span>
+      <figure class="acc-citation">
+        <blockquote>« Les réformes sont un processus continu, pas une fin en soi. »</blockquote>
+        <figcaption>
+          <strong>Aimé Martial Massamba</strong>
+          Ministre de la Réforme et des Relations avec les Institutions · 11 octobre 2026
+        </figcaption>
+      </figure>
+      <div class="acc-chiffres">
+        <div class="acc-chiffre"><strong><?= $totalStructures ?></strong><span>Institutions et A.A.I référencées</span></div>
+        <div class="acc-chiffre"><strong><?= $totalActualites ?></strong><span>Actualités publiées</span></div>
+        <div class="acc-chiffre"><strong><?= $totalConsultations ?></strong><span>Consultation(s) ouverte(s)</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- =========================================================
      ACCÈS RAPIDES
      ========================================================= -->
-<section class="quick-access">
-    <div class="container">
-        <div class="row g-4 justify-content-center">
-            <!-- CARTE 1 -->
-            <div class="col-md-6 col-lg-4">
-                <div class="quick-card">
-                    <div class="quick-top">
-                        <div class="quick-icon green">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="21" x2="21" y2="21"/>
-                    <line x1="5" y1="21" x2="5" y2="10"/>
-                    <line x1="19" y1="21" x2="19" y2="10"/>
-                    <line x1="9" y1="21" x2="9" y2="10"/>
-                    <line x1="15" y1="21" x2="15" y2="10"/>
-                    <polygon points="12 3 21 9 3 9"/>
-                    </svg>
-                        </div>
-                        <h3>
-                            I.C &  A.A.I
-                        </h3>
-                    </div>
-                    <a href="catalogue.php"
-                       class="quick-link green-link">
-                        Explorer les institutions
-                        <span>→</span>
-                    </a>
-                </div>
-            </div>
-            <!-- CARTE 3 -->
-            <div class="col-md-6 col-lg-4">
-
-                <div class="quick-card">
-                    <div class="quick-top">
-                        <div class="quick-icon gold">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 4h13a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/>
-                        <line x1="8" y1="8" x2="15" y2="8"/>
-                        <line x1="8" y1="12" x2="15" y2="12"/>
-                        <line x1="8" y1="16" x2="12" y2="16"/>
-                    </svg>
-                        </div>
-                        <h3>
-                            Actualités
-                        </h3>
-                    </div>
-                    <a href="actualite.php"
-                       class="quick-link gold-link">
-                        Découvrir les actualités
-                        <span>→</span>
-                    </a>
-                </div>
-            </div>
-            <!-- CARTE 4 -->
-            <div class="col-md-6 col-lg-4">
-                <div class="quick-card">
-                    <div class="quick-top">
-                        <div class="quick-icon dark">
-                             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="9"/>
-                            <line x1="12" y1="11" x2="12" y2="16.5"/>
-                            <circle cx="12" cy="7.5" r="0.9" fill="#fff" stroke="none"/>
-                        </svg>
-                                                </div>
-                        <h3>
-                            À propos du MRRI
-                        </h3>
-                    </div>
-                    <a href="https://relations-institutions.gouv.ga/"
-                       class="quick-link dark-link">
-                        En savoir plus
-                        <span>→</span>
-                    </a>
-                </div>
-            </div>
-        </div>
+<section class="acc-section acc-acces" aria-labelledby="titre-acces">
+  <div class="container">
+    <div class="acc-entete">
+      <div>
+        <span class="acc-surtitre">Accès rapides</span>
+        <h2 id="titre-acces">Ce que vous pouvez faire ici</h2>
+      </div>
     </div>
+    <div class="acc-acces-grille">
+      <a href="catalogue.php" class="acc-tuile">
+        <span class="acc-tuile-icone" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 5l9 4.5z"/><path d="M6 12v6M10 12v6M14 12v6M18 12v6M4.5 12h15M4 18h16M3 21h18"/></svg>
+        </span>
+        <h3>I.C &amp; A.A.I</h3>
+        <p>Le répertoire des Institutions constitutionnelles et des Autorités administratives indépendantes.</p>
+        <span class="acc-tuile-fleche">Explorer les institutions <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="consultations.php" class="acc-tuile">
+        <?php if ($totalConsultations > 0): ?><span class="acc-tuile-badge"><?= $totalConsultations ?> ouverte<?= $totalConsultations > 1 ? 's' : '' ?></span><?php endif; ?>
+        <span class="acc-tuile-icone" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h1.5A1.5 1.5 0 0 1 18 5.5V10"/><path d="M9 4H7.5A1.5 1.5 0 0 0 6 5.5v14A1.5 1.5 0 0 0 7.5 21H12"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="m8.5 10 1 1 2-2M13 10h2m-6.5 4.5 1 1 2-2"/><path d="M15 13.5h5.5a1 1 0 0 1 1 1v3.5a1 1 0 0 1-1 1H18l-2 2v-2h-1a1 1 0 0 1-1-1v-3.5a1 1 0 0 1 1-1z"/></svg>
+        </span>
+        <h3>Consultations</h3>
+        <p>Donnez votre avis sur les projets soumis à la participation citoyenne.</p>
+        <span class="acc-tuile-fleche">Participer <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="actualite.php" class="acc-tuile">
+        <span class="acc-tuile-icone" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h11A1.5 1.5 0 0 1 18 5.5V19a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2z"/><path d="M18 9h2v10a2 2 0 0 1-2 2M8 8h6M8 12h6M8 16h3"/></svg>
+        </span>
+        <h3>Actualités</h3>
+        <p>Les dernières informations publiées par les structures sous tutelle.</p>
+        <span class="acc-tuile-fleche">Découvrir les actualités <span aria-hidden="true">→</span></span>
+      </a>
+      <a href="https://relations-institutions.gouv.ga/" class="acc-tuile" target="_blank" rel="noopener">
+        <span class="acc-tuile-icone" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.6" r=".6" fill="currentColor"/></svg>
+        </span>
+        <h3>À propos du MRRI</h3>
+        <p>Missions et organisation du Ministère, sur son site officiel.</p>
+        <span class="acc-tuile-fleche">En savoir plus <span aria-hidden="true">↗</span></span>
+      </a>
+    </div>
+  </div>
 </section>
+
 <!-- =========================================================
      STRUCTURES
      ========================================================= -->
-<section class="structures-section">
-    <div class="container">
-        <div class="section-heading">
-            <div>
-                <h2>
-                 Institutions constitutionnelles et AAI
-                </h2>
-                <div class="heading-line"></div>
-                <p>
-                    Explorez les structures enregistrées
-                    dans la plateforme.
-                </p>
-            </div>
-            <a
-                href="catalogue.php"
-                class="btn btn-outline-primary">
-                Voir le catalogue
-            </a>
-        </div>
-
-        <!-- Aperçu volontairement épuré : les filtres complets sont disponibles dans le catalogue. -->
-
-        <?php if (empty($structuresListe)): ?>
-
-            <div class="alert alert-light border">
-
-                Aucune structure trouvée.
-
-            </div>
-
-        <?php else: ?>
-
-
-            <div class="row g-4">
-
-
-                <?php foreach ($structuresListe as $s): ?>
-
-                    <div class="col-md-6 col-lg-4">
-
-                        <div class="structure-card">
-
-
-                            <div class="structure-card-top">
-
-                                <div class="structure-icon">
- <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00865a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="21" x2="21" y2="21"/>
-                    <line x1="5" y1="21" x2="5" y2="10"/>
-                    <line x1="19" y1="21" x2="19" y2="10"/>
-                    <line x1="9" y1="21" x2="9" y2="10"/>
-                    <line x1="15" y1="21" x2="15" y2="10"/>
-                    <polygon points="12 3 21 9 3 9"/>
-                    </svg>
-
-                                </div>
-
-
-
-                            </div>
-
-
-
-                            <h3>
-
-                                <?= htmlspecialchars($s['nom_struc']) ?>
-
-                            </h3>
-
-
-
-                            <?php if (!empty($s['sigle'])): ?>
-
-                                <div class="structure-sigle">
-
-                                    <?= htmlspecialchars($s['sigle']) ?>
-
-                                </div>
-
-                            <?php endif; ?>
-
-
-
-                            <p class="structure-address">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                            width="16" height="16" fill="currentColor"
-                            viewBox="0 0 16 16" class="bi bi-geo-alt">
-                            <path d="M12.166 8.94 8 15.5l-4.166-6.56A4.5 4.5 0 1 1 12.166 8.94z"/>
-                            <path d="M8 9.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
-                           </svg>
-                                <?= htmlspecialchars(
-                                    $s['adresse'] ?? 'Adresse non renseignée'
-                                ) ?>
-                            </p>
-                            <a
-                                href="fiche.php?id=<?= $s['id_struc'] ?>"
-                                class="structure-link"
-                            >
-                                <span>
-                                    voir 
-                                </span>
-                                <span>
-                                    →
-                                </span>
-                            </a>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-
-
-        <?php endif; ?>
-
+<section class="acc-section" aria-labelledby="titre-structures">
+  <div class="container">
+    <div class="acc-entete">
+      <div>
+        <span class="acc-surtitre">Répertoire</span>
+        <h2 id="titre-structures">Institutions constitutionnelles et A.A.I</h2>
+        <p>Explorez les structures enregistrées dans la plateforme.</p>
+      </div>
+      <a href="catalogue.php" class="acc-lien-fleche">Voir le catalogue <span aria-hidden="true">→</span></a>
     </div>
 
+    <?php if (empty($structuresListe)): ?>
+      <div class="acc-vide">Aucune structure trouvée.</div>
+    <?php else: ?>
+      <div class="acc-structures-grille">
+        <?php foreach ($structuresListe as $s): ?>
+          <a href="fiche.php?id=<?= (int) $s['id_struc'] ?>" class="acc-structure">
+            <div class="acc-structure-tete">
+              <span class="acc-structure-icone" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5v3"/><path d="M12 2.5h3l-.75 1 .75 1h-3"/><path d="M3 9.5 12 5.5l9 4z"/><path d="M4 9.5h16"/><path d="M6 12v6M10 12v6M14 12v6M18 12v6"/><path d="M4.5 12h15M4 18h16M3 21h18"/></svg>
+              </span>
+              <div>
+                <?php if (!empty($s['sigle'])): ?><div class="acc-structure-sigle"><?= h($s['sigle']) ?></div><?php endif; ?>
+                <div class="acc-structure-cat"><?= h(libelleCategorie($s['nom_cat'])) ?></div>
+              </div>
+            </div>
+            <h3><?= h($s['nom_struc']) ?></h3>
+            <p class="acc-structure-adresse">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span><?= h($s['adresse'] ?: 'Adresse non renseignée') ?></span>
+            </p>
+            <span class="acc-fleche">Voir la fiche <span aria-hidden="true">→</span></span>
+          </a>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+  </div>
 </section>
-
-
 
 <!-- =========================================================
      ACTUALITÉS
      ========================================================= -->
-
-<section class="news-section">
-
-    <div class="container">
-
-
-        <div class="section-heading">
-
-            <div>
-
-                <h2>
-                    Actualités récentes
-                </h2>
-
-                <div class="heading-line"></div>
-
-                <p>
-                    Les dernières informations publiées
-                    sur la plateforme.
-                </p>
-
-            </div>
-
-
-            <a
-                href="actualite.php"
-                class="btn btn-outline-primary"
-            >
-                Toutes les actualités →
-            </a>
-
-        </div>
-
-
-
-        <?php if (!empty($actualites)): ?>
-
-            <div class="row g-4">
-
-
-                <?php foreach ($actualites as $actualite): ?>
-
-                    <?php
-
-                    $photosActuStmt = $db->prepare("
-                        SELECT *
-                        FROM actualites_photos
-                        WHERE id_actualites = :id
-                        ORDER BY Position
-                    ");
-
-                    $photosActuStmt->execute([
-                        ':id' => $actualite['id_actu']
-                    ]);
-
-                    $premierePhoto =
-                        $photosActuStmt->fetch(PDO::FETCH_ASSOC);?>
-                    <div class="col-md-6 col-lg-4">
-                        <a href="actualite_detail.php?id=<?= $actualite['id_actu'] ?>" class="text-decoration-none">
-                            <article class="news-card">
-                                <div class="news-image">
-                                    <?php if ($premierePhoto): ?>
-                                        <img src="../../uploads/photos/<?= htmlspecialchars($premierePhoto['Photos_actu_url']) ?>" alt="<?= htmlspecialchars($actualite['titre']) ?>">
-                                    <?php else: ?>
-                                        <div class="news-image-placeholder">
-                                            <span style="font-size: 2rem;">
-                                                📰
-                                            </span>
-                                        </div>
-                                    <?php endif; ?>
-                                    <span class="news-badge">
-                                        <?= htmlspecialchars(  $actualite['nom_struc'] ) ?>
-                                    </span>
-                                </div>
-                                <div class="news-content">
-                                    <div class="news-date">
-                                        <?= htmlspecialchars($actualite['date_publication']) ?>
-                                    </div>
-                                    <h3>
-                                        <?= htmlspecialchars( $actualite['titre']) ?>
-                                    </h3>
-                                </div>
-                            </article>
-                        </a>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <div class="alert alert-light border">
-                Aucune actualité publiée pour le moment.
-            </div>
-        <?php endif; ?>
+<section class="acc-section acc-actus" aria-labelledby="titre-actus">
+  <div class="container">
+    <div class="acc-entete">
+      <div>
+        <span class="acc-surtitre">Actualités</span>
+        <h2 id="titre-actus">Actualités récentes</h2>
+        <p>Les dernières informations publiées sur la plateforme.</p>
+      </div>
+      <a href="actualite.php" class="acc-lien-fleche">Toutes les actualités <span aria-hidden="true">→</span></a>
     </div>
+
+    <?php if (empty($actualites)): ?>
+      <div class="acc-vide">Aucune actualité publiée pour le moment.</div>
+    <?php else: ?>
+      <?php
+        // Rendu d'une carte d'actualité ; la première est mise en avant
+        $carteActu = function (array $a, string $variante) {
+            $image = !empty($a['photo']) ? '../../uploads/photos/' . h($a['photo']) : '../../publique/image/GA.jpeg';
+            ?>
+            <a href="actualite_detail.php?id=<?= (int) $a['id_actu'] ?>" class="acc-actu <?= $variante ?>">
+              <div class="acc-actu-media"><img src="<?= $image ?>" alt="" loading="lazy"></div>
+              <div class="acc-actu-corps">
+                <div class="acc-actu-meta">
+                  <span class="acc-actu-source"><?= h($a['nom_struc']) ?></span>
+                  <span class="acc-actu-date"><?= h(formaterDateFr($a['date_publication'])) ?></span>
+                </div>
+                <h3><?= h($a['titre']) ?></h3>
+                <?php if ($variante === 'une' && !empty($a['contenu'])): ?>
+                  <p class="acc-actu-extrait"><?= h(mb_strimwidth(strip_tags($a['contenu']), 0, 220, '…')) ?></p>
+                <?php endif; ?>
+              </div>
+            </a>
+            <?php
+        };
+      ?>
+      <div class="acc-actus-grille">
+        <?php $carteActu($actualites[0], 'une'); ?>
+        <?php if (count($actualites) > 1): ?>
+          <div class="acc-actus-cote">
+            <?php foreach (array_slice($actualites, 1) as $a): ?>
+              <?php $carteActu($a, 'secondaire'); ?>
+            <?php endforeach; ?>
+          </div>
+        <?php endif; ?>
+      </div>
+    <?php endif; ?>
+  </div>
+</section>
+
+<!-- =========================================================
+     APPEL À PARTICIPATION
+     ========================================================= -->
+<section class="acc-appel" aria-labelledby="titre-appel">
+  <div class="container acc-appel-grille">
+    <div>
+      <span class="acc-surtitre">Participation citoyenne</span>
+      <h2 id="titre-appel">Votre avis compte dans la réforme de l'action publique</h2>
+      <p>
+        <?= $totalConsultations > 0
+            ? $totalConsultations . ' consultation' . ($totalConsultations > 1 ? 's sont ouvertes' : ' est ouverte') . ' en ce moment. Prenez part aux échanges avant leur clôture.'
+            : 'Aucune consultation n\'est ouverte pour le moment. Revenez bientôt pour participer.' ?>
+      </p>
+    </div>
+    <a href="consultations.php" class="acc-bouton-clair">Voir les consultations <span aria-hidden="true">→</span></a>
+  </div>
 </section>
 
 <?php require '../../includes/footer.php'; ?>
 
-
 <!-- =========================================================
      RECHERCHE DYNAMIQUE
      ========================================================= -->
-
 <script>
+(function () {
+    const searchInput = document.getElementById('search');
+    const results = document.getElementById('results');
+    if (!searchInput || !results) return;
 
-const searchInput =
-    document.getElementById('search');
+    let delai = null;
 
-const results =
-    document.getElementById('results');
+    searchInput.addEventListener('input', function () {
+        const q = this.value.trim();
+        clearTimeout(delai);
 
-
-if (searchInput) {
-
-    searchInput.addEventListener(
-        'keyup',
-        function () {
-
-            let q = this.value.trim();
-
-
-            if (q.length < 1) {
-
-                results.innerHTML = "";
-
-                return;
-
-            }
-
-
-            fetch(
-                'search_structures.php?q='
-                + encodeURIComponent(q)
-            )
-
-            .then(response => response.text())
-
-            .then(data => {
-
-                results.innerHTML = data;
-
-            })
-
-            .catch(error => {
-
-                console.error(
-                    'Erreur de recherche :',
-                    error
-                );
-
-            });
-
+        if (q.length < 1) {
+            results.innerHTML = '';
+            return;
         }
-    );
 
-}
+        // Attend une courte pause dans la frappe avant d'interroger le serveur
+        delai = setTimeout(function () {
+            fetch('search_structures.php?q=' + encodeURIComponent(q))
+                .then(response => response.text())
+                .then(data => { results.innerHTML = data; })
+                .catch(error => console.error('Erreur de recherche :', error));
+        }, 200);
+    });
 
+    // Ferme la liste avec Échap ou en cliquant ailleurs
+    searchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') results.innerHTML = '';
+    });
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.acc-recherche-form')) results.innerHTML = '';
+    });
+})();
 </script>

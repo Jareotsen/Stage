@@ -308,21 +308,6 @@ body {
     letter-spacing: 1.5px;
 }
 
-.brand-kicker::before {
-    content: "";
-
-    width: 28px;
-    height: 3px;
-
-    border-radius: 5px;
-
-    background:
-        linear-gradient(90deg,
-            var(--vert-irlandais) 0 33%,
-            var(--jaune-or) 33% 66%,
-            var(--bleu-roi) 66% 100%);
-}
-
 
 .brand-title {
     margin: 0;

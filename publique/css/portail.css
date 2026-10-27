@@ -1,0 +1,120 @@
+/* =========================================================
+   PORTAIL PUBLIC — composants communs (accueil, catalogue, actualités)
+   Couleurs du drapeau gabonais en accents ponctuels :
+   le bleu nuit et le blanc portent la mise en page.
+   ========================================================= */
+:root {
+  --acc-vert: #009E60;
+  --acc-vert-fonce: #00764A;
+  --acc-jaune: #FCD116;
+  --acc-bleu: #3A75C4;
+  --acc-bleu-fonce: #24569A;
+  --acc-nuit: #0A1A33;
+  --acc-encre: #14213D;
+  --acc-gris: #5B6576;
+  --acc-ligne: #E3E7EE;
+  --acc-fond: #F5F7FA;
+}
+
+/* ---------- Bandeau de page (pages intérieures) ---------- */
+.acc-bandeau { position: relative; overflow: hidden; padding: clamp(2.6rem, 6vw, 4.5rem) 0 clamp(2.4rem, 5vw, 3.6rem); background: var(--acc-nuit); color: #fff; isolation: isolate; }
+.acc-bandeau-image { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; opacity: .55; }
+.acc-bandeau::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(6,18,38,.95) 0%, rgba(6,18,38,.8) 50%, rgba(6,18,38,.45) 100%); }
+.acc-fil { display: flex; flex-wrap: wrap; gap: .45rem; margin: 0 0 1.4rem; padding: 0; list-style: none; color: rgba(255,255,255,.65); font-size: .8rem; }
+.acc-fil li + li::before { content: "/"; margin-right: .45rem; color: rgba(255,255,255,.35); }
+.acc-fil a { color: #fff; font-weight: 600; text-decoration: underline; text-decoration-color: rgba(255,255,255,.35); text-underline-offset: 3px; }
+.acc-fil a:hover { text-decoration-color: var(--acc-jaune); }
+.acc-bandeau h1 { max-width: 20ch; margin: 0 0 .9rem; color: #fff; font-family: var(--font-title); font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 600; line-height: 1.08; }
+.acc-bandeau p { max-width: 60ch; margin: 0; color: rgba(255,255,255,.8); font-size: 1.02rem; line-height: 1.7; }
+.acc-bandeau .acc-surtitre { color: var(--acc-jaune); }
+
+/* ---------- Titres de section ---------- */
+.acc-section { padding: clamp(3.5rem, 7vw, 5.5rem) 0; background: #fff; }
+.acc-entete { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; margin-bottom: 2.2rem; }
+.acc-surtitre { display: block; margin-bottom: .55rem; color: var(--acc-vert-fonce); font-size: .74rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.acc-entete h2 { margin: 0; color: var(--acc-encre); font-family: var(--font-title); font-size: clamp(1.75rem, 3.2vw, 2.5rem); font-weight: 600; line-height: 1.15; }
+.acc-entete p { max-width: 52ch; margin: .7rem 0 0; color: var(--acc-gris); font-size: .98rem; line-height: 1.65; }
+.acc-lien-fleche { display: inline-flex; flex-shrink: 0; align-items: center; gap: .5rem; padding-bottom: .2rem; border-bottom: 2px solid var(--acc-bleu); color: var(--acc-bleu-fonce); font-size: .9rem; font-weight: 700; transition: color .2s ease, border-color .2s ease; }
+.acc-lien-fleche:hover { border-color: var(--acc-vert); color: var(--acc-vert-fonce); }
+.acc-lien-fleche span { transition: transform .2s ease; }
+.acc-lien-fleche:hover span { transform: translateX(4px); }
+.acc-fleche { display: inline-flex; align-items: center; gap: .4rem; color: var(--acc-bleu-fonce); font-size: .85rem; font-weight: 700; }
+.acc-fleche span { transition: transform .2s ease; }
+a:hover > .acc-fleche span, a:hover .acc-fleche span { transform: translateX(4px); }
+
+/* ---------- Champ de recherche ---------- */
+.acc-champ { position: relative; display: flex; }
+.acc-champ > svg { position: absolute; top: 50%; left: 1.1rem; transform: translateY(-50%); color: var(--acc-gris); pointer-events: none; }
+.acc-champ input { flex: 1; min-width: 0; height: 54px; padding: 0 1rem 0 3rem; border: 2px solid var(--acc-encre); border-right: 0; border-radius: 4px 0 0 4px; background: #fff; color: var(--acc-encre); font: inherit; font-size: .98rem; }
+.acc-champ input:focus { outline: 0; border-color: var(--acc-bleu); box-shadow: 0 0 0 4px rgba(58,117,196,.15); }
+.acc-champ button { height: 54px; padding: 0 1.5rem; border: 0; border-radius: 0 4px 4px 0; background: var(--acc-encre); color: #fff; font: inherit; font-weight: 700; transition: background .2s ease; }
+.acc-champ button:hover { background: var(--acc-bleu-fonce); }
+
+/* ---------- Barre de résultats : compteur + tri ---------- */
+.acc-barre { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--acc-ligne); color: var(--acc-gris); font-size: .88rem; }
+.acc-barre strong { color: var(--acc-encre); }
+.acc-barre select { min-height: 40px; padding: .4rem 2rem .4rem .75rem; border: 1px solid #CBD3DF; border-radius: 4px; background-color: #fff; color: var(--acc-encre); font: inherit; font-size: .86rem; }
+.acc-barre select:focus { outline: 0; border-color: var(--acc-bleu); box-shadow: 0 0 0 3px rgba(58,117,196,.15); }
+.acc-barre label { display: flex; align-items: center; gap: .55rem; margin: 0; }
+.acc-filtre-actif { display: inline-flex; align-items: center; gap: .4rem; margin-left: .6rem; padding: .2rem .4rem .2rem .7rem; border-radius: 999px; background: #E3F5EC; color: var(--acc-vert-fonce); font-size: .78rem; font-weight: 700; }
+.acc-filtre-actif a { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; color: var(--acc-vert-fonce); }
+.acc-filtre-actif a:hover { background: rgba(0,118,74,.15); }
+
+/* ---------- Carte structure ---------- */
+.acc-structures-grille { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.acc-structure { display: flex; flex-direction: column; padding: 1.6rem; border: 1px solid var(--acc-ligne); border-top: 4px solid var(--acc-nuit); border-radius: 4px; background: #fff; color: var(--acc-encre); transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+.acc-structure:hover { transform: translateY(-4px); border-top-color: var(--acc-vert); box-shadow: 0 16px 32px rgba(10,26,51,.09); color: var(--acc-encre); }
+.acc-structure-tete { display: flex; align-items: center; gap: .9rem; margin-bottom: 1.1rem; }
+.acc-structure-icone { display: flex; flex: 0 0 48px; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; background: #E3F5EC; color: var(--acc-vert-fonce); transition: background .2s ease, color .2s ease; }
+.acc-structure:hover .acc-structure-icone { background: var(--acc-vert); color: #fff; }
+.acc-structure-sigle { color: var(--acc-vert-fonce); font-size: .78rem; font-weight: 800; letter-spacing: .08em; }
+.acc-structure-cat { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; color: var(--acc-gris); font-size: .74rem; }
+.acc-structure h3 { margin: 0 0 .8rem; font-family: var(--font-title); font-size: 1.18rem; font-weight: 600; line-height: 1.3; }
+.acc-structure-adresse { display: flex; flex: 1; gap: .5rem; margin: 0 0 1.2rem; color: var(--acc-gris); font-size: .84rem; line-height: 1.5; overflow-wrap: anywhere; }
+.acc-structure-adresse svg { flex: 0 0 15px; margin-top: 3px; color: var(--acc-vert); }
+
+/* ---------- Carte actualité ---------- */
+.acc-actu { display: flex; flex-direction: column; overflow: hidden; border-radius: 4px; background: #fff; color: var(--acc-encre); box-shadow: 0 1px 0 var(--acc-ligne); transition: box-shadow .2s ease; }
+.acc-actu:hover { box-shadow: 0 16px 32px rgba(10,26,51,.1); color: var(--acc-encre); }
+.acc-actu-media { position: relative; overflow: hidden; aspect-ratio: 16 / 9; background: var(--acc-nuit); }
+.acc-actu-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+.acc-actu:hover .acc-actu-media img { transform: scale(1.04); }
+.acc-actu-corps { display: flex; flex: 1; flex-direction: column; padding: 1.4rem 1.5rem 1.5rem; }
+.acc-actu-meta { display: flex; flex-wrap: wrap; gap: .3rem .9rem; margin-bottom: .6rem; font-size: .74rem; }
+.acc-actu-source { color: var(--acc-vert-fonce); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.acc-actu-date { color: var(--acc-gris); }
+.acc-actu h3 { margin: 0; font-family: var(--font-title); font-size: 1.12rem; font-weight: 600; line-height: 1.35; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; transition: color .2s ease; }
+.acc-actu:hover h3 { color: var(--acc-bleu-fonce); }
+.acc-actu-extrait { margin: .8rem 0 0; color: var(--acc-gris); font-size: .92rem; line-height: 1.6; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.acc-actu .acc-fleche { margin-top: auto; padding-top: 1rem; }
+.acc-actu.une h3 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); line-height: 1.2; }
+.acc-actu.une .acc-actu-corps { padding: 1.7rem 1.8rem 1.9rem; }
+.acc-actu.secondaire { flex-direction: row; }
+.acc-actu.secondaire .acc-actu-media { flex: 0 0 42%; aspect-ratio: auto; min-height: 170px; }
+
+/* ---------- Pagination ---------- */
+.acc-pagination { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem; margin-top: 3rem; }
+.acc-pagination a, .acc-pagination span { display: inline-flex; align-items: center; justify-content: center; min-width: 42px; height: 42px; padding: 0 .7rem; border: 1px solid var(--acc-ligne); border-radius: 4px; background: #fff; color: var(--acc-encre); font-size: .88rem; font-weight: 700; transition: border-color .2s ease, color .2s ease; }
+.acc-pagination a:hover { border-color: var(--acc-bleu); color: var(--acc-bleu-fonce); }
+.acc-pagination .actif { border-color: var(--acc-encre); background: var(--acc-encre); color: #fff; }
+.acc-pagination .desactive { opacity: .4; pointer-events: none; }
+
+/* ---------- État vide ---------- */
+.acc-vide { padding: 2.5rem 1.5rem; border: 1px dashed #CBD3DF; border-radius: 4px; background: #fff; color: var(--acc-gris); text-align: center; }
+.acc-vide h2 { margin: 0 0 .4rem; color: var(--acc-encre); font-family: var(--font-title); font-size: 1.3rem; font-weight: 600; }
+.acc-vide p { margin: 0; }
+
+@media (max-width: 991.98px) {
+  .acc-structures-grille { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 575.98px) {
+  .acc-structures-grille { grid-template-columns: 1fr; }
+  .acc-entete { flex-direction: column; align-items: flex-start; }
+  .acc-barre { flex-direction: column; align-items: flex-start; }
+  .acc-actu.secondaire { flex-direction: column; }
+  .acc-actu.secondaire .acc-actu-media { aspect-ratio: 16 / 9; min-height: 0; }
+  .acc-champ button { padding: 0 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .acc-structure, .acc-actu, .acc-actu-media img { transition: none; }
+}

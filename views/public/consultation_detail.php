@@ -454,7 +454,6 @@ require '../../includes/header.php';
 .cdp-retour i { transition: transform .18s ease; }
 .cdp-retour:hover i { transform: translateX(-3px); }
 .cdp-kicker { display: inline-flex; align-items: center; gap: .55rem; margin-bottom: .9rem; color: #F7EACB; font-size: .75rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
-.cdp-kicker::before { content: ""; width: 28px; height: 3px; border-radius: 5px; background: #C9972C; }
 .cdp-badges { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
 .cdp-badge { display: inline-flex; align-items: center; gap: .4rem; max-width: 100%; padding: .3rem .8rem; border: 1px solid rgba(255,255,255,.3); border-radius: 999px; color: #fff; font-size: .76rem; font-weight: 650; }
 .cdp-badge.ouverte { border-color: var(--accent); background: var(--accent); color: var(--texte); font-weight: 750; }

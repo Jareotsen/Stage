@@ -14,6 +14,7 @@ $versionCss = static fn(string $fichier): int => (int) @filemtime(__DIR__ . '/..
 ?>
 <link href="../../publique/css/theme.css?v=<?= $versionCss('theme.css') ?>" rel="stylesheet">
 <link href="../../publique/css/public.css?v=<?= $versionCss('public.css') ?>" rel="stylesheet">
+<link href="../../publique/css/portail.css?v=<?= $versionCss('portail.css') ?>" rel="stylesheet">
 <?php if (basename($_SERVER['SCRIPT_NAME'] ?? '') === 'localisation.php'): ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">

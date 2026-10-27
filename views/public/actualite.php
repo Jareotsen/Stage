@@ -1,12 +1,13 @@
 <?php
 session_start();
 require '../../config/database.php';
+require_once '../../includes/dates.php';
 
 /**
- * Recherche facultative dans les actualités.
- * Les noms de tables et de colonnes restent ceux du code existant.
+ * Recherche et filtre par structure, tous deux facultatifs.
  */
 $recherche = trim((string) ($_GET['q'] ?? ''));
+$sourceFiltre = (int) ($_GET['s'] ?? 0);
 
 // Pagination : 9 actualités par page (3 rangées de 3).
 $parPage = 9;
@@ -15,12 +16,20 @@ $page = max(1, (int) ($_GET['page'] ?? 1));
 $baseSql = " FROM actualites
              JOIN structure ON actualites.id_structure = structure.id_struc";
 
+$conditions = [];
 $params = [];
 if ($recherche !== '') {
-    $baseSql .= " WHERE actualites.titre LIKE :q
-                  OR actualites.contenu LIKE :q
-                  OR structure.nom_struc LIKE :q";
+    $conditions[] = "(actualites.titre LIKE :q
+                      OR actualites.contenu LIKE :q
+                      OR structure.nom_struc LIKE :q)";
     $params[':q'] = '%' . $recherche . '%';
+}
+if ($sourceFiltre) {
+    $conditions[] = "actualites.id_structure = :s";
+    $params[':s'] = $sourceFiltre;
+}
+if ($conditions) {
+    $baseSql .= " WHERE " . implode(' AND ', $conditions);
 }
 
 // Nombre total de résultats pour calculer la pagination.
@@ -31,547 +40,215 @@ $totalPages = max(1, (int) ceil($totalActualites / $parPage));
 $page = min($page, $totalPages);
 $offset = ($page - 1) * $parPage;
 
+// La première photo de chaque actualité est récupérée dans la même requête.
 $sql = "SELECT actualites.id_actu,
                actualites.titre,
                actualites.contenu,
                actualites.date_publication,
-               structure.nom_struc" . $baseSql . "
-        ORDER BY actualites.date_publication DESC
+               structure.nom_struc,
+               (SELECT p.Photos_actu_url
+                  FROM actualites_photos p
+                 WHERE p.id_actualites = actualites.id_actu
+                 ORDER BY p.Position
+                 LIMIT 1) AS image" . $baseSql . "
+        ORDER BY actualites.date_publication DESC, actualites.id_actu DESC
         LIMIT :limite OFFSET :debut";
 
 $actuStmt = $db->prepare($sql);
 foreach ($params as $key => $value) {
-    $actuStmt->bindValue($key, $value, PDO::PARAM_STR);
+    $actuStmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
 }
 $actuStmt->bindValue(':limite', $parPage, PDO::PARAM_INT);
 $actuStmt->bindValue(':debut', $offset, PDO::PARAM_INT);
 $actuStmt->execute();
 $actualites = $actuStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Récupère la première photo de chaque actualité.
-$photoStmt = $db->prepare(
-    "SELECT Photos_actu_url
-     FROM actualites_photos
-     WHERE id_actualites = :id
-     ORDER BY Position
-     LIMIT 1"
-);
-foreach ($actualites as &$actualite) {
-    $photoStmt->execute([':id' => $actualite['id_actu']]);
-    $actualite['image'] = $photoStmt->fetchColumn();
+// Structures ayant publié au moins une actualité (liste du filtre « Source »)
+$sources = $db->query("
+    SELECT DISTINCT structure.id_struc, structure.nom_struc
+    FROM actualites
+    JOIN structure ON actualites.id_structure = structure.id_struc
+    ORDER BY structure.nom_struc
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// En page 1 sans filtre, la plus récente est mise en avant au-dessus de la grille.
+$aLaUne = ($page === 1 && $recherche === '' && !$sourceFiltre && $actualites)
+    ? array_shift($actualites)
+    : null;
+
+function h(?string $valeur): string {
+    return htmlspecialchars($valeur ?? '', ENT_QUOTES, 'UTF-8');
 }
-unset($actualite);
 
-// Formate une date SQL en français, par exemple : « 12 juin 2024 ».
-function formaterDateFr(string $dateSql): string
-{
-    $mois = [
-        1 => 'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
-        'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
+// Conserve la recherche et le filtre lors de la navigation entre les pages.
+function lienActualites(array $modifications = []): string {
+    $params = [
+        'q' => trim((string) ($_GET['q'] ?? '')),
+        's' => (int) ($_GET['s'] ?? 0),
+        'page' => max(1, (int) ($_GET['page'] ?? 1)),
     ];
-
-    $timestamp = strtotime($dateSql);
-    if ($timestamp === false) {
-        return $dateSql;
+    foreach ($modifications as $cle => $valeur) {
+        $params[$cle] = $valeur;
     }
+    $params = array_filter($params, static fn($v) => $v !== '' && $v !== 0 && $v !== null);
+    return 'actualite.php' . ($params ? '?' . http_build_query($params) : '');
+}
 
-    return date('d', $timestamp) . ' ' . $mois[(int) date('n', $timestamp)] . ' ' . date('Y', $timestamp);
+function imageActualite(array $a): string {
+    $nom = trim((string) ($a['image'] ?? ''));
+    return $nom !== ''
+        ? '../../uploads/photos/' . h(basename($nom))
+        : '../../publique/image/GA.jpeg';
 }
 
 require '../../includes/header.php';
 ?>
 
 <style>
-/* Largeur commune au bandeau, à la recherche et à la liste */
-.actualite-contenu {
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 0 26px;
-}
-.actualite-page {
-    padding-top: 34px;
-    padding-bottom: 76px;
-    color: #24364b;
-}
+/* Styles propres aux actualités : les composants communs sont dans publique/css/portail.css */
+.act-recherche { max-width: 640px; margin-top: 1.8rem; }
+.act-recherche .acc-champ input { border-color: #fff; }
+.act-recherche .acc-champ button { background: var(--acc-jaune); color: var(--acc-nuit); }
+.act-recherche .acc-champ button:hover { background: #fff; }
 
-/* Bandeau d'en-tête, sur le modèle du catalogue des structures */
-.actualite-hero {
-    position: relative;
-    overflow: hidden;
-    padding: clamp(2.5rem, 5vw, 4.4rem) 0 3.3rem;
-    color: #fff;
-    background: linear-gradient(118deg, #0B1D4D 0%, #173B91 68%, #176B58 100%);
-}
-.actualite-hero::before,
-.actualite-hero::after {
-    content: "";
-    position: absolute;
-    border: 1px solid rgba(255, 255, 255, .13);
-    border-radius: 50%;
-    pointer-events: none;
-}
-.actualite-hero::before { width: 360px; height: 360px; right: -90px; top: -190px; }
-.actualite-hero::after { width: 240px; height: 240px; right: 70px; bottom: -175px; }
-.actualite-hero .actualite-contenu {
-    position: relative;
-    z-index: 1;
-}
-.actualite-kicker {
-    display: inline-flex;
-    align-items: center;
-    gap: .55rem;
-    margin-bottom: .9rem;
-    color: #F7EACB;
-    font-size: .75rem;
-    font-weight: 800;
-    letter-spacing: .13em;
-    text-transform: uppercase;
-}
-.actualite-kicker::before {
-    content: "";
-    width: 28px;
-    height: 3px;
-    border-radius: 5px;
-    background: #C9972C;
-}
-.actualite-hero h1 {
-    max-width: 760px;
-    margin: 0 0 1rem;
-    color: #fff;
-    font-family: var(--font-title);
-    font-size: clamp(2rem, 4vw, 3.15rem);
-    line-height: 1.12;
-}
-.actualite-hero p {
-    max-width: 680px;
-    margin: 0;
-    color: rgba(255, 255, 255, .82);
-    font-size: 1rem;
-    line-height: 1.8;
-}
-.actualite-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .7rem;
-    margin-top: 1.5rem;
-}
-.actualite-stat {
-    display: inline-flex;
-    align-items: center;
-    gap: .5rem;
-    padding: .55rem .85rem;
-    border: 1px solid rgba(255, 255, 255, .22);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, .08);
-    color: #fff;
-    font-size: .82rem;
-}
-.actualite-stat strong {
-    color: #fff;
-    font-size: .95rem;
-}
+.act-une { margin-bottom: clamp(2.5rem, 5vw, 3.5rem); }
+.act-une .acc-actu { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); border: 1px solid var(--acc-ligne); }
+.act-une .acc-actu-media { aspect-ratio: auto; min-height: 380px; }
+.act-une .acc-actu-corps { justify-content: center; padding: clamp(1.6rem, 3vw, 2.6rem); }
+.act-une .acc-actu-etiquette { align-self: flex-start; margin-bottom: 1rem; padding: .3rem .7rem; border-radius: 2px; background: var(--acc-jaune); color: var(--acc-nuit); font-size: .7rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.act-une .acc-actu h3 { font-size: clamp(1.5rem, 2.6vw, 2.1rem); line-height: 1.2; -webkit-line-clamp: 4; }
+.act-une .acc-actu-extrait { -webkit-line-clamp: 4; font-size: .98rem; }
 
-/* Recherche : carte blanche qui chevauche le bas du bandeau */
-.actualite-tools {
-    position: relative;
-    z-index: 3;
-    margin-top: -1.45rem;
+.act-grille { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem; }
+.act-grille .acc-actu { border: 1px solid var(--acc-ligne); }
+.act-barre-source select { max-width: 320px; }
+
+@media (max-width: 991.98px) {
+  .act-une .acc-actu { grid-template-columns: 1fr; }
+  .act-une .acc-actu-media { min-height: 0; aspect-ratio: 16 / 9; }
+  .act-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.actualite-search {
-    display: flex;
-    align-items: end;
-    gap: 12px;
-    margin: 0;
-    padding: 1rem 1.25rem 1.15rem;
-    background: #fff;
-    border: 1px solid var(--mrri-border);
-    border-radius: 16px;
-    box-shadow: 0 14px 38px rgba(11, 29, 77, .12);
-}
-.actualite-search-field {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: 8px;
-}
-.actualite-search label {
-    color: #334c65;
-    font-size: .88rem;
-    font-weight: 700;
-}
-.actualite-search input {
-    width: 100%;
-    min-height: 46px;
-    padding: 11px 13px;
-    border: 1px solid #D7DDE7;
-    border-radius: 10px;
-    background: #fff;
-    color: #24364b;
-    font: inherit;
-}
-.actualite-search input:focus {
-    outline: 0;
-    border-color: var(--mrri-vert);
-    box-shadow: 0 0 0 3px rgba(15, 138, 75, .12);
-}
-.actualite-search button,
-.actualite-reset {
-    display: inline-flex;
-    min-height: 46px;
-    align-items: center;
-    justify-content: center;
-    padding: 11px 18px;
-    border: 1px solid var(--mrri-bleu);
-    border-radius: 10px;
-    background: var(--mrri-bleu);
-    color: #fff;
-    font: inherit;
-    font-size: .9rem;
-    font-weight: 700;
-    text-decoration: none;
-    cursor: pointer;
-}
-.actualite-search button:hover {
-    background: var(--mrri-bleu-dark);
-}
-.actualite-reset {
-    border-color: #cbd7e2;
-    background: #fff;
-    color: #35536f;
-}
-.actualite-reset:hover {
-    background: #edf3f8;
-}
-.actualite-results-heading {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
-    margin: 0 0 8px;
-}
-.actualite-results-heading h2 {
-    margin: 0;
-    color: #244c72;
-    font-size: 1.25rem;
-    font-weight: 700;
-}
-.actualite-count {
-    color: #6a7e91;
-    font-size: .88rem;
-}
-.actualite-list {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 26px;
-    margin-top: 18px;
-}
-.actualite-item {
-    min-width: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 5px 22px rgba(25, 53, 78, .10);
-    border: 1px solid #edf1f5;
-}
-.actualite-media {
-    width: 100%;
-    height: 230px;
-    overflow: hidden;
-    background: #e5edf4;
-}
-.actualite-media img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.actualite-no-image {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    align-items: center;
-    justify-content: center;
-    color: #52728e;
-    background: linear-gradient(135deg, #e6eef5, #d2e2ef);
-    font-size: .9rem;
-}
-.actualite-item-body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 22px 20px 24px;
-}
-.actualite-date {
-    padding-top: 0;
-    margin-bottom: 18px;
-    color: #637b91;
-    font-size: .88rem;
-    line-height: 1.5;
-}
-.actualite-date time {
-    display: block;
-    color: #41617f;
-    font-weight: 700;
-}
-.actualite-source {
-    display: block;
-    margin-top: 7px;
-    color: #74879a;
-    font-size: .8rem;
-}
-.actualite-item-content {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0 20px 22px;
-}
-.actualite-item-content h3 {
-    margin: 0 0 10px;
-    color: #145ca8;
-    font-size: 1.22rem;
-    font-weight: 700;
-    line-height: 1.4;
-}
-.actualite-item-content p {
-    margin: 0 0 13px;
-    color: #52677b;
-    font-size: .95rem;
-    line-height: 1.7;
-}
-.actualite-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: auto;
-    padding-top: 8px;
-    color: #1262ad;
-    font-size: .9rem;
-    font-weight: 750;
-    text-decoration: none;
-}
-.actualite-link span {
-    transition: transform .2s ease;
-}
-.actualite-link:hover {
-    color: #0b7a49;
-    text-decoration: underline;
-}
-.actualite-link:hover span {
-    transform: translateX(4px);
-}
-.actualite-empty {
-    padding: 38px 22px;
-    border: 1px solid #dce4ec;
-    background: #f7f9fb;
-    text-align: center;
-}
-.actualite-empty h2 {
-    margin: 0 0 8px;
-    color: #244c72;
-    font-size: 1.25rem;
-}
-.actualite-empty p {
-    margin: 0;
-    color: #65798d;
-    line-height: 1.6;
-}
-.actualite-pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 34px;
-}
-.actualite-pagination a,
-.actualite-pagination span {
-    display: inline-flex;
-    min-width: 40px;
-    min-height: 40px;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 12px;
-    border: 1px solid #d6e0e9;
-    border-radius: 4px;
-    background: #fff;
-    color: #285b80;
-    text-decoration: none;
-    font-weight: 700;
-}
-.actualite-pagination .is-current {
-    border-color: #1262ad;
-    background: #1262ad;
-    color: #fff;
-}
-.actualite-pagination a:hover {
-    background: #eef5fb;
-}
-@media (max-width: 900px) {
-    .actualite-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-}
-@media (max-width: 640px) {
-    .actualite-contenu {
-        padding: 0 15px;
-    }
-    .actualite-page {
-        padding-top: 26px;
-        padding-bottom: 48px;
-    }
-    .actualite-hero {
-        padding-bottom: 2.8rem;
-    }
-    .actualite-search {
-        align-items: stretch;
-        flex-direction: column;
-        padding: 15px;
-    }
-    .actualite-search button,
-    .actualite-reset {
-        width: 100%;
-    }
-    .actualite-list { grid-template-columns: 1fr; gap: 18px; }
-    .actualite-media { height: 220px; }
-    .actualite-item-body { padding: 18px 16px 8px; }
-    .actualite-item-content { padding: 0 16px 20px; }
-    .actualite-results-heading {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 5px;
-    }
-    .actualite-item-content h3 {
-        font-size: 1.1rem;
-    }
-}
-@media (prefers-reduced-motion: reduce) {
-    .actualite-link span {
-        transition: none;
-    }
+@media (max-width: 575.98px) {
+  .act-grille { grid-template-columns: 1fr; }
+  .act-barre-source select { max-width: 70vw; }
 }
 </style>
 
-<section class="actualite-hero">
-    <div class="actualite-contenu">
-        <div class="actualite-kicker">Portail institutionnel du Gabon</div>
-        <h1>Actualités</h1>
-        <p>Retrouvez les informations, annonces et publications officielles des structures.</p>
-        <div class="actualite-stats" aria-label="Résumé des actualités">
-            <span class="actualite-stat">
-                <strong><?= $totalActualites ?></strong>
-                actualité<?= $totalActualites > 1 ? 's' : '' ?> <?= $recherche !== '' ? 'correspondant à votre recherche' : 'publiée' . ($totalActualites > 1 ? 's' : '') ?>
-            </span>
-            <span class="actualite-stat">Publications officielles des structures</span>
-        </div>
-    </div>
-</section>
+<header class="acc-bandeau">
+  <img class="acc-bandeau-image" src="../../publique/image/GA1.jpe" alt="">
+  <div class="container">
+    <ol class="acc-fil" aria-label="Fil d'Ariane">
+      <li><a href="accueil.php">Accueil</a></li>
+      <li aria-current="page">Actualités</li>
+    </ol>
+    <span class="acc-surtitre">Salle de presse</span>
+    <h1>Actualités</h1>
+    <p>Informations, annonces et publications officielles des structures sous tutelle du Ministère.</p>
 
-<div class="actualite-contenu actualite-tools">
-    <form class="actualite-search" action="actualite.php" method="get" role="search">
-        <div class="actualite-search-field">
-            <label for="actualite-q">Mots clés</label>
-            <input
-                type="search"
-                id="actualite-q"
-                name="q"
-                value="<?= htmlspecialchars($recherche, ENT_QUOTES, 'UTF-8') ?>"
-                placeholder="Rechercher une actualité…"
-            >
-        </div>
+    <form class="act-recherche" action="actualite.php" method="get" role="search">
+      <div class="acc-champ">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <label for="actualite-q" class="visually-hidden">Rechercher une actualité</label>
+        <input type="search" id="actualite-q" name="q" value="<?= h($recherche) ?>" placeholder="Rechercher une actualité…">
+        <?php if ($sourceFiltre): ?><input type="hidden" name="s" value="<?= $sourceFiltre ?>"><?php endif; ?>
         <button type="submit">Rechercher</button>
-        <?php if ($recherche !== ''): ?>
-            <a class="actualite-reset" href="actualite.php">Réinitialiser</a>
-        <?php endif; ?>
+      </div>
     </form>
-</div>
+  </div>
+</header>
 
-<main class="actualite-contenu actualite-page">
-    <div class="actualite-results-heading">
-        <h2><?= $recherche !== '' ? 'Résultats de recherche' : 'Toutes les actualités' ?></h2>
-        <span class="actualite-count">
-            <?= $totalActualites ?> résultat<?= $totalActualites > 1 ? 's' : '' ?>
-        </span>
+<main class="acc-section">
+  <div class="container">
+
+    <?php if ($aLaUne): ?>
+      <section class="act-une" aria-label="Actualité à la une">
+        <a href="actualite_detail.php?id=<?= (int) $aLaUne['id_actu'] ?>" class="acc-actu une">
+          <div class="acc-actu-media"><img src="<?= imageActualite($aLaUne) ?>" alt=""></div>
+          <div class="acc-actu-corps">
+            <span class="acc-actu-etiquette">À la une</span>
+            <div class="acc-actu-meta">
+              <span class="acc-actu-source"><?= h($aLaUne['nom_struc']) ?></span>
+              <time class="acc-actu-date" datetime="<?= h(date('Y-m-d', strtotime($aLaUne['date_publication']) ?: time())) ?>"><?= h(formaterDateFr($aLaUne['date_publication'])) ?></time>
+            </div>
+            <h3><?= h($aLaUne['titre']) ?></h3>
+            <?php if (!empty($aLaUne['contenu'])): ?>
+              <p class="acc-actu-extrait"><?= h(mb_strimwidth(strip_tags($aLaUne['contenu']), 0, 260, '…')) ?></p>
+            <?php endif; ?>
+            <span class="acc-fleche">Lire l'actualité <span aria-hidden="true">→</span></span>
+          </div>
+        </a>
+      </section>
+    <?php endif; ?>
+
+    <div class="acc-barre">
+      <div>
+        <strong><?= $totalActualites ?></strong> actualité<?= $totalActualites > 1 ? 's' : '' ?>
+        <?php if ($recherche !== ''): ?>
+          <span class="acc-filtre-actif">« <?= h($recherche) ?> »
+            <a href="<?= h(lienActualites(['q' => '', 'page' => 1])) ?>" aria-label="Retirer la recherche">×</a></span>
+        <?php endif; ?>
+      </div>
+      <?php if (count($sources) > 1): ?>
+        <form action="actualite.php" method="get" class="act-barre-source">
+          <?php if ($recherche !== ''): ?><input type="hidden" name="q" value="<?= h($recherche) ?>"><?php endif; ?>
+          <label>Source
+            <select name="s" onchange="this.form.submit()">
+              <option value="">Toutes les structures</option>
+              <?php foreach ($sources as $source): ?>
+                <option value="<?= (int) $source['id_struc'] ?>" <?= $sourceFiltre === (int) $source['id_struc'] ? 'selected' : '' ?>><?= h($source['nom_struc']) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </label>
+        </form>
+      <?php endif; ?>
     </div>
 
-    <?php if (empty($actualites)): ?>
-        <section class="actualite-empty" aria-live="polite">
-            <h2>Aucune actualité trouvée</h2>
-            <p>
-                <?php if ($recherche !== ''): ?>
-                    Aucun résultat ne correspond à « <?= htmlspecialchars($recherche, ENT_QUOTES, 'UTF-8') ?> ».
-                    Essayez d’autres mots clés.
-                <?php else: ?>
-                    Les nouvelles publications des structures apparaîtront ici dès leur mise en ligne.
-                <?php endif; ?>
-            </p>
-        </section>
+    <?php if (!$aLaUne && empty($actualites)): ?>
+      <div class="acc-vide" aria-live="polite">
+        <h2>Aucune actualité trouvée</h2>
+        <p>
+          <?php if ($recherche !== '' || $sourceFiltre): ?>
+            Aucun résultat ne correspond à vos critères. Essayez d'autres mots clés ou une autre source.
+          <?php else: ?>
+            Les nouvelles publications des structures apparaîtront ici dès leur mise en ligne.
+          <?php endif; ?>
+        </p>
+      </div>
     <?php else: ?>
-        <section class="actualite-list" aria-label="Liste des actualités">
-            <?php foreach ($actualites as $actualite): ?>
-                <?php
-                    $date = (string) $actualite['date_publication'];
-                    $imageNom = trim((string) ($actualite['image'] ?: ''));
-                ?>
-                <article class="actualite-item">
-                    <div class="actualite-media">
-                        <?php if ($imageNom !== ''): ?>
-                            <img
-                                src="../../uploads/photos/<?= htmlspecialchars(basename($imageNom), ENT_QUOTES, 'UTF-8') ?>"
-                                alt="<?= htmlspecialchars((string) $actualite['titre'], ENT_QUOTES, 'UTF-8') ?>"
-                                loading="lazy"
-                            >
-                        <?php else: ?>
-                            <div class="actualite-no-image">Aucune image disponible</div>
-                        <?php endif; ?>
-                    </div>
-                    <div class="actualite-item-body">
-                        <div class="actualite-date">
-                            <time datetime="<?= htmlspecialchars(date('Y-m-d', strtotime($date) ?: time()), ENT_QUOTES, 'UTF-8') ?>">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-     width="17" height="17"
-     viewBox="0 0 24 24"
-     fill="none"
-     stroke="currentColor"
-     stroke-width="1.7"
-     stroke-linecap="round"
-     stroke-linejoin="round"
-     aria-hidden="true">
-    <rect x="3" y="5" width="18" height="16" rx="2"/>
-    <path d="M16 3v4M8 3v4M3 11h18"/>
-</svg> <?= htmlspecialchars(formaterDateFr($date), ENT_QUOTES, 'UTF-8') ?>
-                            </time>
-                        </div>
-                    </div>
-                    <div class="actualite-item-content">
-                        <h3><?= htmlspecialchars((string) $actualite['titre'], ENT_QUOTES, 'UTF-8') ?></h3>
-                        <a class="actualite-link" href="actualite_detail.php?id=<?= (int) $actualite['id_actu'] ?>">
-                            Lire plus <span aria-hidden="true">→</span>
-                        </a>
-                    </div>
-                </article>
-            <?php endforeach; ?>
+      <?php if ($actualites): ?>
+        <section class="act-grille" aria-label="Liste des actualités">
+          <?php foreach ($actualites as $actualite): ?>
+            <a href="actualite_detail.php?id=<?= (int) $actualite['id_actu'] ?>" class="acc-actu">
+              <div class="acc-actu-media"><img src="<?= imageActualite($actualite) ?>" alt="" loading="lazy"></div>
+              <div class="acc-actu-corps">
+                <div class="acc-actu-meta">
+                  <span class="acc-actu-source"><?= h($actualite['nom_struc']) ?></span>
+                  <time class="acc-actu-date" datetime="<?= h(date('Y-m-d', strtotime($actualite['date_publication']) ?: time())) ?>"><?= h(formaterDateFr($actualite['date_publication'])) ?></time>
+                </div>
+                <h3><?= h($actualite['titre']) ?></h3>
+                <span class="acc-fleche">Lire la suite <span aria-hidden="true">→</span></span>
+              </div>
+            </a>
+          <?php endforeach; ?>
         </section>
+      <?php endif; ?>
 
-        <?php if ($totalPages > 1): ?>
-            <nav class="actualite-pagination" aria-label="Pagination des actualités">
-                <?php if ($page > 1): ?>
-                    <a href="?page=<?= $page - 1 ?>&amp;q=<?= urlencode($recherche) ?>" aria-label="Page précédente">‹</a>
-                <?php endif; ?>
-                <?php for ($numero = 1; $numero <= $totalPages; $numero++): ?>
-                    <?php if ($numero === $page): ?>
-                        <span class="is-current" aria-current="page"><?= $numero ?></span>
-                    <?php else: ?>
-                        <a href="?page=<?= $numero ?>&amp;q=<?= urlencode($recherche) ?>"><?= $numero ?></a>
-                    <?php endif; ?>
-                <?php endfor; ?>
-                <?php if ($page < $totalPages): ?>
-                    <a href="?page=<?= $page + 1 ?>&amp;q=<?= urlencode($recherche) ?>" aria-label="Page suivante">›</a>
-                <?php endif; ?>
-            </nav>
-        <?php endif; ?>
+      <?php if ($totalPages > 1): ?>
+        <nav class="acc-pagination" aria-label="Pagination des actualités">
+          <a href="<?= h(lienActualites(['page' => max(1, $page - 1)])) ?>" class="<?= $page <= 1 ? 'desactive' : '' ?>" aria-label="Page précédente">‹</a>
+          <?php for ($numero = 1; $numero <= $totalPages; $numero++): ?>
+            <?php if ($numero === $page): ?>
+              <span class="actif" aria-current="page"><?= $numero ?></span>
+            <?php else: ?>
+              <a href="<?= h(lienActualites(['page' => $numero])) ?>"><?= $numero ?></a>
+            <?php endif; ?>
+          <?php endfor; ?>
+          <a href="<?= h(lienActualites(['page' => min($totalPages, $page + 1)])) ?>" class="<?= $page >= $totalPages ? 'desactive' : '' ?>" aria-label="Page suivante">›</a>
+        </nav>
+      <?php endif; ?>
     <?php endif; ?>
+
+  </div>
 </main>
 
 <?php require '../../includes/footer.php'; ?>
