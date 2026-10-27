@@ -426,7 +426,7 @@ require '../../includes/header.php';
   <div class="citation-voile"></div>
   <div class="container">
     <div class="citation-carte">
-      <img src="../../publique/image/GA2.png" alt="[Nom de la personne citée]" class="citation-portrait">
+      <img src="../../publique/image/minis.jpeg" alt="[Nom de la personne citée]" class="citation-portrait">
       <span class="citation-guillemet">"</span>
       <p class="citation-texte">Les réformes sont un pro­ces­sus continu, pas une fin en soi</p>
       <div class="citation-trait"></div>
@@ -617,7 +617,7 @@ require '../../includes/header.php';
                                 class="structure-link"
                             >
                                 <span>
-                                    voir +
+                                    voir 
                                 </span>
                                 <span>
                                     →

@@ -108,11 +108,10 @@ require '../../includes/header.php';
 /* L'espace du logo qui dépasse est réservé sur la colonne : la carte reste dans sa case et ne déborde plus sur la rangée suivante */
 .catalogue-grille > .col { display: flex; flex-direction: column; padding-top: 2.5rem; }
 .structure-carte-2 { position: relative; display: flex; flex: 1 1 auto; flex-direction: column; align-items: stretch; min-height: 300px; padding: 0 1.25rem 1.25rem; overflow: visible; border: 1px solid #E1E6EF; border-radius: 18px; background: #fff; box-shadow: 0 5px 18px rgba(11,29,77,.045); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-.structure-carte-2::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--mrri-vert), var(--mrri-or)); opacity: 0; transition: opacity .2s ease; }
-.structure-carte-2:hover { transform: translateY(-4px); border-color: #C9D4E8; box-shadow: 0 13px 28px rgba(11,29,77,.09); }
-.structure-carte-2:hover::before { opacity: 1; }
+.structure-carte-2:hover { transform: translateY(-4px); border-color: #B9C8E6; box-shadow: 0 14px 30px rgba(11,29,77,.10); }
+.structure-carte-2:hover .structure-logo-rond { border-color: var(--mrri-bleu); background: var(--mrri-bleu); color: #fff; }
 .structure-carte-2-top { display: flex; align-items: center; justify-content: center; margin: -2.5rem 0 1.1rem; }
-.structure-logo-rond { display: flex; flex: 0 0 92px; align-items: center; justify-content: center; width: 92px; height: 92px; border: 7px solid #D7E8FB; border-radius: 50%; background: #F9FBFF; color: var(--mrri-bleu); box-shadow: 0 7px 16px rgba(11,29,77,.13); }
+.structure-logo-rond { display: flex; flex: 0 0 92px; align-items: center; justify-content: center; width: 92px; height: 92px; border: 7px solid #D7E8FB; border-radius: 50%; background: #F9FBFF; color: var(--mrri-bleu); box-shadow: 0 7px 16px rgba(11,29,77,.13); transition: background .2s ease, border-color .2s ease, color .2s ease; }
 .structure-logo-rond svg { width: 36px; height: 36px; }
 .structure-carte-2 h3 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; min-height: 2.8rem; margin: 0 0 .35rem; color: var(--mrri-bleu-nuit); font-family: var(--font-title); font-size: 1.15rem; line-height: 1.35; text-align: center; }
 .structure-carte-2 .sigle { margin: 0 0 1rem; color: var(--mrri-text-light); font-size: .82rem; font-weight: 650; letter-spacing: .01em; text-align: center; }
@@ -224,7 +223,15 @@ require '../../includes/header.php';
             <article class="structure-carte-2">
               <div class="structure-carte-2-top">
                 <div class="structure-logo-rond" aria-hidden="true">
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6M9 10h.01M15 10h.01"/></svg>
+                  <!-- Édifice institutionnel : fronton, drapeau et colonnes -->
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2.5v3"/>
+                    <path d="M12 2.5h3l-.75 1 .75 1h-3"/>
+                    <path d="M3 9.5 12 5.5l9 4z"/>
+                    <path d="M4 9.5h16"/>
+                    <path d="M6 12v6M10 12v6M14 12v6M18 12v6"/>
+                    <path d="M4.5 12h15M4 18h16M3 21h18"/>
+                  </svg>
                 </div>
               </div>
               <h3><?= htmlspecialchars($s['nom_struc'], ENT_QUOTES, 'UTF-8') ?></h3>
