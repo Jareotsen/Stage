@@ -19,9 +19,9 @@
                             République Gabonaise
                         </div>
                         <div class="mrri-footer-title">
-                            Ministère de la Réforme et des
+                            Plateform de consultation publique
                             <br>
-                            Relations avec les Institutions
+                            
                         </div>
                        
                     </div>
@@ -119,8 +119,7 @@
             <div class="mrri-footer-copyright">
 
                 © <?= date("Y") ?>
-                Ministère de la Réforme et des Relations
-                avec les Institutions.
+                Plateform de consultation publique.
                 Tous droits réservés.
 
             </div>

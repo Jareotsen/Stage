@@ -83,15 +83,27 @@ require '../../includes/header.php';
 .acc-resultats .border { border-color: var(--acc-ligne) !important; }
 
 /* ---------- Mot du Ministre + chiffres clés ---------- */
-.acc-ministre-grille { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
-.acc-ministre-photo { position: relative; max-width: 380px; }
-.acc-ministre-photo img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: top; border-radius: 4px; }
-.acc-ministre-photo::after { content: ""; position: absolute; right: -14px; bottom: -14px; z-index: -1; width: 60%; height: 60%; border-radius: 4px; background: var(--acc-vert); }
+/* Bandeau sombre en haut, carte de citation à cheval dessus, portrait rond qui déborde à gauche */
+.acc-ministre { padding: 2.75rem 0 clamp(3.5rem, 7vw, 5rem); background: linear-gradient(var(--acc-nuit) 0 130px, #fff 130px); }
+.acc-ministre-carte { position: relative; max-width: 1080px; margin: 0 auto; padding: 1.9rem 2.2rem 1.7rem 250px; min-height: 165px; border: 1px solid #D5DBE5; border-radius: 14px; background: #F9FAFB; box-shadow: 0 6px 18px rgba(10,26,51,.10); }
+.acc-ministre-photo { position: absolute; top: 50%; left: 30px; width: 200px; height: 200px; margin: 0; border-radius: 50%; overflow: hidden; background: #E4E7EC; box-shadow: 0 10px 28px rgba(10,26,51,.22); transform: translateY(-50%); }
+.acc-ministre-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .acc-citation { margin: 0; }
-.acc-citation blockquote { position: relative; margin: 0 0 1.6rem; padding-left: 1.6rem; border-left: 4px solid var(--acc-jaune); color: var(--acc-encre); font-family: var(--font-title); font-size: clamp(1.55rem, 3vw, 2.35rem); font-weight: 500; line-height: 1.25; }
-.acc-citation figcaption { color: var(--acc-gris); font-size: .92rem; line-height: 1.55; }
-.acc-citation figcaption strong { display: block; color: var(--acc-encre); font-size: 1rem; }
-.acc-chiffres { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 2.6rem; border-top: 1px solid var(--acc-ligne); }
+.acc-citation blockquote { margin: 0; color: var(--acc-encre); font-size: clamp(1rem, 1.6vw, 1.15rem); font-weight: 600; line-height: 1.55; }
+.acc-guillemet { color: var(--acc-vert); font-family: Georgia, serif; font-size: 1.9em; font-weight: 700; line-height: 0; vertical-align: -.3em; }
+.acc-guillemet.ouvrant { margin-right: .3rem; }
+.acc-guillemet.fermant { margin-left: .2rem; }
+.acc-citation-trait { width: 50px; height: 2px; margin: 1rem 0 .9rem; background: var(--acc-vert); }
+.acc-citation figcaption { color: var(--acc-encre); font-size: .88rem; font-weight: 600; line-height: 1.5; }
+.acc-citation figcaption span { display: block; color: var(--acc-gris); font-weight: 500; }
+@media (max-width: 767.98px) {
+  .acc-ministre { background: linear-gradient(var(--acc-nuit) 0 110px, #fff 110px); padding-top: 1.5rem; }
+  .acc-ministre-carte { padding: 120px 1.4rem 1.5rem; text-align: center; }
+  .acc-ministre-photo { top: -90px; left: 50%; width: 180px; height: 180px; transform: translateX(-50%); }
+  .acc-citation-trait { margin-inline: auto; }
+  .acc-ministre-carte { margin-top: 90px; }
+}
+.acc-chiffres { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 980px; margin: 2.8rem auto 0; border-top: 1px solid var(--acc-ligne); }
 .acc-chiffre { padding: 1.4rem 1rem 0 0; }
 .acc-chiffre + .acc-chiffre { padding-left: 1.2rem; border-left: 1px solid var(--acc-ligne); }
 .acc-chiffre strong { display: block; color: var(--acc-encre); font-family: var(--font-title); font-size: clamp(2rem, 3.6vw, 2.8rem); font-weight: 600; line-height: 1; }
@@ -128,8 +140,7 @@ require '../../includes/header.php';
 
 
 @media (max-width: 991.98px) {
-  .acc-recherche-grille, .acc-ministre-grille, .acc-actus-grille { grid-template-columns: 1fr; }
-  .acc-ministre-photo { max-width: 260px; }
+  .acc-recherche-grille, .acc-actus-grille { grid-template-columns: 1fr; }
   .acc-acces-grille { grid-template-columns: repeat(2, 1fr); }
   .acc-appel-grille { flex-direction: column; align-items: flex-start; }
 }
@@ -138,7 +149,6 @@ require '../../includes/header.php';
   .acc-tuile { min-height: 0; }
   .acc-chiffre + .acc-chiffre { padding-left: .8rem; }
   .acc-chiffre span { font-size: .76rem; }
-  .acc-ministre-photo::after { right: -8px; bottom: -8px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .acc-tuile, .acc-bouton-clair { transition: none; }
@@ -178,25 +188,27 @@ require '../../includes/header.php';
 <!-- =========================================================
      MOT DU MINISTRE + CHIFFRES CLÉS
      ========================================================= -->
-<section class="acc-section" aria-labelledby="titre-ministre">
-  <div class="container acc-ministre-grille">
-    <div class="acc-ministre-photo">
-      <img src="../../publique/image/minis.jpeg" alt="Aimé Martial Massamba, Ministre de la Réforme et des Relations avec les Institutions">
-    </div>
-    <div>
-      <span class="acc-surtitre" id="titre-ministre">Le mot du Ministre</span>
+<section class="acc-ministre" aria-labelledby="titre-ministre">
+  <div class="container">
+    <h2 class="visually-hidden" id="titre-ministre">Le mot du Ministre</h2>
+    <div class="acc-ministre-carte">
+      <figure class="acc-ministre-photo">
+        <img src="../../publique/image/minis2.jpeg" alt="Aimé Martial Massamba, Ministre de la Réforme et des Relations avec les Institutions">
+      </figure>
       <figure class="acc-citation">
-        <blockquote>« Les réformes sont un processus continu, pas une fin en soi. »</blockquote>
+        <blockquote><span class="acc-guillemet ouvrant" aria-hidden="true">“</span>Les réformes sont un processus continu, pas une fin en soi.<span class="acc-guillemet fermant" aria-hidden="true">”</span></blockquote>
+        <div class="acc-citation-trait" aria-hidden="true"></div>
         <figcaption>
-          <strong>Aimé Martial Massamba</strong>
-          Ministre de la Réforme et des Relations avec les Institutions · 11 octobre 2026
+          Aimé Martial Massamba, Ministre de la Réforme et des Relations avec les Institutions
+          <span>11 octobre 2026</span>
         </figcaption>
       </figure>
-      <div class="acc-chiffres">
-        <div class="acc-chiffre"><strong><?= $totalStructures ?></strong><span>Institutions et A.A.I référencées</span></div>
-        <div class="acc-chiffre"><strong><?= $totalActualites ?></strong><span>Actualités publiées</span></div>
-        <div class="acc-chiffre"><strong><?= $totalConsultations ?></strong><span>Consultation(s) ouverte(s)</span></div>
-      </div>
+    </div>
+
+    <div class="acc-chiffres">
+      <div class="acc-chiffre"><strong><?= $totalStructures ?></strong><span>Institutions et A.A.I référencées</span></div>
+      <div class="acc-chiffre"><strong><?= $totalActualites ?></strong><span>Actualités publiées</span></div>
+      <div class="acc-chiffre"><strong><?= $totalConsultations ?></strong><span>Consultation(s) ouverte(s)</span></div>
     </div>
   </div>
 </section>

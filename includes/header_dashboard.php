@@ -12,7 +12,6 @@ $versionCss = static fn(string $fichier): int => (int) @filemtime(__DIR__ . '/..
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tableau de bord — MRRI</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="../../publique/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="../../publique/vendor/fonts/fonts.css" rel="stylesheet">
 <link href="../../publique/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">

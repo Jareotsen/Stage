@@ -16,8 +16,7 @@ $versionCss = static fn(string $fichier): int => (int) @filemtime(__DIR__ . '/..
 <link href="../../publique/css/public.css?v=<?= $versionCss('public.css') ?>" rel="stylesheet">
 <link href="../../publique/css/portail.css?v=<?= $versionCss('portail.css') ?>" rel="stylesheet">
 <?php if (basename($_SERVER['SCRIPT_NAME'] ?? '') === 'localisation.php'): ?>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link href="../../publique/vendor/leaflet/leaflet.css" rel="stylesheet">
 <?php endif; ?>
 </head>
 <body>
@@ -69,7 +68,7 @@ $menuStructuresDisponible = !empty($racinesMenu);
     <a href="../public/accueil.php" class="mrri-brand">
       <img src="../../publique/image/sceau.png" alt="Armoiries de la République Gabonaise">
       <div>
-        <p class="mrri-brand-titre">MINISTERE DE LA REFORME ET DES <br>RELATIONS AVEC LES INSTITUTIONS</p>
+        <p class="mrri-brand-titre">Plateforme de <br>consultations publiques</p>
       </div>
     </a>
 

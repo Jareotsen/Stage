@@ -19,7 +19,7 @@ if ($id !== '' && ctype_digit((string) $id)) {
     $id = (int) $id;
     $stmt = $db->prepare(
         "SELECT c.id_consultation, c.titre, c.contenu, c.date_ouverture, c.date_fermeture,
-                c.statut, c.id_structure, s.nom_struc
+                c.statut, c.id_structure, s.nom_struc, s.sigle
          FROM consultations c
          LEFT JOIN structure s ON c.id_structure = s.id_struc
          WHERE c.id_consultation = :id AND c.statut != 'brouillon'"
@@ -432,128 +432,128 @@ $afficherTexte = static function (?string $texte): string {
 $nbContributions = count($contributions);
 $joursRestants = null;
 if ($consultation && $ouverte && !empty($consultation['date_fermeture'])) {
-    $joursRestants = max(0, (int) ceil((strtotime($consultation['date_fermeture']) - time()) / 86400));
+    // Jours calendaires jusqu'à la clôture, comme sur la liste des consultations
+    $joursRestants = max(0, (int) round((strtotime(date('Y-m-d', strtotime($consultation['date_fermeture']))) - strtotime(date('Y-m-d'))) / 86400));
 }
 
 require '../../includes/header.php';
 ?>
 
 <style>
-/* Page détail d'une consultation — même langage visuel que le catalogue des structures */
-.cdp { padding-bottom: 5rem; }
-.cdp-hero {
-  position: relative; overflow: hidden; padding: clamp(2rem, 4vw, 3.4rem) 0 5rem;
-  color: #fff; background: linear-gradient(118deg, #0B1D4D 0%, #173B91 68%, #176B58 100%);
-}
-.cdp-hero::before, .cdp-hero::after { content: ""; position: absolute; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; pointer-events: none; }
-.cdp-hero::before { width: 360px; height: 360px; right: -90px; top: -190px; }
-.cdp-hero::after { width: 240px; height: 240px; right: 70px; bottom: -175px; }
-.cdp-hero .container { position: relative; z-index: 1; }
-.cdp-retour { display: flex; width: fit-content; align-items: center; gap: .45rem; margin-bottom: 1.6rem; color: rgba(255,255,255,.75); font-size: .85rem; font-weight: 600; }
-.cdp-retour:hover { color: #fff; }
-.cdp-retour i { transition: transform .18s ease; }
-.cdp-retour:hover i { transform: translateX(-3px); }
-.cdp-kicker { display: inline-flex; align-items: center; gap: .55rem; margin-bottom: .9rem; color: #F7EACB; font-size: .75rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+/* Détail d'une consultation : les composants communs sont dans publique/css/portail.css */
+.cdp-hero { padding-bottom: clamp(2.6rem, 5vw, 3.6rem); }
 .cdp-badges { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
-.cdp-badge { display: inline-flex; align-items: center; gap: .4rem; max-width: 100%; padding: .3rem .8rem; border: 1px solid rgba(255,255,255,.3); border-radius: 999px; color: #fff; font-size: .76rem; font-weight: 650; }
-.cdp-badge.ouverte { border-color: var(--accent); background: var(--accent); color: var(--texte); font-weight: 750; }
-.cdp-badge.ouverte::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-tres-fonce); }
+.cdp-badge { display: inline-flex; align-items: center; gap: .4rem; max-width: 100%; padding: .3rem .75rem; border: 1px solid rgba(255,255,255,.35); border-radius: 2px; color: #fff; font-size: .78rem; font-weight: 600; }
+.cdp-badge.ouverte { border-color: var(--acc-jaune); background: var(--acc-jaune); color: var(--acc-nuit); font-weight: 800; }
+.cdp-badge.ouverte::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--acc-vert-fonce); }
 .cdp-badge.cloturee { background: rgba(255,255,255,.12); }
-.cdp-hero h1 { max-width: 900px; margin: 0; color: #fff; font-family: var(--font-title); font-size: clamp(1.7rem, 3.3vw, 2.6rem); line-height: 1.18; overflow-wrap: anywhere; }
-.cdp-stats { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.5rem; }
-.cdp-stat { display: inline-flex; align-items: center; gap: .5rem; padding: .55rem .9rem; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: rgba(255,255,255,.08); color: rgba(255,255,255,.9); font-size: .82rem; }
-.cdp-stat i { color: #F7EACB; }
-.cdp-stat strong { color: #fff; }
-.cdp-stat.alerte { border-color: rgba(247,234,203,.55); background: rgba(201,151,44,.22); }
+.cdp-hero h1 { max-width: 30ch; font-size: clamp(1.8rem, 3.6vw, 2.8rem); line-height: 1.15; overflow-wrap: anywhere; }
+
+/* Repères clés : bande blanche sous l'en-tête */
+.cdp-reperes { border-bottom: 1px solid var(--acc-ligne); background: #fff; }
+.cdp-reperes dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; }
+.cdp-reperes dl > div { display: flex; align-items: center; gap: .85rem; padding: 1.4rem 1.2rem 1.4rem 0; }
+.cdp-reperes dl > div + div { padding-left: 1.2rem; border-left: 1px solid var(--acc-ligne); }
+.cdp-repere-icone { display: flex; flex: 0 0 40px; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #E3F5EC; color: var(--acc-vert-fonce); font-size: 1.05rem; }
+.cdp-reperes dt { color: var(--acc-gris); font-size: .7rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.cdp-reperes dd { margin: .15rem 0 0; color: var(--acc-encre); font-size: .95rem; font-weight: 700; }
+.cdp-reperes .alerte .cdp-repere-icone { background: #FDECEC; color: #B42318; }
+.cdp-reperes .alerte dd { color: #B42318; }
 
 /* Grille : présentation + contributions à gauche, participation à droite */
-.cdp-grille { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 1.75rem; align-items: start; margin-top: -3rem; }
-.cdp-colonne { display: flex; flex-direction: column; gap: 1.75rem; min-width: 0; }
-.cdp-carte { padding: clamp(1.4rem, 3vw, 2.2rem); border: 1px solid var(--mrri-border); border-radius: 16px; background: #fff; box-shadow: 0 14px 38px rgba(11,29,77,.08); }
-.cdp-titre { display: flex; align-items: center; gap: .75rem; margin: 0 0 1.25rem; color: var(--primaire-nuit); font-size: 1.3rem; }
-.cdp-titre::before { content: ""; width: 4px; height: 1.2em; border-radius: 2px; background: var(--accent); box-shadow: 0 0 0 1px var(--mrri-bleu-nuit); }
-.cdp-titre .cdp-compteur { margin-left: auto; padding: .2rem .65rem; border-radius: 999px; background: var(--primaire-clair); color: var(--mrri-bleu); font-family: var(--font-body); font-size: .8rem; font-weight: 750; }
+.cdp-grille { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: clamp(2rem, 4vw, 3.5rem); align-items: start; }
+.cdp-colonne { display: flex; flex-direction: column; gap: clamp(2.5rem, 5vw, 3.5rem); min-width: 0; }
+.cdp-titre { display: flex; align-items: center; gap: .75rem; margin: 0 0 1.3rem; padding-bottom: .7rem; border-bottom: 2px solid var(--acc-encre); color: var(--acc-encre); font-family: var(--font-title); font-size: 1.6rem; font-weight: 600; }
+.cdp-titre .cdp-compteur { margin-left: auto; padding: .15rem .65rem; border-radius: 999px; background: var(--acc-fond); color: var(--acc-gris); font-family: var(--font-body); font-size: .8rem; font-weight: 800; }
 
 /* Texte de la consultation */
-.cdp-texte { color: var(--texte-secondaire); font-size: .98rem; line-height: 1.8; overflow-wrap: anywhere; }
+.cdp-texte { color: var(--acc-encre); font-size: 1.02rem; line-height: 1.8; overflow-wrap: anywhere; }
 .cdp-texte p { margin: 0 0 1rem; }
-.cdp-texte h3 { margin: 1.6rem 0 .6rem; color: var(--primaire-nuit); font-family: var(--font-body); font-size: 1.02rem; font-weight: 750; }
+.cdp-texte h3 { margin: 1.8rem 0 .6rem; color: var(--acc-encre); font-family: var(--font-title); font-size: 1.2rem; font-weight: 600; }
 .cdp-texte h3:first-child { margin-top: 0; }
 .cdp-texte > :last-child { margin-bottom: 0; }
 
 /* Contributions */
-.cdp-vide { padding: 2.2rem 1rem; border: 1px dashed #CDD5E1; border-radius: 12px; text-align: center; color: var(--texte-leger); }
-.cdp-vide i { display: block; margin-bottom: .5rem; color: var(--mrri-bleu); font-size: 1.8rem; }
-.cdp-contrib { padding: 1.35rem 0; border-top: 1px solid #EEF1F5; }
-.cdp-contrib:first-of-type { padding-top: 0; border-top: 0; }
+.cdp-vide { padding: 2.2rem 1rem; border: 1px dashed #CBD3DF; border-radius: 4px; color: var(--acc-gris); text-align: center; }
+.cdp-vide i { display: block; margin-bottom: .5rem; color: var(--acc-bleu); font-size: 1.8rem; }
+.cdp-vide a { color: var(--acc-bleu-fonce); font-weight: 700; }
+.cdp-contrib { padding: 1.4rem 1.5rem; border: 1px solid var(--acc-ligne); border-radius: 4px; background: #fff; }
+.cdp-contrib + .cdp-contrib { margin-top: 1rem; }
 .cdp-contrib-tete { display: flex; align-items: center; gap: .75rem; margin-bottom: .8rem; }
-.cdp-avatar { display: flex; flex: 0 0 38px; align-items: center; justify-content: center; width: 38px; height: 38px; border: 3px solid #D7E8FB; border-radius: 50%; background: #F9FBFF; color: var(--mrri-bleu); }
-.cdp-auteur { color: var(--primaire-nuit); font-size: .88rem; font-weight: 700; line-height: 1.2; }
-.cdp-date { color: var(--texte-leger); font-size: .78rem; }
-.cdp-contrib .cdp-texte { font-size: .94rem; }
-.cdp-avis { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.2rem; margin-top: 1rem; }
+.cdp-avatar { display: flex; flex: 0 0 38px; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: #E8F0FA; color: var(--acc-bleu-fonce); }
+.cdp-auteur { color: var(--acc-encre); font-size: .88rem; font-weight: 700; line-height: 1.2; }
+.cdp-date { color: var(--acc-gris); font-size: .78rem; }
+.cdp-contrib .cdp-texte { font-size: .95rem; }
+.cdp-avis { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.2rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--acc-ligne); }
 .cdp-score { display: flex; flex: 1 1 220px; flex-direction: column; gap: .4rem; min-width: 0; }
-.cdp-score-chiffres { display: flex; gap: 1rem; font-size: .8rem; font-weight: 650; }
-.cdp-score-chiffres .pour { color: var(--accent-fonce); }
-.cdp-score-chiffres .contre { color: var(--danger); }
-.cdp-barre { display: flex; height: 6px; overflow: hidden; border-radius: 999px; background: #EEF1F5; }
-.cdp-barre .pour { background: var(--accent-fonce); }
-.cdp-barre .contre { background: var(--danger); }
-.cdp-vote > summary { display: inline-flex; align-items: center; gap: .45rem; padding: .5rem 1rem; border: 1px solid #D7DDE7; border-radius: 999px; background: #fff; color: var(--mrri-bleu); font-size: .82rem; font-weight: 750; list-style: none; cursor: pointer; transition: border-color .18s, background .18s; }
-.cdp-vote > summary::-webkit-details-marker { display: none; }
-.cdp-vote > summary:hover { border-color: var(--mrri-bleu); background: var(--primaire-clair); }
-.cdp-vote[open] > summary { border-color: var(--mrri-bleu); background: var(--mrri-bleu); color: #fff; }
+.cdp-score-chiffres { display: flex; gap: 1rem; font-size: .8rem; font-weight: 700; }
+.cdp-score-chiffres .pour { color: var(--acc-vert-fonce); }
+.cdp-score-chiffres .contre { color: #B42318; }
+.cdp-barre { display: flex; height: 6px; overflow: hidden; border-radius: 999px; background: var(--acc-fond); }
+.cdp-barre .pour { background: var(--acc-vert); }
+.cdp-barre .contre { background: #D92D20; }
 .cdp-vote { flex: 0 0 auto; }
 .cdp-vote[open] { flex-basis: 100%; }
-.cdp-vote-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin-top: .9rem; padding: 1.1rem; border-radius: 12px; background: var(--arriere-plan); }
+.cdp-vote > summary { display: inline-flex; align-items: center; gap: .45rem; padding: .5rem 1rem; border: 2px solid var(--acc-encre); border-radius: 4px; background: #fff; color: var(--acc-encre); font-size: .82rem; font-weight: 700; list-style: none; cursor: pointer; transition: background .2s ease, color .2s ease; }
+.cdp-vote > summary::-webkit-details-marker { display: none; }
+.cdp-vote > summary:hover, .cdp-vote[open] > summary { background: var(--acc-encre); color: #fff; }
+.cdp-vote-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin-top: .9rem; padding: 1.1rem; border-radius: 4px; background: var(--acc-fond); }
 .cdp-vote-form .cdp-plein { grid-column: 1 / -1; }
 .cdp-vote-boutons { display: flex; gap: .6rem; }
-.cdp-btn-vote { display: inline-flex; flex: 1; align-items: center; justify-content: center; gap: .45rem; min-height: 44px; border: 1px solid; border-radius: 10px; background: #fff; font: inherit; font-size: .88rem; font-weight: 750; transition: background .18s, color .18s; }
-.cdp-btn-vote.pour { border-color: var(--accent-fonce); color: var(--accent-fonce); }
-.cdp-btn-vote.pour:hover { background: var(--accent-fonce); color: #fff; }
-.cdp-btn-vote.contre { border-color: var(--danger); color: var(--danger); }
-.cdp-btn-vote.contre:hover { background: var(--danger); color: #fff; }
+.cdp-btn-vote { display: inline-flex; flex: 1; align-items: center; justify-content: center; gap: .45rem; min-height: 46px; border: 2px solid; border-radius: 4px; background: #fff; font: inherit; font-size: .88rem; font-weight: 700; transition: background .2s ease, color .2s ease; }
+.cdp-btn-vote.pour { border-color: var(--acc-vert-fonce); color: var(--acc-vert-fonce); }
+.cdp-btn-vote.pour:hover { background: var(--acc-vert-fonce); color: #fff; }
+.cdp-btn-vote.contre { border-color: #B42318; color: #B42318; }
+.cdp-btn-vote.contre:hover { background: #B42318; color: #fff; }
 
 /* Formulaires */
 .cdp-champ { display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
-.cdp-champ > span, .cdp-champ > label { color: #475467; font-size: .8rem; font-weight: 700; }
-.cdp-champ input, .cdp-champ select, .cdp-champ textarea { width: 100%; min-height: 44px; padding: .6rem .8rem; border: 1px solid #D7DDE7; border-radius: 10px; background: #fff; color: var(--texte); font: inherit; font-size: .9rem; }
-.cdp-champ textarea { min-height: 130px; resize: vertical; line-height: 1.6; }
-.cdp-champ input:focus, .cdp-champ select:focus, .cdp-champ textarea:focus { outline: 0; border-color: var(--mrri-vert); box-shadow: 0 0 0 3px rgba(15,138,75,.12); }
-.cdp-consentement { display: flex; align-items: flex-start; gap: .6rem; color: var(--texte-secondaire); font-size: .8rem; line-height: 1.5; }
-.cdp-consentement input { flex: 0 0 auto; width: 17px; height: 17px; margin-top: 2px; accent-color: var(--mrri-vert); }
-.cdp-aide { margin: 0; color: var(--texte-leger); font-size: .76rem; line-height: 1.5; }
+.cdp-champ > span, .cdp-champ > label { color: var(--acc-encre); font-size: .8rem; font-weight: 700; }
+.cdp-champ input, .cdp-champ select, .cdp-champ textarea { width: 100%; min-height: 46px; padding: .6rem .8rem; border: 1px solid #CBD3DF; border-radius: 4px; background: #fff; color: var(--acc-encre); font: inherit; font-size: .9rem; }
+.cdp-champ textarea { min-height: 140px; resize: vertical; line-height: 1.6; }
+.cdp-champ input:focus, .cdp-champ select:focus, .cdp-champ textarea:focus { outline: 0; border-color: var(--acc-bleu); box-shadow: 0 0 0 3px rgba(58,117,196,.15); }
+.cdp-consentement { display: flex; align-items: flex-start; gap: .6rem; color: var(--acc-gris); font-size: .8rem; line-height: 1.5; }
+.cdp-consentement input { flex: 0 0 auto; width: 17px; height: 17px; margin-top: 2px; accent-color: var(--acc-vert); }
+.cdp-aide { margin: 0; color: var(--acc-gris); font-size: .76rem; line-height: 1.5; }
 
 /* Carte « Participer » */
-.cdp-participer { position: relative; overflow: hidden; }
-.cdp-participer::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--mrri-vert), var(--mrri-or)); }
-.cdp-participer-intro { margin: -.5rem 0 1.2rem; color: var(--texte-leger); font-size: .86rem; line-height: 1.6; }
+.cdp-participer { overflow: hidden; border: 1px solid var(--acc-ligne); border-radius: 4px; background: #fff; }
+.cdp-participer-tete { padding: 1.4rem 1.5rem 1.2rem; border-top: 4px solid var(--acc-jaune); background: var(--acc-nuit); color: #fff; }
+.cdp-participer-tete h2 { margin: 0 0 .35rem; color: #fff; font-family: var(--font-title); font-size: 1.4rem; font-weight: 600; }
+.cdp-participer-tete p { margin: 0; color: rgba(255,255,255,.75); font-size: .86rem; line-height: 1.55; }
+.cdp-participer-corps { padding: 1.4rem 1.5rem 1.5rem; }
 .cdp-form { display: flex; flex-direction: column; gap: .9rem; }
 .cdp-form-ligne { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
-.cdp-envoyer { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; min-height: 50px; padding: .7rem 1.3rem; border: 1px solid var(--mrri-bleu); border-radius: 10px; background: var(--mrri-bleu); color: #fff; font: inherit; font-weight: 750; transition: background .18s, transform .18s; }
-.cdp-envoyer:hover { background: var(--mrri-bleu-dark); transform: translateY(-1px); }
-.cdp-cloturee { display: flex; gap: .75rem; padding: 1rem; border-radius: 12px; background: var(--arriere-plan); color: var(--texte-secondaire); font-size: .88rem; line-height: 1.6; }
-.cdp-cloturee i { color: var(--mrri-or); font-size: 1.2rem; }
-.cdp .alert { border-radius: 12px; font-size: .88rem; }
+.cdp-envoyer { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; min-height: 52px; padding: .7rem 1.3rem; border: 0; border-radius: 4px; background: var(--acc-jaune); color: var(--acc-nuit); font: inherit; font-weight: 800; transition: background .2s ease, color .2s ease; }
+.cdp-envoyer:hover { background: var(--acc-nuit); color: #fff; }
+.cdp-cloturee { display: flex; gap: .75rem; padding: 1rem; border-radius: 4px; background: var(--acc-fond); color: var(--acc-gris); font-size: .88rem; line-height: 1.6; }
+.cdp-cloturee i { color: var(--acc-encre); font-size: 1.2rem; }
+.cdp-verification { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--acc-ligne); }
+.cdp-verification h3 { margin: 0 0 .4rem; color: var(--acc-encre); font-family: var(--font-title); font-size: 1.1rem; font-weight: 600; }
+.cdp-verification > p { margin: 0 0 1rem; color: var(--acc-gris); font-size: .86rem; line-height: 1.55; }
+.cdp-participer .alert, .cdp-colonne .alert { border-radius: 4px; font-size: .88rem; }
 
 /* Bouton flottant */
 .cdp-flottant {
   position: fixed; right: clamp(16px, 3vw, 32px); bottom: clamp(16px, 3vw, 32px); z-index: 1030;
   display: inline-flex; align-items: center; gap: .6rem; padding: .8rem 1.2rem .8rem 1rem;
-  border: 1px solid rgba(255,255,255,.15); border-radius: 999px; background: var(--primaire-nuit); color: #fff;
-  font-size: .88rem; font-weight: 750; box-shadow: 0 12px 30px rgba(1,13,61,.3);
-  transition: opacity .25s ease, transform .25s ease, background .18s ease;
+  border-radius: 4px; background: var(--acc-nuit); color: #fff;
+  font-size: .88rem; font-weight: 700; box-shadow: 0 12px 30px rgba(10,26,51,.3);
+  transition: opacity .25s ease, transform .25s ease, background .2s ease;
 }
-.cdp-flottant:hover { background: var(--mrri-bleu); color: #fff; }
-.cdp-flottant:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-.cdp-flottant .cdp-flottant-nb { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 .4rem; border-radius: 999px; background: var(--accent); color: var(--texte); font-size: .75rem; }
+.cdp-flottant:hover { background: var(--acc-bleu-fonce); color: #fff; }
+.cdp-flottant:focus-visible { outline: 3px solid var(--acc-jaune); outline-offset: 3px; }
+.cdp-flottant .cdp-flottant-nb { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 .4rem; border-radius: 999px; background: var(--acc-jaune); color: var(--acc-nuit); font-size: .75rem; font-weight: 800; }
 .cdp-flottant.masque { opacity: 0; transform: translateY(16px); pointer-events: none; }
-#contributions { scroll-margin-top: 24px; }
+#contributions, #deposer { scroll-margin-top: 100px; }
 
 @media (min-width: 992px) and (min-height: 820px) {
-  .cdp-participer { position: sticky; top: 24px; }
+  .cdp-participer { position: sticky; top: 100px; }
 }
 @media (max-width: 991.98px) {
+  .cdp-reperes dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cdp-reperes dl > div:nth-child(3) { padding-left: 0; border-left: 0; }
+  .cdp-reperes dl > div:nth-child(n+3) { border-top: 1px solid var(--acc-ligne); }
   .cdp-grille { grid-template-columns: 1fr; }
   /* Sur mobile : présentation, puis participation, puis contributions */
   .cdp-colonne { display: contents; }
@@ -562,12 +562,16 @@ require '../../includes/header.php';
   .cdp-contributions { order: 3; }
 }
 @media (max-width: 575.98px) {
+  .cdp-reperes dl { grid-template-columns: 1fr; }
+  .cdp-reperes dl > div, .cdp-reperes dl > div + div { padding: 1rem 0; border-left: 0; }
+  .cdp-reperes dl > div + div { border-top: 1px solid var(--acc-ligne); }
   .cdp-form-ligne, .cdp-vote-form { grid-template-columns: 1fr; }
+  .cdp-contrib { padding: 1.1rem; }
   .cdp-flottant-texte { display: none; }
   .cdp-flottant { padding: .85rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cdp-flottant, .cdp-envoyer, .cdp-retour i { transition: none; }
+  .cdp-flottant, .cdp-envoyer { transition: none; }
 }
 </style>
 
@@ -575,79 +579,98 @@ require '../../includes/header.php';
 
 <?php if (!$consultation): ?>
 
-    <section class="cdp-hero">
+    <header class="acc-bandeau cdp-hero">
+        <img class="acc-bandeau-image" src="../../publique/image/GA3.jpeg" alt="">
         <div class="container">
-            <a class="cdp-retour" href="consultations.php"><i class="bi bi-arrow-left" aria-hidden="true"></i> Toutes les consultations</a>
-            <div class="cdp-kicker">Consultation citoyenne</div>
+            <ol class="acc-fil" aria-label="Fil d'Ariane">
+                <li><a href="accueil.php">Accueil</a></li>
+                <li><a href="consultations.php">Consultations</a></li>
+            </ol>
+            <span class="acc-surtitre">Consultation citoyenne</span>
             <h1>Consultation introuvable</h1>
         </div>
-    </section>
-    <main class="container cdp-grille" style="grid-template-columns:1fr;">
-        <div class="cdp-carte cdp-vide">
-            <i class="bi bi-search" aria-hidden="true"></i>
-            Cette consultation n'existe pas ou n'est pas disponible.
+    </header>
+    <main class="acc-section">
+        <div class="container">
+            <div class="acc-vide">
+                <h2>Consultation indisponible</h2>
+                <p>Cette consultation n'existe pas ou n'est pas disponible. <a href="consultations.php">Voir toutes les consultations</a></p>
+            </div>
         </div>
     </main>
 
 <?php else: ?>
 
     <!-- ================= EN-TÊTE ================= -->
-    <section class="cdp-hero">
+    <header class="acc-bandeau cdp-hero">
+        <img class="acc-bandeau-image" src="../../publique/image/GA3.jpeg" alt="">
         <div class="container">
-            <a class="cdp-retour" href="consultations.php"><i class="bi bi-arrow-left" aria-hidden="true"></i> Toutes les consultations</a>
-            <div class="cdp-kicker">Consultation citoyenne</div>
+            <ol class="acc-fil" aria-label="Fil d'Ariane">
+                <li><a href="accueil.php">Accueil</a></li>
+                <li><a href="consultations.php">Consultations</a></li>
+                <li aria-current="page"><?= echapper(mb_strimwidth($consultation['titre'], 0, 50, '…')) ?></li>
+            </ol>
+            <span class="acc-surtitre">Consultation citoyenne</span>
 
             <div class="cdp-badges">
+                <span class="cdp-badge <?= $ouverte ? 'ouverte' : 'cloturee' ?>"><?= $ouverte ? 'Ouverte' : 'Clôturée' ?></span>
                 <span class="cdp-badge">
                     <i class="bi <?= $estGenerale ? 'bi-globe2' : 'bi-building' ?>" aria-hidden="true"></i>
                     <?= $estGenerale ? 'Consultation générale' : echapper($consultation['nom_struc']) ?>
                 </span>
-                <span class="cdp-badge <?= $ouverte ? 'ouverte' : 'cloturee' ?>"><?= $ouverte ? 'Ouverte' : 'Clôturée' ?></span>
             </div>
 
             <h1><?= echapper($consultation['titre']) ?></h1>
+        </div>
+    </header>
 
-            <div class="cdp-stats">
-                <span class="cdp-stat">
-                    <i class="bi bi-calendar-event" aria-hidden="true"></i>
-                    Ouverte le <strong><?= formaterDateFr($consultation['date_ouverture']) ?></strong>
-                </span>
-                <?php if (!empty($consultation['date_fermeture'])): ?>
-                    <span class="cdp-stat">
-                        <i class="bi bi-calendar-check" aria-hidden="true"></i>
-                        <?= $ouverte ? 'Clôture le' : 'Clôturée le' ?> <strong><?= formaterDateFr($consultation['date_fermeture']) ?></strong>
-                    </span>
-                <?php endif; ?>
-                <?php if ($joursRestants !== null): ?>
-                    <span class="cdp-stat <?= $joursRestants <= 3 ? 'alerte' : '' ?>">
-                        <i class="bi bi-hourglass-split" aria-hidden="true"></i>
-                        <?php if ($joursRestants === 0): ?>
-                            <strong>Dernier jour</strong> pour participer
+    <!-- ================= REPÈRES CLÉS ================= -->
+    <section class="cdp-reperes" aria-label="Calendrier et participation">
+        <div class="container">
+            <dl>
+                <div>
+                    <span class="cdp-repere-icone" aria-hidden="true"><i class="bi bi-calendar-event"></i></span>
+                    <div><dt>Ouverture</dt><dd><?= formaterDateFr($consultation['date_ouverture']) ?></dd></div>
+                </div>
+                <div>
+                    <span class="cdp-repere-icone" aria-hidden="true"><i class="bi bi-calendar-check"></i></span>
+                    <div><dt><?= $ouverte ? 'Clôture' : 'Clôturée le' ?></dt><dd><?= !empty($consultation['date_fermeture']) ? formaterDateFr($consultation['date_fermeture']) : 'Non définie' ?></dd></div>
+                </div>
+                <div class="<?= $joursRestants !== null && $joursRestants <= 3 ? 'alerte' : '' ?>">
+                    <span class="cdp-repere-icone" aria-hidden="true"><i class="bi bi-hourglass-split"></i></span>
+                    <div><dt>Temps restant</dt><dd>
+                        <?php if (!$ouverte): ?>
+                            Terminée
+                        <?php elseif ($joursRestants === null): ?>
+                            Sans échéance
+                        <?php elseif ($joursRestants === 0): ?>
+                            Dernier jour
                         <?php else: ?>
-                            <strong><?= $joursRestants ?> jour<?= $joursRestants > 1 ? 's' : '' ?></strong> pour participer
+                            <?= $joursRestants ?> jour<?= $joursRestants > 1 ? 's' : '' ?>
                         <?php endif; ?>
-                    </span>
-                <?php endif; ?>
-                <span class="cdp-stat">
-                    <i class="bi bi-chat-square-text" aria-hidden="true"></i>
-                    <strong><?= $nbContributions ?></strong> contribution<?= $nbContributions > 1 ? 's' : '' ?> publiée<?= $nbContributions > 1 ? 's' : '' ?>
-                </span>
-            </div>
+                    </dd></div>
+                </div>
+                <div>
+                    <span class="cdp-repere-icone" aria-hidden="true"><i class="bi bi-chat-square-text"></i></span>
+                    <div><dt>Contributions</dt><dd><?= $nbContributions ?> publiée<?= $nbContributions > 1 ? 's' : '' ?></dd></div>
+                </div>
+            </dl>
         </div>
     </section>
 
-    <main class="container cdp-grille">
+    <main class="acc-section">
+    <div class="container cdp-grille">
 
         <div class="cdp-colonne">
 
             <!-- ================= PRÉSENTATION ================= -->
-            <article class="cdp-carte cdp-presentation">
+            <article class="cdp-presentation">
                 <h2 class="cdp-titre">Présentation</h2>
                 <div class="cdp-texte"><?= $afficherTexte($consultation['contenu']) ?></div>
             </article>
 
             <!-- ================= CONTRIBUTIONS VALIDÉES ================= -->
-            <section class="cdp-carte cdp-contributions" id="contributions" aria-labelledby="titre-contributions">
+            <section class="cdp-contributions" id="contributions" aria-labelledby="titre-contributions">
                 <h2 class="cdp-titre" id="titre-contributions">
                     Contributions
                     <span class="cdp-compteur"><?= $nbContributions ?></span>
@@ -757,8 +780,12 @@ require '../../includes/header.php';
         </div>
 
         <!-- ================= PARTICIPER ================= -->
-        <aside class="cdp-carte cdp-participer" id="deposer" aria-labelledby="titre-participer">
-            <h2 class="cdp-titre" id="titre-participer">Participer</h2>
+        <aside class="cdp-participer" id="deposer" aria-labelledby="titre-participer">
+            <div class="cdp-participer-tete">
+                <h2 id="titre-participer">Participer</h2>
+                <p><?= $ouverte ? 'Partagez votre avis. Votre contribution sera publiée après modération.' : 'Les contributions sont fermées pour cette consultation.' ?></p>
+            </div>
+            <div class="cdp-participer-corps">
 
             <?php if ($erreurDepot): ?>
                 <div class="alert alert-danger" role="alert"><?= echapper($erreurDepot) ?></div>
@@ -773,8 +800,6 @@ require '../../includes/header.php';
                     <span>Cette consultation est clôturée : il n'est plus possible de contribuer ni de voter.</span>
                 </div>
             <?php else: ?>
-                <p class="cdp-participer-intro">Partagez votre avis. Votre contribution sera publiée après modération.</p>
-
                 <form action="#deposer" method="post" class="cdp-form">
                     <input type="hidden" name="csrf_token" value="<?= echapper($token) ?>">
                     <input type="hidden" name="action" value="deposer">
@@ -837,9 +862,9 @@ require '../../includes/header.php';
             <?php endif; ?>
 
             <?php if (VERIFICATION_EMAIL_CITOYEN && !empty($_SESSION['pending_citizen_action'])): ?>
-                <div id="verifier-email" style="margin-top:1.5rem;">
-                    <h3 class="cdp-titre" style="font-size:1.05rem;">Vérifier votre adresse email</h3>
-                    <p class="cdp-participer-intro" style="margin-top:0;">Un code à 6 chiffres a été envoyé à l’adresse indiquée. Saisissez-le pour confirmer votre participation.</p>
+                <div id="verifier-email" class="cdp-verification">
+                    <h3>Vérifier votre adresse email</h3>
+                    <p>Un code à 6 chiffres a été envoyé à l’adresse indiquée. Saisissez-le pour confirmer votre participation.</p>
                     <form action="#verifier-email" method="post" class="cdp-form">
                         <input type="hidden" name="csrf_token" value="<?= echapper($token) ?>">
                         <input type="hidden" name="action" value="verifier_email">
@@ -853,8 +878,10 @@ require '../../includes/header.php';
                     </form>
                 </div>
             <?php endif; ?>
+            </div>
         </aside>
 
+    </div>
     </main>
 
     <!-- ================= BOUTON FLOTTANT ================= -->

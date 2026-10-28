@@ -1,0 +1,40 @@
+# =========================================================
+# Pages de l'application (dossier views/ et ses sous-dossiers)
+# Règles de sécurité appliquées par Apache avant même PHP.
+# =========================================================
+
+# 1. Pas de liste des fichiers quand on ouvre un dossier sans page d'accueil
+#    (ex. /views/public/ affiche « Accès interdit » au lieu du contenu du dossier)
+Options -Indexes
+
+# 2. Fichiers oubliés (sauvegardes, notes, exports…) : jamais téléchargeables
+<FilesMatch "(?i)\.(bak|old|orig|sav|swp|tmp|sql|log|ini|env|md|txt|dist)$|~$">
+    Require all denied
+</FilesMatch>
+
+# 3. En-têtes de sécurité envoyés avec chaque page
+<IfModule mod_headers.c>
+    # Le navigateur ne « devine » pas le type d'un fichier (empêche d'exécuter un texte comme un script)
+    Header set X-Content-Type-Options "nosniff"
+    # Les pages ne peuvent être affichées dans un cadre (iframe) que par le site lui-même (anti-clickjacking).
+    # Exception pour le développeur sur son propre PC (aperçus mobiles de VS Code, etc.) :
+    # l'en-tête n'est pas envoyé si la requête vient de la machine elle-même ET ne passe pas
+    # par un tunnel (cloudflared/ngrok ajoutent X-Forwarded-For ou CF-Connecting-IP).
+    Header set X-Frame-Options "SAMEORIGIN" "expr=!(-R '127.0.0.1' || -R '::1') || -n %{HTTP:X-Forwarded-For} || -n %{HTTP:CF-Connecting-IP}"
+    # Les sites externes ne reçoivent que le nom du site, jamais l'adresse complète de la page
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    # Caméra, micro et géolocalisation : jamais utilisés par l'application, donc désactivés
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    # Ne pas annoncer la version de PHP utilisée
+    Header unset X-Powered-By
+</IfModule>
+
+# 4. Cookie de session protégé
+<IfModule php_module>
+    # Illisible par JavaScript : un script injecté ne peut pas voler la session
+    php_flag session.cookie_httponly on
+    # Non envoyé par les formulaires d'autres sites (seconde barrière avec le jeton CSRF)
+    php_value session.cookie_samesite Lax
+    # Refuse un identifiant de session inventé ou imposé par un tiers (fixation de session)
+    php_flag session.use_strict_mode on
+</IfModule>

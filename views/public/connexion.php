@@ -1,18 +1,60 @@
 <?php
 session_start();
 require '../../config/database.php';
+require_once '../../includes/csrf.php';
 
 $erreur = null;
 
+// Limitation des essais : au-delà, la connexion est refusée pendant la fenêtre ci-dessous
+const ESSAIS_MAX_PAR_COMPTE = 5;
+const ESSAIS_MAX_PAR_IP = 20;
+const FENETRE_ESSAIS_MINUTES = 15;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
+    $username = mb_substr(trim((string) ($_POST['username'] ?? '')), 0, 50);
+    $password = (string) ($_POST['password'] ?? '');
+    $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
 
-    $stmt = $db->prepare("SELECT * FROM utilisateurs WHERE username = :username");
-    $stmt->execute([':username' => $username]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Les échecs de plus de 24 h ne servent plus à rien
+    $db->exec("DELETE FROM tentatives_connexion WHERE tente_le < NOW() - INTERVAL 1 DAY");
 
-    if ($user && password_verify($password, $user['password'])) {
+    // Échecs récents : par adresse IP et par compte visé
+    $essaisIpStmt = $db->prepare(
+        "SELECT COUNT(*) FROM tentatives_connexion
+         WHERE ip = :ip AND tente_le > NOW() - INTERVAL " . FENETRE_ESSAIS_MINUTES . " MINUTE"
+    );
+    $essaisIpStmt->execute([':ip' => $ip]);
+    $essaisIp = (int) $essaisIpStmt->fetchColumn();
+    $essaisCompteStmt = $db->prepare(
+        "SELECT COUNT(*) FROM tentatives_connexion
+         WHERE username = :username AND tente_le > NOW() - INTERVAL " . FENETRE_ESSAIS_MINUTES . " MINUTE"
+    );
+    $essaisCompteStmt->execute([':username' => $username]);
+    $essaisCompte = (int) $essaisCompteStmt->fetchColumn();
+
+    $user = null;
+    if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
+        $erreur = "La session a expiré. Rechargez la page et réessayez.";
+    } elseif ($essaisCompte >= ESSAIS_MAX_PAR_COMPTE || $essaisIp >= ESSAIS_MAX_PAR_IP) {
+        $erreur = "Trop de tentatives. Réessayez dans " . FENETRE_ESSAIS_MINUTES . " minutes.";
+    } else {
+        $stmt = $db->prepare("SELECT * FROM utilisateurs WHERE username = :username");
+        $stmt->execute([':username' => $username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+
+        // Même temps de calcul que le compte existe ou non (n'indique pas les identifiants valides)
+        $hashCompare = $user['password'] ?? '$2y$10$7cEBK6V.JpcgU1lTG.w2z.dn88ihnJEYs4442ApIxtctKhUTnELhu';
+        if (!password_verify($password, $hashCompare) || !$user) {
+            $user = null;
+            $db->prepare("INSERT INTO tentatives_connexion (ip, username) VALUES (:ip, :username)")
+               ->execute([':ip' => $ip, ':username' => $username]);
+        }
+    }
+
+    if ($user) {
+        // Connexion réussie : on efface les échecs de ce compte
+        $db->prepare("DELETE FROM tentatives_connexion WHERE username = :username")
+           ->execute([':username' => $username]);
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
@@ -34,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             default:
                 $erreur = "Rôle utilisateur inconnu.";
         }
-    } else {
+    } elseif ($erreur === null) {
         $erreur = "Nom d'utilisateur ou mot de passe incorrect.";
     }
 }
@@ -49,7 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link
     rel="stylesheet" href="../../publique/vendor/bootstrap-icons/bootstrap-icons.min.css">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="../../publique/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="../../publique/vendor/fonts/fonts.css" rel="stylesheet">
 
@@ -1088,6 +1129,7 @@ padding-right: 45px;
             <?php endif; ?>
             <!-- Formulaire -->
             <form action="connexion.php" method="post">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf(), ENT_QUOTES, 'UTF-8') ?>">
                 <!-- Username -->
                 <div class="login-field">
                     <label for="username">

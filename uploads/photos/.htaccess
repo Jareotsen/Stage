@@ -1,0 +1,28 @@
+# =========================================================
+# Photos envoyées par les points focaux (structures, actualités, dirigeants)
+# Les images restent visibles sur le site ; rien d'autre n'y est exécutable.
+# =========================================================
+
+# Pas de liste des fichiers du dossier, pas de script CGI
+Options -Indexes -ExecCGI
+
+# PHP désactivé dans ce dossier : un fichier .php déposé ici ne serait jamais exécuté
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+# Seules les images peuvent être servies ; tout autre fichier est refusé
+<FilesMatch ".">
+    Require all denied
+</FilesMatch>
+<FilesMatch "(?i)\.(jpe?g|jpe|png|gif|webp)$">
+    Require all granted
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    # Le navigateur ne doit jamais interpréter une image comme une page ou un script
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
