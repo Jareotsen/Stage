@@ -52,6 +52,9 @@ function supprimerPhotoDirigeant(?string $nomFichier): void
 $resultat = $db->prepare("SELECT * FROM structure WHERE id_responsable = :id_responsable");
 $resultat->execute([':id_responsable' => $_SESSION['user_id']]);
 $structures = $resultat->fetch(PDO::FETCH_ASSOC);
+// Nom et sigle enregistrés : leur modification exige une confirmation explicite
+$nomInitial = (string) ($structures['nom_struc'] ?? '');
+$sigleInitial = (string) ($structures['sigle'] ?? '');
 $erreurCoordonnees = null;
 $latitudeAffichee = $structures['latitude'] ?? '';
 $longitudeAffichee = $structures['longitude'] ?? '';
@@ -67,6 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
+    $nom_struc = trim($_POST['nom_struc'] ?? '');
+    $sigle = trim($_POST['sigle'] ?? '');
+    $identiteModifiee = $nom_struc !== $nomInitial || $sigle !== $sigleInitial;
+    $identiteConfirmee = ($_POST['confirmer_identite'] ?? '') === '1';
     $adresse = trim($_POST['adresse'] ?? '');
     $directeur_general = trim($_POST['directeur_general'] ?? '');
     $fonction_dirigeant = trim($_POST['fonction_dirigeant'] ?? '');
@@ -83,6 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Longueurs maximales des colonnes : au-delà, MySQL tronquerait sans prévenir
     $limites = [
+        'Nom de la structure' => [$nom_struc, 200], 'Sigle' => [$sigle, 30],
         'Adresse' => [$adresse, 255], 'Nom du dirigeant' => [$directeur_general, 200],
         'Fonction du dirigeant' => [$fonction_dirigeant, 100],
         'Rôle et missions' => [$mission, 5000], 'Historique' => [$historique, 5000],
@@ -95,6 +103,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
         }
     }
+    if ($erreurCoordonnees === null && $nom_struc === '') {
+        $erreurCoordonnees = "Le nom de la structure ne peut pas être vide.";
+    }
+    // Contrôle serveur : la case de confirmation peut être contournée dans le navigateur
+    if ($erreurCoordonnees === null && $identiteModifiee && !$identiteConfirmee) {
+        $erreurCoordonnees = "Vous avez modifié le nom ou le sigle de la structure : cochez la case de confirmation pour valider ce changement.";
+    }
     if ($erreurCoordonnees === null && $email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $erreurCoordonnees = "L'adresse email n'est pas valide.";
     }
@@ -106,6 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Les valeurs saisies restent affichées en cas d'erreur
     $structures = array_merge($structures, [
+        'nom_struc' => $nom_struc, 'sigle' => $sigle,
         'adresse' => $adresse, 'directeur_general' => $directeur_general,
         'fonction_dirigeant' => $fonction_dirigeant, 'mission' => $mission,
         'historique' => $historique, 'composition' => $composition,
@@ -161,7 +177,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($erreurCoordonnees === null) {
         $updateStmt = $db->prepare(
             "UPDATE structure
-             SET adresse = :adresse, directeur_general = :directeur_general,
+             SET nom_struc = :nom_struc, sigle = :sigle,
+                 adresse = :adresse, directeur_general = :directeur_general,
                  fonction_dirigeant = :fonction_dirigeant, dirigeant_depuis = :dirigeant_depuis,
                  photo_dirigeant = :photo_dirigeant,
                  mission = :mission, historique = :historique, composition = :composition,
@@ -172,6 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         try {
             $updateStmt->execute([
+                ':nom_struc' => $nom_struc, ':sigle' => $sigle !== '' ? $sigle : null,
                 ':adresse' => $adresse, ':directeur_general' => $directeur_general,
                 ':fonction_dirigeant' => $fonction_dirigeant !== '' ? $fonction_dirigeant : null,
                 ':dirigeant_depuis' => $dirigeant_depuis, ':photo_dirigeant' => $photoDirigeant,
@@ -223,6 +241,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
      $messageFlash = "Structure mise à jour avec succès.";
+    if ($identiteModifiee) {
+        $messageFlash .= " Le nom et le sigle officiels ont été modifiés.";
+    }
     if (!empty($photosRejetees)) {
         $messageFlash .= " Cependant, les fichiers suivants ont été rejetés (format non valide) : " . implode(', ',$photosRejetees) . ".";
         definir_flash($messageFlash, 'warning');
@@ -248,6 +269,8 @@ require '../../includes/header_dashboard.php';
     .ms-bloc .ms-intro { margin-bottom: 1rem; color: #5F6775; font-size: .85rem; }
     .ms-photo-actuelle { display: flex; align-items: center; gap: .9rem; margin-bottom: .75rem; }
     .ms-photo-actuelle img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
+    .ms-confirmation { padding: .75rem 1rem; border: 1px solid #E8D9A8; border-radius: 10px; background: #FBF4E0; }
+    .ms-confirmation[hidden] { display: none; }
 </style>
 <main class="container my-4" style="max-width: 760px;">
     <h1 class="h3">Modifier la structure</h1>
@@ -260,7 +283,32 @@ require '../../includes/header_dashboard.php';
     <?php if (!$structures): ?>
         <div class="alert alert-warning">Aucune structure ne vous est rattachée : contactez l'administrateur.</div>
     <?php else: ?>
-    <form action="" method="post" enctype="multipart/form-data">
+    <form action="" method="post" enctype="multipart/form-data" id="form-structure">
+
+        <fieldset class="ms-bloc">
+            <legend>Identité officielle</legend>
+            <p class="ms-intro">Le nom et le sigle apparaissent sur l'ensemble du site. Ne les modifiez qu'en cas de changement officiel de dénomination.</p>
+            <div class="row">
+                <div class="col-sm-8 mb-3">
+                    <label class="form-label" for="nom_struc">Nom de la structure</label>
+                    <input type="text" id="nom_struc" name="nom_struc" maxlength="200" required class="form-control"
+                           value="<?= $e($structures['nom_struc'] ?? '') ?>" data-initial="<?= $e($nomInitial) ?>">
+                </div>
+                <div class="col-sm-4 mb-3">
+                    <label class="form-label" for="sigle">Sigle</label>
+                    <input type="text" id="sigle" name="sigle" maxlength="30" class="form-control"
+                           value="<?= $e($structures['sigle'] ?? '') ?>" data-initial="<?= $e($sigleInitial) ?>">
+                </div>
+            </div>
+            <div class="ms-confirmation mb-3" id="bloc-confirmation-identite">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="confirmer_identite" name="confirmer_identite" value="1">
+                    <label class="form-check-label" for="confirmer_identite">
+                        Je confirme la modification du nom et/ou du sigle officiels de la structure.
+                    </label>
+                </div>
+            </div>
+        </fieldset>
 
         <fieldset class="ms-bloc">
             <legend>Rôle et histoire</legend>
@@ -366,6 +414,49 @@ require '../../includes/header_dashboard.php';
          <input type="hidden" name="csrf_token" value="<?= $e(generer_token_csrf()) ?>">
         <button type="submit" class="btn btn-mrri">Mettre à jour</button>
     </form>
+
+    <script>
+    // Nom et sigle : la case de confirmation n'apparaît que s'ils changent,
+    // puis une dernière confirmation est demandée à l'envoi (le serveur revérifie)
+    (function () {
+        const formulaire = document.getElementById('form-structure');
+        const nom = document.getElementById('nom_struc');
+        const sigle = document.getElementById('sigle');
+        const bloc = document.getElementById('bloc-confirmation-identite');
+        const caseConfirmation = document.getElementById('confirmer_identite');
+
+        const identiteModifiee = () =>
+            nom.value.trim() !== nom.dataset.initial || sigle.value.trim() !== sigle.dataset.initial;
+
+        function actualiser() {
+            const modifiee = identiteModifiee();
+            bloc.hidden = !modifiee;
+            caseConfirmation.required = modifiee;
+            if (!modifiee) {
+                caseConfirmation.checked = false;
+            }
+        }
+
+        nom.addEventListener('input', actualiser);
+        sigle.addEventListener('input', actualiser);
+        actualiser();
+
+        formulaire.addEventListener('submit', function (evenement) {
+            if (!identiteModifiee()) {
+                return;
+            }
+            const message = 'Vous allez modifier l\'identité officielle de la structure.\n\n'
+                + 'Nom actuel : ' + nom.dataset.initial + '\n'
+                + 'Nouveau nom : ' + nom.value.trim() + '\n\n'
+                + 'Sigle actuel : ' + (sigle.dataset.initial || '(aucun)') + '\n'
+                + 'Nouveau sigle : ' + (sigle.value.trim() || '(aucun)') + '\n\n'
+                + 'Ce changement sera visible sur tout le site. Confirmer ?';
+            if (!window.confirm(message)) {
+                evenement.preventDefault();
+            }
+        });
+    })();
+    </script>
     <?php endif; ?>
 </main>
 

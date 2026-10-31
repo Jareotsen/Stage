@@ -231,7 +231,7 @@ require '../../includes/header.php';
         </span>
         <h3>I.C &amp; A.A.I</h3>
         <p>Le répertoire des Institutions constitutionnelles et des Autorités administratives indépendantes.</p>
-        <span class="acc-tuile-fleche">Explorer les institutions <span aria-hidden="true">→</span></span>
+        <span class="acc-tuile-fleche">Explorer les institutions</span>
       </a>
       <a href="consultations.php" class="acc-tuile">
         <?php if ($totalConsultations > 0): ?><span class="acc-tuile-badge"><?= $totalConsultations ?> ouverte<?= $totalConsultations > 1 ? 's' : '' ?></span><?php endif; ?>
@@ -240,7 +240,7 @@ require '../../includes/header.php';
         </span>
         <h3>Consultations</h3>
         <p>Donnez votre avis sur les projets soumis à la participation citoyenne.</p>
-        <span class="acc-tuile-fleche">Participer <span aria-hidden="true">→</span></span>
+        <span class="acc-tuile-fleche">Participer</span>
       </a>
       <a href="actualite.php" class="acc-tuile">
         <span class="acc-tuile-icone" aria-hidden="true">
@@ -248,7 +248,7 @@ require '../../includes/header.php';
         </span>
         <h3>Actualités</h3>
         <p>Les dernières informations publiées par les structures sous tutelle.</p>
-        <span class="acc-tuile-fleche">Découvrir les actualités <span aria-hidden="true">→</span></span>
+        <span class="acc-tuile-fleche">Découvrir les actualités</span>
       </a>
       <a href="https://relations-institutions.gouv.ga/" class="acc-tuile" target="_blank" rel="noopener">
         <span class="acc-tuile-icone" aria-hidden="true">
@@ -273,7 +273,7 @@ require '../../includes/header.php';
         <h2 id="titre-structures">Institutions constitutionnelles et A.A.I</h2>
         <p>Explorez les structures enregistrées dans la plateforme.</p>
       </div>
-      <a href="catalogue.php" class="acc-lien-fleche">Voir le catalogue <span aria-hidden="true">→</span></a>
+      <a href="catalogue.php" class="acc-lien-fleche">Voir le catalogue</a>
     </div>
 
     <?php if (empty($structuresListe)): ?>
@@ -296,7 +296,7 @@ require '../../includes/header.php';
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               <span><?= h($s['adresse'] ?: 'Adresse non renseignée') ?></span>
             </p>
-            <span class="acc-fleche">Voir la fiche <span aria-hidden="true">→</span></span>
+            <span class="acc-fleche">Voir la fiche</span>
           </a>
         <?php endforeach; ?>
       </div>
@@ -315,7 +315,7 @@ require '../../includes/header.php';
         <h2 id="titre-actus">Actualités récentes</h2>
         <p>Les dernières informations publiées sur la plateforme.</p>
       </div>
-      <a href="actualite.php" class="acc-lien-fleche">Toutes les actualités <span aria-hidden="true">→</span></a>
+      <a href="actualite.php" class="acc-lien-fleche">Toutes les actualités</a>
     </div>
 
     <?php if (empty($actualites)): ?>
@@ -370,7 +370,7 @@ require '../../includes/header.php';
             : 'Aucune consultation n\'est ouverte pour le moment. Revenez bientôt pour participer.' ?>
       </p>
     </div>
-    <a href="consultations.php" class="acc-bouton-clair">Voir les consultations <span aria-hidden="true">→</span></a>
+    <a href="consultations.php" class="acc-bouton-clair">Voir les consultations</a>
   </div>
 </section>
 

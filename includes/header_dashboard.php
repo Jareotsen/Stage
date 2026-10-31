@@ -17,5 +17,6 @@ $versionCss = static fn(string $fichier): int => (int) @filemtime(__DIR__ . '/..
 <link href="../../publique/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../../publique/css/public.css?v=<?= $versionCss('public.css') ?>">
 <link rel="stylesheet" href="../../publique/css/theme.css?v=<?= $versionCss('theme.css') ?>">
+<link rel="stylesheet" href="../../publique/css/dashboard.css?v=<?= $versionCss('dashboard.css') ?>">
 </head>
 <body>

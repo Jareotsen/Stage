@@ -434,7 +434,7 @@ require '../../includes/header.php';
                     <time class="acc-actu-date" datetime="<?= $h(date('Y-m-d', strtotime($actualite['date_publication']) ?: time())) ?>"><?= $h(formaterDateFr($actualite['date_publication'])) ?></time>
                   </div>
                   <h3><?= $h($actualite['titre']) ?></h3>
-                  <span class="acc-fleche">Lire la suite <span aria-hidden="true">→</span></span>
+                  <span class="acc-fleche">Lire la suite</span>
                 </div>
               </a>
             <?php endforeach; ?>

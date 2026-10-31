@@ -205,7 +205,7 @@ if ($idBrut === null) {
                   contenu.appendChild(document.createElement('br'));
                   const lien = document.createElement('a');
                   lien.href = 'fiche.php?id=' + s.id;
-                  lien.textContent = 'Voir la fiche →';
+                  lien.textContent = 'Voir la fiche';
                   contenu.appendChild(lien);
               });
 

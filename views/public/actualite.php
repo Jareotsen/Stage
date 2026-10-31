@@ -174,7 +174,7 @@ require '../../includes/header.php';
             <?php if (!empty($aLaUne['contenu'])): ?>
               <p class="acc-actu-extrait"><?= h(mb_strimwidth(strip_tags($aLaUne['contenu']), 0, 260, '…')) ?></p>
             <?php endif; ?>
-            <span class="acc-fleche">Lire l'actualité <span aria-hidden="true">→</span></span>
+            <span class="acc-fleche">Lire l'actualité</span>
           </div>
         </a>
       </section>
@@ -226,7 +226,7 @@ require '../../includes/header.php';
                   <time class="acc-actu-date" datetime="<?= h(date('Y-m-d', strtotime($actualite['date_publication']) ?: time())) ?>"><?= h(formaterDateFr($actualite['date_publication'])) ?></time>
                 </div>
                 <h3><?= h($actualite['titre']) ?></h3>
-                <span class="acc-fleche">Lire la suite <span aria-hidden="true">→</span></span>
+                <span class="acc-fleche">Lire la suite</span>
               </div>
             </a>
           <?php endforeach; ?>

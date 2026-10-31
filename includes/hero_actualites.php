@@ -78,7 +78,7 @@ $heroImageDefaut = '../../publique/image/GA.jpeg';
     <div class="container acc-hero-contenu">
       <span class="acc-hero-kicker">Ministère de la Réforme et des Relations avec les Institutions</span>
       <h1 class="acc-hero-titre">Plateforme de consultation des structures sous tutelle du MRRI</h1>
-      <a href="catalogue.php" class="acc-hero-lien">Consulter les structures <span aria-hidden="true">→</span></a>
+      <a href="catalogue.php" class="acc-hero-lien">Consulter les structures</a>
     </div>
   </div>
 </section>
@@ -96,7 +96,7 @@ $heroImageDefaut = '../../publique/image/GA.jpeg';
         <h2 class="acc-hero-titre"><?= htmlspecialchars($a['titre']) ?></h2>
         <p class="acc-hero-source"><?= htmlspecialchars($a['nom_struc']) ?></p>
         <a href="actualite_detail.php?id=<?= (int) $a['id_actu'] ?>" class="acc-hero-lien" tabindex="<?= $i === 0 ? '0' : '-1' ?>">
-          Lire l'actualité <span aria-hidden="true">→</span>
+          Lire l'actualité
         </a>
       </div>
     </article>

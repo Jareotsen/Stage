@@ -190,7 +190,7 @@ require '../../includes/header.php';
       <div class="cat-aide">
         <strong>Où se trouvent-elles ?</strong>
         Visualisez l'emplacement des institutions sur la carte de Libreville.
-        <a href="localisation.php">Voir la carte <span aria-hidden="true">→</span></a>
+        <a href="localisation.php">Voir la carte</a>
       </div>
     </aside>
 
@@ -242,7 +242,7 @@ require '../../includes/header.php';
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                 <span><?= h($s['adresse'] ?: 'Adresse non renseignée') ?></span>
               </p>
-              <span class="acc-fleche">Consulter la fiche <span aria-hidden="true">→</span></span>
+              <span class="acc-fleche">Consulter la fiche</span>
             </a>
           <?php endforeach; ?>
         </div>

@@ -273,7 +273,7 @@ require '../../includes/header.php';
                 <p class="cons-extrait"><?= echapper(mb_strimwidth(strip_tags($consultation['contenu'] ?? ''), 0, 240, '…')) ?></p>
                 <div class="cons-pied">
                   <span>Ouverte le <?= formaterDateFr($consultation['date_ouverture']) ?><?= !$estGenerale ? ' · ' . echapper($consultation['nom_struc']) : '' ?></span>
-                  <span class="acc-fleche">Participer <span aria-hidden="true">→</span></span>
+                  <span class="acc-fleche">Participer</span>
                 </div>
               </div>
             </a>

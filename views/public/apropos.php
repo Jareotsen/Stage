@@ -280,7 +280,7 @@ require '../../includes/header.php';
       </p>
       <div class="ap-hero-actions">
         <a href="#ap-avant" class="ap-bouton plein">Découvrir l'histoire <span aria-hidden="true">↓</span></a>
-        <a href="catalogue.php" class="ap-bouton">Explorer les structures <span aria-hidden="true">→</span></a>
+        <a href="catalogue.php" class="ap-bouton">Explorer les structures</a>
       </div>
     </div>
 
@@ -462,8 +462,8 @@ require '../../includes/header.php';
       <h2 class="ap-h2" id="ap-merci-titre">Merci d'utiliser la plateforme</h2>
       <p>Vous contribuez à un Gabon plus organisé, plus moderne, et avec beaucoup moins de classeurs perdus.</p>
       <div class="ap-hero-actions">
-        <a href="consultations.php" class="ap-bouton plein">Participer à une consultation <span aria-hidden="true">→</span></a>
-        <a href="actualite.php" class="ap-bouton">Lire les actualités <span aria-hidden="true">→</span></a>
+        <a href="consultations.php" class="ap-bouton plein">Participer à une consultation</a>
+        <a href="actualite.php" class="ap-bouton">Lire les actualités</a>
       </div>
       <p class="ap-signature">Conçu et développé avec beaucoup de code, de café et un stagiaire motivé.</p>
     </div>

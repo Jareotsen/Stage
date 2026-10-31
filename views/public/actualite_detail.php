@@ -252,7 +252,7 @@ require '../../includes/header.php';
 
       <div class="art-pied">
         <a href="actualite.php" class="acc-lien-fleche"><span aria-hidden="true">←</span> Toutes les actualités</a>
-        <a href="actualite.php?s=<?= (int) $actualite['id_structure'] ?>" class="acc-lien-fleche">Actualités de <?= $escape($actualite['sigle'] ?: 'cette structure') ?> <span aria-hidden="true">→</span></a>
+        <a href="actualite.php?s=<?= (int) $actualite['id_structure'] ?>" class="acc-lien-fleche">Actualités de <?= $escape($actualite['sigle'] ?: 'cette structure') ?></a>
       </div>
     </article>
 
@@ -261,7 +261,7 @@ require '../../includes/header.php';
         <h2 id="art-source-titre">Publié par</h2>
         <strong><?= $escape($actualite['nom_struc']) ?></strong>
         <p>Retrouvez les missions, la composition et les coordonnées de cette structure.</p>
-        <a class="lien" href="fiche.php?id=<?= (int) $actualite['id_structure'] ?>">Voir la fiche <span aria-hidden="true">→</span></a>
+        <a class="lien" href="fiche.php?id=<?= (int) $actualite['id_structure'] ?>">Voir la fiche</a>
       </section>
 
       <?php if ($recentes): ?>
@@ -295,7 +295,7 @@ require '../../includes/header.php';
           <span class="acc-surtitre">À lire également</span>
           <h2 id="art-associes-titre">Articles associés</h2>
         </div>
-        <a href="actualite.php" class="acc-lien-fleche">Toutes les actualités <span aria-hidden="true">→</span></a>
+        <a href="actualite.php" class="acc-lien-fleche">Toutes les actualités</a>
       </div>
       <div class="art-associes-grille">
         <?php foreach ($associees as $a): ?>
@@ -307,7 +307,7 @@ require '../../includes/header.php';
                 <?php if (!empty($a['date_publication'])): ?><time class="acc-actu-date" datetime="<?= $escape($a['date_publication']) ?>"><?= $escape(formaterDateFr($a['date_publication'])) ?></time><?php endif; ?>
               </div>
               <h3><?= $escape($a['titre']) ?></h3>
-              <span class="acc-fleche">Lire la suite <span aria-hidden="true">→</span></span>
+              <span class="acc-fleche">Lire la suite</span>
             </div>
           </a>
         <?php endforeach; ?>

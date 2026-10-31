@@ -65,14 +65,14 @@ require '../../includes/header_dashboard.php';
             <div class="mrri-stat-grid">
                 <div class="mrri-stat-card stat-vert">
                     <div class="mrri-stat-icon">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><line x1="8" y1="8" x2="15" y2="8"/><line x1="8" y1="12" x2="15" y2="12"/></svg>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8z" fill="currentColor" fill-opacity=".16"/></svg>
                     </div>
                     <div class="mrri-stat-label">Actualités publiées</div>
                     <div class="mrri-stat-value"><?= $nbActualites ?></div>
                 </div>
                 <div class="mrri-stat-card stat-bleu">
                     <div class="mrri-stat-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7l4 4v10a2 2 0 0 1-2 2Z" fill="currentColor" fill-opacity=".16"/><path d="M20 7h-3a2 2 0 0 1-2-2V2"/><path d="M3 7.6v12.8A1.6 1.6 0 0 0 4.6 22h9.8"/></svg>
                     </div>
                     <div class="mrri-stat-label">Documents partagés</div>
                     <div class="mrri-stat-value"><?= $nbDocuments ?></div>

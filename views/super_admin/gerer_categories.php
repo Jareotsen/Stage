@@ -46,6 +46,41 @@ if (!verifier_token_csrf($_POST['csrf_token'] ?? null)) {
                 $erreur = $e->getCode() === '23000' ? "Cette catégorie existe déjà." : "Une erreur est survenue lors de l'ajout.";
             }
         }
+    } elseif ($action === 'renommer') {
+        $idCat = (int) ($_POST['id_cat'] ?? 0);
+        $nouveauNom = trim($_POST['nom_cat'] ?? '');
+
+        $verifCategorie = $db->prepare("SELECT nom_cat FROM categories WHERE id_cat = :id_cat");
+        $verifCategorie->execute([':id_cat' => $idCat]);
+        $ancienNom = $verifCategorie->fetchColumn();
+
+        if ($ancienNom === false) {
+            $erreur = "Cette catégorie n'existe pas.";
+        } elseif ($nouveauNom === '') {
+            $erreur = "Le nom de la catégorie ne peut pas être vide.";
+        } elseif (mb_strlen($nouveauNom) > 150) {
+            $erreur = "Le nom de la catégorie ne doit pas dépasser 150 caractères.";
+        } elseif ($nouveauNom === $ancienNom) {
+            definir_flash("Le nom de la catégorie est inchangé.", 'warning');
+            header("Location: gerer_categories.php");
+            exit();
+        } else {
+            try {
+                $renommer = $db->prepare("UPDATE categories SET nom_cat = :nom_cat WHERE id_cat = :id_cat");
+                $renommer->execute([':nom_cat' => $nouveauNom, ':id_cat' => $idCat]);
+                definir_flash("Catégorie « " . $ancienNom . " » renommée en « " . $nouveauNom . " ».");
+                header("Location: gerer_categories.php");
+                exit();
+            } catch (PDOException $e) {
+                // nom_cat est unique en base : deux catégories ne peuvent pas porter le même nom
+                if ($e->getCode() === '23000') {
+                    $erreur = "Une autre catégorie porte déjà ce nom.";
+                } else {
+                    error_log("Renommage catégorie : " . $e->getMessage());
+                    $erreur = "Une erreur est survenue lors du renommage.";
+                }
+            }
+        }
     } elseif ($action === 'supprimer') {
         $idCat = (int) ($_POST['id_cat'] ?? 0);
         $compter = $db->prepare("SELECT COUNT(*) AS nb FROM structure WHERE id_cat = :id_cat");
@@ -129,19 +164,37 @@ require '../../includes/header_dashboard.php';
             <?php if (empty($categories)): ?><p class="text-secondary">Aucune catégorie pour le moment.</p><?php endif; ?>
 
             <?php foreach ($categories as $cat): ?>
-                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                    <div<?= $cat['parent_id'] !== null ? ' class="ps-4"' : '' ?>>
-                        <?= $cat['parent_id'] !== null ? '<span class="text-secondary" aria-hidden="true">↳ </span>' : '' ?>
-                        <?= htmlspecialchars($cat['nom_cat']) ?>
-                        <span class="small text-secondary">
-                            <?= (int) $cat['nb_structures'] ?> structure(s)<?= (int) $cat['nb_sous_categories'] > 0 ? ' · ' . (int) $cat['nb_sous_categories'] . ' sous-catégorie(s)' : '' ?>
-                        </span>
+                <div class="border-bottom py-2">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div<?= $cat['parent_id'] !== null ? ' class="ps-4"' : '' ?>>
+                            <?= $cat['parent_id'] !== null ? '<span class="text-secondary" aria-hidden="true">↳ </span>' : '' ?>
+                            <?= htmlspecialchars($cat['nom_cat']) ?>
+                            <span class="small text-secondary">
+                                <?= (int) $cat['nb_structures'] ?> structure(s)<?= (int) $cat['nb_sous_categories'] > 0 ? ' · ' . (int) $cat['nb_sous_categories'] . ' sous-catégorie(s)' : '' ?>
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    data-bs-toggle="collapse" data-bs-target="#renommer-<?= (int) $cat['id_cat'] ?>"
+                                    aria-expanded="false" aria-controls="renommer-<?= (int) $cat['id_cat'] ?>">Renommer</button>
+                            <form action="" method="post" onsubmit="return confirm('Supprimer cette catégorie ?');">
+                                <input type="hidden" name="action" value="supprimer">
+                                <input type="hidden" name="id_cat" value="<?= $cat['id_cat'] ?>">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Supprimer</button>
+                            </form>
+                        </div>
                     </div>
-                    <form action="" method="post" onsubmit="return confirm('Supprimer cette catégorie ?');">
-                        <input type="hidden" name="action" value="supprimer">
-                        <input type="hidden" name="id_cat" value="<?= $cat['id_cat'] ?>">
+                    <form action="" method="post" id="renommer-<?= (int) $cat['id_cat'] ?>" class="collapse mt-2">
+                        <input type="hidden" name="action" value="renommer">
+                        <input type="hidden" name="id_cat" value="<?= (int) $cat['id_cat'] ?>">
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generer_token_csrf()) ?>">
-                        <button type="submit" class="btn btn-outline-danger btn-sm">Supprimer</button>
+                        <div class="d-flex gap-2">
+                            <input type="text" name="nom_cat" class="form-control form-control-sm" maxlength="150" required
+                                   value="<?= htmlspecialchars($cat['nom_cat']) ?>"
+                                   aria-label="Nouveau nom pour la catégorie <?= htmlspecialchars($cat['nom_cat']) ?>">
+                            <button type="submit" class="btn btn-mrri btn-sm">Enregistrer</button>
+                        </div>
                     </form>
                 </div>
             <?php endforeach; ?>

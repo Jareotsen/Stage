@@ -13,18 +13,24 @@ $pageActive = $pageActive ?? '';
 // cle => [lien, libellé, contenu de l'icône SVG]
 $liens = [
     'dashboard' => ['dashboard.php', 'Tableau de bord',
-        '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>'],
+        '<rect x="3" y="3" width="7" height="9" rx="1.5" fill="currentColor" fill-opacity=".16"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5" fill="currentColor" fill-opacity=".16"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'],
     'structure' => ['modifier_structure.php', 'Ma structure',
-        '<path d="M3 21h18"/><path d="M9 21V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v12"/><path d="M9 9V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/>'],
+        '<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" fill="currentColor" fill-opacity=".16"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/>'],
     'actualites' => ['mes_actualites.php', 'Actualités',
-        '<path d="M4 4h13a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><line x1="8" y1="8" x2="15" y2="8"/><line x1="8" y1="12" x2="15" y2="12"/>'],
+        '<path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8z" fill="currentColor" fill-opacity=".16"/>'],
     'consultations' => ['mes_consultations.php', 'Consultations',
-        '<rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/>'],
+        '<path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z" fill="currentColor" fill-opacity=".16"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>'],
     'documents' => ['upload.php', 'Documents',
-        '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>'],
+        '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" fill="currentColor" fill-opacity=".16"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M12 12v6"/><path d="m15 15-3-3-3 3"/>'],
 ];
 ?>
-<aside class="mrri-sidebar">
+<!-- Bouton du menu sur téléphone (le script est dans includes/footer_dashboard.php) -->
+<button type="button" class="mrri-menu-btn" aria-controls="mrri-sidebar" aria-expanded="false" aria-label="Ouvrir le menu">
+    <svg class="ouvrir" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h10"/></svg>
+    <svg class="fermer" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+</button>
+<div class="mrri-sidebar-overlay" hidden></div>
+<aside class="mrri-sidebar" id="mrri-sidebar">
     <div class="mrri-sidebar-brand">
         <img src="../../publique/image/sceau.png" alt="Armoiries du Gabon">
         <div>
@@ -41,7 +47,7 @@ $liens = [
                    class="mrri-sidebar-link <?= $pageActive === $cle ? 'active' : '' ?>"
                    <?= $pageActive === $cle ? 'aria-current="page"' : '' ?>>
                     <span class="icon">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?= $icone ?></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?= $icone ?></svg>
                     </span>
                     <?= $libelle ?>
                 </a>
@@ -51,7 +57,7 @@ $liens = [
 
     <div class="mrri-sidebar-bottom">
         <a href="../../deconnexion.php" class="mrri-sidebar-logout">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
             Déconnexion
         </a>
     </div>

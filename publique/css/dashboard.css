@@ -1,0 +1,1167 @@
+/* =========================================================
+   MRRI — HABILLAGE DES ESPACES PROFESSIONNELS
+   Chargé uniquement par includes/header_dashboard.php, après theme.css.
+   Palette : celle de la page de connexion (vert irlandais, or, bleu roi).
+   Style : minimal et chaleureux — fond ivoire, titres serif,
+   libellés en capitales espacées, cartes très arrondies.
+   ========================================================= */
+
+:root {
+    /* ---------- Palette de la page de connexion ---------- */
+    --cx-bleu-roi: #1B3FAE;
+    --cx-bleu-fonce: #102A73;
+    --cx-vert: #009A44;
+    --cx-vert-fonce: #006B30;
+    --cx-vert-nuit: #004A22;
+    --cx-or: #D4AF37;
+    --cx-or-clair: #F4E7B5;
+    --cx-texte: #172033;
+    --cx-gris: #758096;
+
+    /* ---------- Déclinaisons ---------- */
+    --cx-ivoire: #F6F4EE;
+    --cx-ivoire-fonce: #EFEBE0;
+    --cx-carte: #FFFFFF;
+    --cx-ligne: #E9E4D7;
+    --cx-ligne-douce: #F1EDE3;
+    --cx-or-fonce: #8C6D12;
+    --cx-or-pale: #FAF3DC;
+    --cx-vert-pale: #E4F3EA;
+    --cx-bleu-pale: #EAEFFB;
+
+    /* ---------- Tokens du thème redirigés vers la palette ---------- */
+    --texte: var(--cx-texte);
+    --arriere-plan: var(--cx-ivoire);
+    --primaire: var(--cx-bleu-roi);
+    --primaire-fonce: var(--cx-bleu-fonce);
+    --primaire-nuit: var(--cx-bleu-fonce);
+    --primaire-clair: var(--cx-bleu-pale);
+    --accent: var(--cx-vert);
+    --accent-fonce: var(--cx-vert-fonce);
+    --accent-tres-fonce: var(--cx-vert-nuit);
+    --accent-clair: var(--cx-vert-pale);
+    --texte-secondaire: #4A5468;
+    --texte-leger: #6A7489;
+    --bordure: var(--cx-ligne);
+
+    --attention: var(--cx-or);
+    --attention-fonce: var(--cx-or-fonce);
+    --attention-clair: var(--cx-or-pale);
+    --danger: #B83A3A;
+    --danger-clair: #FBEDEC;
+
+    --radius-sm: 10px;
+    --radius-md: 18px;
+    --radius-lg: 26px;
+    --shadow-sm: 0 1px 2px rgba(23, 32, 51, .03), 0 6px 18px rgba(23, 32, 51, .04);
+    --shadow-md: 0 14px 36px rgba(23, 32, 51, .08);
+
+    --mrri-sidebar-width: 264px;
+    --mrri-radius-sm: 12px;
+    --mrri-shadow-hover: 0 16px 34px rgba(0, 74, 34, .10);
+}
+
+body {
+    background: var(--cx-ivoire);
+    color: var(--cx-texte);
+    -webkit-font-smoothing: antialiased;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(212, 175, 55, .55);
+    outline-offset: 2px;
+}
+
+/* =========================================================
+   SIDEBAR — bloc vert profond, comme le panneau de connexion
+   ========================================================= */
+
+.mrri-sidebar {
+    background: linear-gradient(170deg, var(--cx-vert-fonce) 0%, var(--cx-vert-nuit) 100%);
+    border-radius: 0 28px 28px 0;
+    box-shadow: 8px 0 30px rgba(0, 74, 34, .12);
+    overflow-x: hidden;
+}
+
+/* Bande tricolore en haut */
+.mrri-sidebar::before {
+    height: 4px;
+    background: linear-gradient(90deg, var(--cx-vert) 0 33.33%, var(--cx-or) 33.33% 66.66%, var(--cx-bleu-roi) 66.66% 100%);
+}
+
+/* Cercles décoratifs (repris de la page de connexion) */
+.mrri-sidebar::after {
+    content: "";
+    position: absolute;
+    left: -110px;
+    bottom: -90px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, .07);
+    box-shadow: 0 0 0 46px rgba(255, 255, 255, .02);
+    pointer-events: none;
+}
+
+.mrri-sidebar > * {
+    position: relative;
+    z-index: 1;
+}
+
+.mrri-sidebar-brand {
+    gap: 14px;
+    padding: 26px 22px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, .09);
+}
+
+.mrri-sidebar-brand img {
+    width: 48px;
+    height: 48px;
+    padding: 5px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .14);
+}
+
+.mrri-sidebar-brand strong {
+    font-family: var(--font-title);
+    font-weight: 500;
+    font-size: .9rem;
+    letter-spacing: .005em;
+}
+
+.mrri-sidebar-brand small {
+    margin-top: 5px;
+    color: var(--cx-or);
+    font-size: .6rem;
+    font-weight: 600;
+    letter-spacing: .14em;
+}
+
+.mrri-sidebar-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 26px 24px 10px;
+    color: rgba(255, 255, 255, .45);
+    font-size: .6rem;
+    letter-spacing: .2em;
+}
+
+.mrri-sidebar-section::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, .09);
+}
+
+.mrri-sidebar-nav {
+    padding: 0 14px;
+}
+
+.mrri-sidebar-nav li {
+    margin-bottom: 6px;
+}
+
+.mrri-sidebar-link {
+    gap: 13px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    color: rgba(255, 255, 255, .72);
+    font-size: .83rem;
+}
+
+.mrri-sidebar-link .icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .07);
+    transition: background var(--mrri-transition), color var(--mrri-transition);
+}
+
+.mrri-sidebar-link:hover {
+    background: rgba(255, 255, 255, .06);
+    color: #fff;
+}
+
+.mrri-sidebar-link:hover .icon {
+    background: rgba(255, 255, 255, .12);
+}
+
+.mrri-sidebar-link.active {
+    background: rgba(255, 255, 255, .11);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+}
+
+.mrri-sidebar-link.active .icon {
+    background: var(--cx-or);
+    color: var(--cx-vert-nuit);
+}
+
+.mrri-sidebar-bottom {
+    padding: 16px 14px 20px;
+    border-top: 1px solid rgba(255, 255, 255, .09);
+}
+
+.mrri-sidebar-logout {
+    padding: 11px 14px;
+    border-radius: 14px;
+    color: rgba(255, 255, 255, .65);
+    border: 1px solid rgba(255, 255, 255, .10);
+}
+
+.mrri-sidebar-logout:hover {
+    background: rgba(212, 175, 55, .14);
+    border-color: rgba(212, 175, 55, .35);
+    color: var(--cx-or-clair);
+}
+
+/* =========================================================
+   STRUCTURE / BARRE SUPÉRIEURE
+   ========================================================= */
+
+.mrri-dashboard {
+    background: var(--cx-ivoire);
+}
+
+.mrri-topbar {
+    height: 76px;
+    padding: 0 40px;
+    background: rgba(246, 244, 238, .86);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--cx-ligne);
+}
+
+.mrri-topbar-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--cx-gris);
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.mrri-topbar-title::before {
+    content: "✦";
+    color: var(--cx-or);
+    font-size: .85rem;
+    letter-spacing: 0;
+}
+
+.mrri-topbar-title strong {
+    color: var(--cx-texte);
+}
+
+.mrri-user {
+    gap: 12px;
+    padding: 6px 16px 6px 6px;
+    border: 1px solid var(--cx-ligne);
+    border-radius: 999px;
+    background: var(--cx-carte);
+}
+
+.mrri-user-avatar {
+    width: 38px;
+    height: 38px;
+    background: var(--cx-vert-fonce);
+    color: var(--cx-or);
+    font-family: var(--font-title);
+    font-size: .82rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+}
+
+.mrri-user-name {
+    color: var(--cx-texte);
+    font-size: .78rem;
+}
+
+.mrri-user-role {
+    color: var(--cx-gris);
+    font-size: .64rem;
+    letter-spacing: .02em;
+}
+
+.dashboard-super-admin .mrri-topbar {
+    border-top: 3px solid var(--cx-or);
+}
+
+.mrri-content {
+    padding: 40px 40px 56px;
+}
+
+/* =========================================================
+   EN-TÊTE DE PAGE — grand titre serif façon éditorial
+   ========================================================= */
+
+.mrri-page-header {
+    align-items: flex-end;
+    gap: 24px;
+    margin-bottom: 34px;
+}
+
+.mrri-breadcrumb {
+    gap: 12px;
+    margin-bottom: 14px;
+    color: var(--cx-gris);
+    font-size: .64rem;
+    font-weight: 600;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+}
+
+.mrri-breadcrumb::after {
+    content: "";
+    width: 26px;
+    height: 1px;
+    background: var(--cx-or);
+    order: 2;
+}
+
+.mrri-breadcrumb .active {
+    color: var(--cx-vert-fonce);
+}
+
+.mrri-page-title {
+    font-family: var(--font-title);
+    font-size: clamp(1.75rem, 2.6vw, 2.5rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    color: var(--cx-texte);
+}
+
+.mrri-page-description {
+    margin-top: 10px;
+    color: var(--texte-secondaire);
+    font-size: .84rem;
+    line-height: 1.65;
+}
+
+/* =========================================================
+   CARTES STATISTIQUES — pastille ronde à droite, chiffre serif
+   ========================================================= */
+
+.mrri-stat-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.mrri-stat-card {
+    padding: 24px 24px 26px;
+    background: var(--cx-carte);
+    border: 1px solid var(--cx-ligne);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.mrri-stat-card:hover {
+    transform: translateY(-3px);
+    border-color: #DDD5C2;
+    box-shadow: var(--mrri-shadow-hover);
+}
+
+.mrri-stat-icon {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    width: 52px;
+    height: 52px;
+    margin: 0;
+    border-radius: 50%;
+}
+
+.mrri-stat-label {
+    padding-right: 64px;
+    color: var(--texte-secondaire);
+    font-size: .64rem;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.mrri-stat-value {
+    margin-top: 14px;
+    font-family: var(--font-title);
+    font-size: 2.3rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -.02em;
+    color: var(--cx-texte);
+}
+
+.stat-vert .mrri-stat-icon {
+    background: var(--cx-vert-pale);
+    color: var(--cx-vert-fonce);
+}
+
+.stat-bleu .mrri-stat-icon {
+    background: var(--cx-bleu-pale);
+    color: var(--cx-bleu-roi);
+}
+
+.stat-or .mrri-stat-icon {
+    background: var(--cx-or-pale);
+    color: var(--cx-or-fonce);
+}
+
+.stat-danger .mrri-stat-icon {
+    background: var(--danger-clair);
+    color: var(--danger);
+}
+
+/* =========================================================
+   PANNEAUX
+   ========================================================= */
+
+.mrri-panel {
+    background: var(--cx-carte);
+    border: 1px solid var(--cx-ligne);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.mrri-panel-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--cx-ligne-douce);
+}
+
+.mrri-panel-title {
+    color: var(--cx-texte);
+    font-family: var(--font-body);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.mrri-panel-body {
+    padding: 24px;
+}
+
+/* Cartes imbriquées (liste des structures, accès rapides) */
+.mrri-panel .mrri-panel {
+    border-radius: 16px;
+    transition: transform var(--mrri-transition), border-color var(--mrri-transition), box-shadow var(--mrri-transition);
+}
+
+.mrri-panel .mrri-panel:hover {
+    transform: translateY(-2px);
+    border-color: rgba(212, 175, 55, .55) !important;
+    box-shadow: var(--mrri-shadow-hover) !important;
+}
+
+.mrri-panel .mrri-panel h5 {
+    font-family: var(--font-title);
+    font-weight: 500;
+    color: var(--cx-texte);
+    line-height: 1.35;
+}
+
+a.mrri-panel {
+    position: relative;
+    color: var(--cx-texte);
+    background: var(--cx-ivoire);
+    box-shadow: none;
+}
+
+a.mrri-panel:hover {
+    background: var(--cx-carte);
+}
+
+a.mrri-panel strong {
+    display: block;
+    font-family: var(--font-title);
+    font-weight: 500;
+    font-size: .95rem !important;
+    color: var(--cx-texte);
+}
+
+/* =========================================================
+   TABLEAUX
+   ========================================================= */
+
+.mrri-table th,
+.mrri-sidebar ~ main .table > thead th {
+    background: var(--cx-ivoire);
+    color: var(--cx-gris);
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--cx-ligne);
+}
+
+.mrri-table td {
+    border-bottom: 1px solid var(--cx-ligne-douce);
+}
+
+.mrri-table tbody tr:hover {
+    background: #FBFAF6;
+}
+
+/* =========================================================
+   BADGES / BOUTONS
+   ========================================================= */
+
+.mrri-badge {
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: .62rem;
+    letter-spacing: .04em;
+}
+
+.mrri-badge-vert {
+    background: var(--cx-vert-pale);
+    color: var(--cx-vert-fonce);
+}
+
+.mrri-badge-bleu {
+    background: var(--cx-bleu-pale);
+    color: var(--cx-bleu-fonce);
+}
+
+.mrri-badge-or {
+    background: var(--cx-or-pale);
+    color: var(--cx-or-fonce);
+}
+
+.mrri-btn {
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: .76rem;
+    letter-spacing: .01em;
+    transition: background var(--mrri-transition), border-color var(--mrri-transition),
+        color var(--mrri-transition), transform var(--mrri-transition), box-shadow var(--mrri-transition);
+}
+
+.mrri-btn-primary,
+.btn-mrri {
+    background: var(--cx-vert-fonce);
+    border-color: var(--cx-vert-fonce);
+    color: #fff;
+}
+
+.mrri-btn-primary:hover,
+.btn-mrri:hover {
+    background: var(--cx-vert-nuit);
+    border-color: var(--cx-vert-nuit);
+    color: var(--cx-or-clair);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(0, 74, 34, .18);
+}
+
+.btn-mrri {
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: .85rem;
+}
+
+.mrri-btn-blue {
+    background: var(--cx-bleu-roi);
+    border-color: var(--cx-bleu-roi);
+}
+
+.mrri-btn-blue:hover {
+    background: var(--cx-bleu-fonce);
+    border-color: var(--cx-bleu-fonce);
+}
+
+.mrri-btn-outline {
+    background: transparent;
+    color: var(--cx-vert-fonce);
+    border-color: var(--cx-ligne);
+}
+
+.mrri-btn-outline:hover {
+    background: var(--cx-vert-pale);
+    border-color: var(--cx-vert-fonce);
+    color: var(--cx-vert-nuit);
+}
+
+.mrri-btn-danger-outline {
+    border-color: #EBCFCC;
+}
+
+/* =========================================================
+   ALERTES
+   ========================================================= */
+
+.mrri-alert,
+.mrri-sidebar ~ main .alert,
+.contenu-principal .alert {
+    border-radius: 14px;
+    font-size: .8rem;
+}
+
+.mrri-alert-success {
+    background: var(--cx-vert-pale);
+    color: var(--cx-vert-nuit);
+    border: 1px solid #C5E5D1;
+}
+
+.mrri-alert-danger {
+    background: var(--danger-clair);
+    color: #9A2F2F;
+    border: 1px solid #EFCFCB;
+}
+
+/* =========================================================
+   FORMULAIRES (classes MRRI et Bootstrap)
+   ========================================================= */
+
+.mrri-form-label,
+.mrri-sidebar ~ main .form-label {
+    color: var(--texte-secondaire);
+    font-size: .64rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.mrri-form-control,
+.mrri-sidebar ~ main .form-control,
+.mrri-sidebar ~ main .form-select {
+    min-height: 44px;
+    padding: 10px 14px;
+    background-color: #FDFCF9;
+    color: var(--cx-texte);
+    border: 1px solid var(--cx-ligne);
+    border-radius: 12px;
+    font-size: .84rem;
+}
+
+.mrri-sidebar ~ main .form-control-sm,
+.mrri-sidebar ~ main .form-select-sm {
+    min-height: 34px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: .78rem;
+}
+
+.mrri-sidebar ~ main .form-select {
+    padding-right: 2.25rem;
+}
+
+.mrri-form-control:hover,
+.mrri-sidebar ~ main .form-control:hover,
+.mrri-sidebar ~ main .form-select:hover {
+    border-color: #DAD2BF;
+}
+
+.mrri-form-control:focus,
+.mrri-sidebar ~ main .form-control:focus,
+.mrri-sidebar ~ main .form-select:focus {
+    background-color: #fff;
+    border-color: var(--cx-or);
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, .16);
+}
+
+.mrri-sidebar ~ main .form-text {
+    color: var(--cx-gris);
+    font-size: .74rem;
+}
+
+.mrri-sidebar ~ main .form-check-input:checked {
+    background-color: var(--cx-vert-fonce);
+    border-color: var(--cx-vert-fonce);
+}
+
+/* =========================================================
+   PAGES FORMULAIRES (sidebar + main.container Bootstrap)
+   ========================================================= */
+
+.mrri-sidebar ~ main.container {
+    margin-left: calc(var(--mrri-sidebar-width) + clamp(24px, 5vw, 72px));
+    margin-right: auto;
+    padding: 40px 44px 44px;
+    background: var(--cx-carte);
+    border: 1px solid var(--cx-ligne);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-top: 40px !important;
+    margin-bottom: 48px !important;
+}
+
+.mrri-sidebar ~ main.container > h1,
+.mrri-sidebar ~ main.container > .h3 {
+    font-family: var(--font-title);
+    font-size: clamp(1.6rem, 2.3vw, 2.15rem);
+    font-weight: 500;
+    letter-spacing: -.02em;
+    color: var(--cx-texte);
+    margin-bottom: 10px;
+}
+
+.mrri-sidebar ~ main.container > h1::before {
+    content: "✦";
+    display: block;
+    margin-bottom: 14px;
+    color: var(--cx-or);
+    font-family: var(--font-body);
+    font-size: 1rem;
+}
+
+.mrri-sidebar ~ main .link-secondary {
+    color: var(--cx-vert-fonce) !important;
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.mrri-sidebar ~ main .link-secondary:hover {
+    color: var(--cx-or-fonce) !important;
+}
+
+.mrri-sidebar ~ main .card {
+    border: 1px solid var(--cx-ligne);
+    border-radius: var(--radius-md);
+    box-shadow: none !important;
+    background: var(--cx-carte);
+}
+
+.mrri-sidebar ~ main .card:hover {
+    transform: none;
+    border-color: var(--cx-ligne);
+}
+
+.mrri-sidebar ~ main .card .h5,
+.mrri-sidebar ~ main .card h2 {
+    font-family: var(--font-body);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--cx-texte);
+    margin-bottom: 18px;
+}
+
+.mrri-sidebar ~ main .border-bottom {
+    border-color: var(--cx-ligne-douce) !important;
+}
+
+.mrri-sidebar ~ main .btn-outline-danger,
+.mrri-sidebar ~ main .btn-outline-secondary,
+.mrri-sidebar ~ main .btn-outline-success,
+.mrri-sidebar ~ main .btn-sm {
+    border-radius: 999px;
+}
+
+.mrri-sidebar ~ main .badge {
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+/* Blocs de modifier_structure.php */
+.mrri-sidebar ~ main .ms-bloc {
+    background: var(--cx-ivoire);
+    border-color: var(--cx-ligne);
+    border-radius: var(--radius-md);
+    padding: 1.5rem 1.5rem .75rem;
+}
+
+.mrri-sidebar ~ main .ms-bloc legend {
+    font-family: var(--font-title);
+    font-weight: 500;
+    font-size: 1.15rem;
+    color: var(--cx-texte);
+}
+
+/* =========================================================
+   MES ACTUALITÉS
+   ========================================================= */
+
+.page-avec-sidebar {
+    background: var(--cx-ivoire);
+}
+
+.contenu-principal {
+    margin-left: var(--mrri-sidebar-width);
+    padding: 44px 44px 56px;
+}
+
+.mes-actu-heading {
+    align-items: flex-end;
+    margin-bottom: 30px;
+}
+
+.mes-actu-heading h1 {
+    font-family: var(--font-title);
+    font-size: clamp(1.75rem, 2.6vw, 2.5rem);
+    font-weight: 500;
+    letter-spacing: -.02em;
+    color: var(--cx-texte);
+}
+
+.mes-actu-heading h1::before {
+    content: "✦";
+    display: block;
+    margin-bottom: 14px;
+    color: var(--cx-or);
+    font-family: var(--font-body);
+    font-size: 1rem;
+}
+
+.mes-actu-heading p {
+    margin-top: 10px;
+    color: var(--texte-secondaire);
+}
+
+.btn-retour {
+    border-radius: 999px;
+    border-color: var(--cx-ligne);
+    background: var(--cx-carte);
+    color: var(--cx-vert-fonce);
+}
+
+.btn-retour:hover {
+    border-color: var(--cx-vert-fonce);
+    color: var(--cx-vert-nuit);
+}
+
+.actu-liste {
+    counter-reset: actu;
+    gap: 12px;
+}
+
+.actu-row {
+    position: relative;
+    padding: 20px 24px 20px 84px;
+    border-color: var(--cx-ligne);
+    border-radius: var(--radius-md);
+    background: var(--cx-carte);
+}
+
+/* Numérotation 01, 02… à la manière des « priorités » */
+.actu-row::before {
+    counter-increment: actu;
+    content: counter(actu, decimal-leading-zero);
+    position: absolute;
+    left: 26px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--cx-or);
+    font-family: var(--font-title);
+    font-size: 1.6rem;
+    font-weight: 400;
+}
+
+.actu-row:hover {
+    border-color: rgba(212, 175, 55, .6);
+    box-shadow: var(--mrri-shadow-hover);
+}
+
+.actu-row-infos h3 {
+    font-family: var(--font-title);
+    font-weight: 500;
+    color: var(--cx-texte);
+}
+
+.actu-row-infos .actu-date {
+    color: var(--cx-gris);
+    font-size: .74rem;
+    letter-spacing: .02em;
+}
+
+.btn-supprimer {
+    border-radius: 999px;
+    border-color: #E6C3C0;
+}
+
+.actu-vide,
+.mod-vide {
+    border: 1px dashed #DAD2BF;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, .6);
+    color: var(--cx-gris);
+}
+
+/* =========================================================
+   MODÉRATION
+   ========================================================= */
+
+.mod-onglets {
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.mod-onglet {
+    border-radius: 999px;
+    border-color: var(--cx-ligne);
+    background: var(--cx-carte);
+    color: var(--texte-secondaire);
+}
+
+.mod-onglet:hover {
+    border-color: var(--cx-vert-fonce);
+    color: var(--cx-vert-fonce);
+}
+
+.mod-onglet.actif {
+    background: var(--cx-vert-fonce);
+    border-color: var(--cx-vert-fonce);
+    color: #fff;
+}
+
+.mod-onglet.actif .nb {
+    background: var(--cx-or);
+    color: var(--cx-vert-nuit);
+}
+
+.mod-carte {
+    border-color: var(--cx-ligne);
+    border-radius: var(--radius-md);
+    background: var(--cx-carte);
+    box-shadow: var(--shadow-sm);
+}
+
+.mod-meta strong {
+    color: var(--cx-texte);
+}
+
+.mod-btn {
+    border-radius: 999px;
+}
+
+/* =========================================================
+   STATISTIQUES
+   ========================================================= */
+
+.st-kpis {
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.st-kpi {
+    padding: 22px 24px;
+    background: var(--cx-carte);
+    border-color: var(--cx-ligne);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.st-kpi .lib {
+    color: var(--cx-gris);
+    font-size: .64rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.st-kpi .val {
+    margin: 10px 0 6px;
+    font-family: var(--font-title);
+    font-size: 2.3rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -.02em;
+    color: var(--cx-texte);
+}
+
+.st-kpi .lib + .val + .lib {
+    text-transform: none;
+    letter-spacing: .01em;
+    color: var(--cx-vert-fonce);
+}
+
+/* Couleurs des graphiques alignées sur la palette */
+.st-demographics {
+    --st-marine: var(--cx-bleu-roi);
+    --st-rouge: #C0392B;
+    --st-validee: var(--cx-vert);
+    --st-attente: var(--cx-or);
+    --st-rejetee: #C0392B;
+}
+
+.st-chart-effectif {
+    border-radius: 999px;
+    background: var(--cx-vert-pale);
+    color: var(--cx-vert-fonce);
+}
+
+.st-bascule {
+    border-radius: 999px;
+    border-color: var(--cx-ligne);
+    background: var(--cx-ivoire);
+}
+
+.st-bascule button {
+    border-radius: 999px;
+}
+
+.st-bascule button[aria-pressed="true"] {
+    background: var(--cx-carte);
+    color: var(--cx-vert-fonce);
+    box-shadow: 0 1px 4px rgba(23, 32, 51, .08);
+}
+
+.st-infobulle {
+    border-color: var(--cx-ligne);
+    border-radius: 14px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+    .mrri-content,
+    .contenu-principal {
+        padding: 32px 28px 44px;
+    }
+
+    .mrri-topbar {
+        padding: 0 28px;
+    }
+}
+
+/* theme.css retire la marge dès 991 px alors que le menu reste affiché jusqu'à 768 px :
+   la largeur du menu (0 sur téléphone) suffit à placer le contenu */
+@media (max-width: 991px) {
+    .contenu-principal {
+        margin-left: var(--mrri-sidebar-width);
+    }
+}
+
+/* ---------- Menu sur téléphone ---------- */
+.mrri-menu-btn,
+.mrri-sidebar-overlay {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mrri-menu-btn {
+        position: fixed;
+        top: 16px;
+        left: 14px;
+        z-index: 1100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: var(--cx-vert-fonce);
+        color: var(--cx-or);
+        box-shadow: 0 6px 16px rgba(0, 74, 34, .25);
+        cursor: pointer;
+        transition: left .25s ease, background var(--mrri-transition);
+    }
+
+    .mrri-menu-btn .fermer,
+    .menu-ouvert .mrri-menu-btn .ouvrir {
+        display: none;
+    }
+
+    .menu-ouvert .mrri-menu-btn .fermer {
+        display: block;
+    }
+
+    /* Menu ouvert : le bouton se place à droite du menu et devient une croix */
+    .menu-ouvert .mrri-menu-btn {
+        left: calc(min(264px, 82vw) + 12px);
+        background: #fff;
+        color: var(--cx-vert-fonce);
+    }
+
+    .mrri-sidebar {
+        width: min(264px, 82vw);
+        border-radius: 0 24px 24px 0;
+        box-shadow: none;
+    }
+
+    .mrri-sidebar.show {
+        box-shadow: 12px 0 40px rgba(0, 0, 0, .25);
+    }
+
+    .mrri-sidebar-overlay:not([hidden]) {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        background: rgba(10, 20, 15, .45);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+    }
+
+    /* La page ne défile pas derrière le menu ouvert */
+    body.menu-ouvert {
+        overflow: hidden;
+    }
+
+    /* Place réservée au bouton du menu */
+    .mrri-topbar {
+        height: 76px;
+        padding: 0 16px 0 72px;
+    }
+
+    .mrri-topbar-title {
+        font-size: .6rem;
+        letter-spacing: .1em;
+    }
+
+    .mrri-content {
+        padding: 24px 16px 36px;
+    }
+
+    .contenu-principal {
+        padding: 84px 16px 36px;
+    }
+
+    .mrri-sidebar ~ main.container {
+        width: auto;
+        margin-left: 12px;
+        margin-right: 12px;
+        margin-top: 80px !important;
+        padding: 28px 20px;
+        border-radius: var(--radius-md);
+    }
+
+    /* Formulaires en ligne (gestion des comptes) : retour à la ligne sur petit écran */
+    .mrri-sidebar ~ main form.d-flex {
+        flex-wrap: wrap;
+    }
+
+    .mrri-sidebar ~ main form.d-flex .form-control,
+    .mrri-sidebar ~ main form.d-flex .form-select {
+        flex: 1 1 160px;
+        width: auto !important;
+    }
+
+    .st-kpis {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .mrri-user-info {
+        display: none;
+    }
+
+    .mrri-user {
+        padding: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mrri-page-title {
+        font-size: 1.6rem;
+    }
+
+    .actu-row {
+        padding-left: 24px;
+    }
+
+    .actu-row::before {
+        display: none;
+    }
+}
